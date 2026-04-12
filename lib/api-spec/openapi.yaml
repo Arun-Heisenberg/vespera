@@ -3,13 +3,17 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Vespera luxury minaudières e-commerce API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: collection
+    description: Product collection operations
+  - name: cart
+    description: Cart and checkout operations
 paths:
   /healthz:
     get:
@@ -24,6 +28,102 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /collection:
+    get:
+      operationId: listCollection
+      tags: [collection]
+      summary: List all pieces in the collection
+      description: Returns all available minaudières in the collection
+      responses:
+        "200":
+          description: Collection pieces
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CollectionPiece"
+
+  /collection/{id}:
+    get:
+      operationId: getCollectionPiece
+      tags: [collection]
+      summary: Get a single collection piece
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Collection piece
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionPiece"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /collection/featured:
+    get:
+      operationId: getFeaturedPieces
+      tags: [collection]
+      summary: Get featured pieces for the home page
+      description: Returns a curated selection of featured pieces for the entrance
+      responses:
+        "200":
+          description: Featured pieces
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CollectionPiece"
+
+  /checkout:
+    post:
+      operationId: createCheckoutSession
+      tags: [cart]
+      summary: Create a Stripe checkout session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckoutRequest"
+      responses:
+        "200":
+          description: Checkout session URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /webhook:
+    post:
+      operationId: stripeWebhook
+      tags: [cart]
+      summary: Stripe webhook handler
+      responses:
+        "200":
+          description: Webhook received
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +134,95 @@ components:
       required:
         - status
 
+    CollectionPiece:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        stockCount:
+          type: integer
+        primaryImage:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+        material:
+          type: string
+        dimensions:
+          type: string
+        occasionStyling:
+          type: array
+          items:
+            type: string
+        artisanNotes:
+          type: string
+        isFeatured:
+          type: boolean
+        slug:
+          type: string
+      required:
+        - id
+        - title
+        - description
+        - price
+        - stockCount
+        - primaryImage
+        - images
+        - material
+        - dimensions
+        - occasionStyling
+        - artisanNotes
+        - isFeatured
+        - slug
+
+    CheckoutRequest:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CartItem"
+      required:
+        - items
+
+    CartItem:
+      type: object
+      properties:
+        pieceId:
+          type: integer
+        quantity:
+          type: integer
+      required:
+        - pieceId
+        - quantity
+
+    CheckoutResponse:
+      type: object
+      properties:
+        url:
+          type: string
+      required:
+        - url
+
+    WebhookResponse:
+      type: object
+      properties:
+        received:
+          type: boolean
+      required:
+        - received
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

@@ -1,0 +1,57 @@
+Role: Senior Full-Stack Architect & Creative Director for Luxury Brands.
+Objective: Build a world-class, production-ready e-commerce flagship for "Vespera"—an elite boutique for curated evening minaudières.
+
+1. Brand Identity & Asset Integration:
+
+Brand Name: Vespera.
+
+Logo: Use the uploaded logo.png in the navigation bar and footer. Ensure it is rendered with high fidelity and proper scaling.
+
+Aesthetic: "High-Fashion Editorial." Minimalist, high whitespace, cinematic transitions.
+
+Palette: Obsidian (#0A0A0A) background, Pure Alabaster (#FFFFFF) text, and Brushed Champagne (#D4AF37) for accents/buttons.
+
+Typography: Playfair Display (Serif) for headlines; Inter (Sans-serif) for body.
+
+2. Tech Stack:
+
+Frontend: Next.js 14 (App Router), Tailwind CSS, Framer Motion.
+
+Backend: Supabase (PostgreSQL) for Products, Customers, and Orders.
+
+Payments: Stripe SDK for secure, frictionless checkout.
+
+3. Database Schema (Supabase):
+Initialize tables for:
+
+collection: (id, title, description, price, stock_count, primary_image, details_json).
+
+orders: (id, status, total_amount, stripe_session_id, shipping_details).
+
+customers: (id, email, full_name).
+
+4. The 5 Premium Pages:
+
+The Entrance (Home): Hero section featuring the Vespera logo and a "Discovery" CTA. Use an elegant fade-in animation for the logo on page load.
+
+The Atelier (Shop): A 3-column gallery grid. Products should have a "Soft Zoom" effect on hover.
+
+The Detail (Product): Multi-image gallery, "Artisan Notes" (description), and "Occasion Styling" suggestions.
+
+The Archive (About): A narrative-style page focusing on the curation of these sculptural silhouettes.
+
+The Concierge (Cart/Checkout): A sliding side-drawer cart that leads to a Stripe-hosted premium checkout page.
+
+5. Premium Copywriting & UI Logic:
+
+Language: Use terms like "Acquire Piece," "Available in the Atelier," and "Sculptural Silhouette."
+
+Animations: Use Framer Motion for a "staggered" entrance of product cards to give a sense of curated luxury.
+
+Mobile First: Ensure the logo and navigation are perfectly centered and elegant on mobile devices.
+
+6. Deployment Instructions:
+
+Create API routes for /api/checkout and /api/webhook.
+
+Ensure all SEO metadata (title, description, open-graph tags) uses the "Vespera" branding.
