@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, pool, collectionTable, ordersTable, orderItemsTable, paymentsTable, customersTable } from "@workspace/db";
-import { inArray, eq, sql } from "drizzle-orm";
+import { inArray, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import Razorpay from "razorpay";
 import crypto from "crypto";
@@ -20,9 +20,8 @@ async function generateOrderNumber(): Promise<string> {
   const now = new Date();
   const date = now.toISOString().slice(0, 10).replace(/-/g, "");
   const prefix = `VES-${date}`;
-  const result = await db.execute(sql`SELECT nextval('order_number_seq') AS seq`);
-  const rows = result as unknown as Array<{ seq: string }>;
-  const seq = Number(rows[0].seq);
+  const result = await pool.query<{ seq: string }>("SELECT nextval('order_number_seq') AS seq");
+  const seq = Number(result.rows[0].seq);
   return `${prefix}-${String(seq).padStart(4, "0")}`;
 }
 
@@ -206,7 +205,9 @@ router.post("/checkout/verify", requireAuth, async (req, res): Promise<void> => 
       if (razorpay) {
         try {
           const paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
-          paymentMethod = (paymentDetails as unknown as Record<string, unknown>).method as string | undefined;
+          if ("method" in paymentDetails && typeof paymentDetails.method === "string") {
+            paymentMethod = paymentDetails.method;
+          }
         } catch {
           req.log.warn({ paymentId: razorpay_payment_id }, "Could not fetch payment method from Razorpay");
         }
