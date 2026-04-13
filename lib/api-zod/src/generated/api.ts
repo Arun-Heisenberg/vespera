@@ -113,3 +113,106 @@ export const VerifyPaymentBody = zod.object({
 export const VerifyPaymentResponse = zod.object({
   verified: zod.boolean(),
 });
+
+/**
+ * @summary Create a new product
+ */
+export const AdminCreateProductBody = zod.object({
+  title: zod.string(),
+  description: zod.string(),
+  price: zod.number(),
+  stockCount: zod.number().optional(),
+  primaryImage: zod.string(),
+  images: zod.array(zod.string()).optional(),
+  material: zod.string().optional(),
+  dimensions: zod.string().optional(),
+  occasionStyling: zod.array(zod.string()).optional(),
+  artisanNotes: zod.string().optional(),
+  isFeatured: zod.boolean().optional(),
+  slug: zod.string(),
+});
+
+/**
+ * @summary Update an existing product
+ */
+export const AdminUpdateProductParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const AdminUpdateProductBody = zod.object({
+  title: zod.string(),
+  description: zod.string(),
+  price: zod.number(),
+  stockCount: zod.number().optional(),
+  primaryImage: zod.string(),
+  images: zod.array(zod.string()).optional(),
+  material: zod.string().optional(),
+  dimensions: zod.string().optional(),
+  occasionStyling: zod.array(zod.string()).optional(),
+  artisanNotes: zod.string().optional(),
+  isFeatured: zod.boolean().optional(),
+  slug: zod.string(),
+});
+
+export const AdminUpdateProductResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  description: zod.string(),
+  price: zod.number(),
+  stockCount: zod.number(),
+  primaryImage: zod.string(),
+  images: zod.array(zod.string()),
+  material: zod.string(),
+  dimensions: zod.string(),
+  occasionStyling: zod.array(zod.string()),
+  artisanNotes: zod.string(),
+  isFeatured: zod.boolean(),
+  slug: zod.string(),
+});
+
+/**
+ * @summary Delete a product
+ */
+export const AdminDeleteProductParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const AdminDeleteProductResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+
+export const RequestUploadUrlBody = zod.object({
+  name: zod.string().min(1),
+  size: zod.number().min(1),
+  contentType: zod.string().min(1),
+});
+
+export const RequestUploadUrlResponse = zod.object({
+  uploadURL: zod.string().url(),
+  objectPath: zod.string(),
+  metadata: zod
+    .object({
+      name: zod.string().min(1),
+      size: zod.number().min(1),
+      contentType: zod.string().min(1),
+    })
+    .optional(),
+});
+
+/**
+ * @summary Serve a public asset from PUBLIC_OBJECT_SEARCH_PATHS
+ */
+export const GetPublicObjectParams = zod.object({
+  filePath: zod.coerce.string(),
+});
+
+/**
+ * @summary Serve an object entity from PRIVATE_OBJECT_DIR
+ */
+export const GetStorageObjectParams = zod.object({
+  objectPath: zod.coerce.string(),
+});

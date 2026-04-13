@@ -6,11 +6,15 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./adminDeleteProduct200";
+export * from "./adminProductInput";
 export * from "./cartItem";
 export * from "./checkoutRequest";
 export * from "./checkoutResponse";
 export * from "./collectionPiece";
 export * from "./errorResponse";
 export * from "./healthStatus";
+export * from "./uploadUrlRequest";
+export * from "./uploadUrlResponse";
 export * from "./verifyPaymentRequest";
 export * from "./verifyPaymentResponse";

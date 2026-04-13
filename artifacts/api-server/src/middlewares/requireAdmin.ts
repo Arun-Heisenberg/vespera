@@ -1,7 +1,7 @@
 import { getAuth, clerkClient } from "@clerk/express";
 import type { Request, Response, NextFunction } from "express";
 
-const ADMIN_EMAILS = ["admin@vespera.com"];
+const ADMIN_EMAILS = ["admin@vespera.com", "avkvasp1@gmail.com"];
 
 interface VesperaPublicMetadata {
   role?: string;

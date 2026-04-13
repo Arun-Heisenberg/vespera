@@ -75,11 +75,23 @@ Luxury e-commerce flagship for curated evening minaudières targeting Indian aud
 
 **User Data Sync:** On sign-in, user data (email, phone, name, avatar) is automatically synced to the `customers` table via `POST /api/users/sync`. The `GET /api/users/me` endpoint returns the current user's data.
 
-**Admin:** Client-side role gating via Clerk `publicMetadata.role === "admin"` or hardcoded admin emails. Admin panel at `/admin` shows product overview and product table.
+**Admin:** Client-side role gating via Clerk `publicMetadata.role === "admin"` or allowed admin emails (`admin@vespera.com`, `avkvasp1@gmail.com`). Admin panel at `/admin` with 3 tabs: Overview, Products (CRUD), Orders.
+
+**Admin Product Management:** Full CRUD for products with image upload support via Object Storage (GCS presigned URLs). Admin can add, edit, and delete products with: title, description, price, stock count, product image (upload or URL), material, dimensions, artisan notes, featured toggle, and slug.
+
+**Object Storage:** GCS-backed storage for product image uploads. Upload route (`POST /api/storage/uploads/request-url`) requires admin auth. Only image files (JPEG, PNG, WebP, GIF, AVIF) up to 10MB allowed. Images served via `GET /api/storage/objects/*`.
 
 **Auth Pages:** `/sign-in`, `/sign-up` (Clerk components), `/account` (profile page with sign-out, shows phone if available).
 
 **Razorpay:** Requires `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` secrets. Prices in INR. Frontend loads Razorpay JS popup for checkout.
+
+**API Routes (admin):**
+- `POST /admin/collection` — create product (admin, Zod-validated)
+- `PUT /admin/collection/:id` — update product (admin, Zod-validated)
+- `DELETE /admin/collection/:id` — delete product (admin)
+- `POST /storage/uploads/request-url` — presigned upload URL (admin)
+- `GET /storage/objects/*` — serve uploaded images
+- `GET /storage/public-objects/*` — serve public assets
 
 ### API Server (api, at `/api`)
 Express 5 backend with Clerk auth middleware.

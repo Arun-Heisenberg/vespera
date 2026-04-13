@@ -25,6 +25,21 @@ export interface CollectionPiece {
   slug: string;
 }
 
+export interface AdminProductInput {
+  title: string;
+  description: string;
+  price: number;
+  stockCount?: number;
+  primaryImage: string;
+  images?: string[];
+  material?: string;
+  dimensions?: string;
+  occasionStyling?: string[];
+  artisanNotes?: string;
+  isFeatured?: boolean;
+  slug: string;
+}
+
 export interface CartItem {
   pieceId: number;
   quantity: number;
@@ -51,6 +66,25 @@ export interface VerifyPaymentResponse {
   verified: boolean;
 }
 
+export interface UploadUrlRequest {
+  /** @minLength 1 */
+  name: string;
+  /** @minimum 1 */
+  size: number;
+  /** @minLength 1 */
+  contentType: string;
+}
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+  metadata?: UploadUrlRequest;
+}
+
 export interface ErrorResponse {
   error: string;
 }
+
+export type AdminDeleteProduct200 = {
+  success: boolean;
+};

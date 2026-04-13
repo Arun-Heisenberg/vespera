@@ -22,39 +22,28 @@ router.post("/users/sync", async (req, res): Promise<void> => {
   };
 
   try {
-    const existing = await db
-      .select()
-      .from(customersTable)
-      .where(eq(customersTable.clerkUserId, clerkUserId))
-      .limit(1);
+    const [result] = await db
+      .insert(customersTable)
+      .values({
+        clerkUserId,
+        email: email || null,
+        phone: phone || null,
+        fullName: fullName || "Valued Client",
+        avatarUrl: avatarUrl || null,
+      })
+      .onConflictDoUpdate({
+        target: customersTable.clerkUserId,
+        set: {
+          email: email || undefined,
+          phone: phone || undefined,
+          fullName: fullName || undefined,
+          avatarUrl: avatarUrl || undefined,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
 
-    if (existing.length > 0) {
-      const updates: Record<string, unknown> = { updatedAt: new Date() };
-      if (email !== undefined) updates.email = email;
-      if (phone !== undefined) updates.phone = phone;
-      if (fullName !== undefined) updates.fullName = fullName;
-      if (avatarUrl !== undefined) updates.avatarUrl = avatarUrl;
-
-      await db
-        .update(customersTable)
-        .set(updates)
-        .where(eq(customersTable.clerkUserId, clerkUserId));
-
-      res.json({ status: "updated", customerId: existing[0].id });
-    } else {
-      const [newCustomer] = await db
-        .insert(customersTable)
-        .values({
-          clerkUserId,
-          email: email || null,
-          phone: phone || null,
-          fullName: fullName || "Valued Client",
-          avatarUrl: avatarUrl || null,
-        })
-        .returning();
-
-      res.json({ status: "created", customerId: newCustomer.id });
-    }
+    res.json({ status: "synced", customerId: result.id });
   } catch (err) {
     req.log.error({ err }, "User sync error");
     res.status(500).json({ error: "Failed to sync user data" });
