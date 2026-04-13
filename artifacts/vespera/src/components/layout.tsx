@@ -47,7 +47,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         }`}
       >
         <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
-          <div className="w-20 md:w-1/3 flex items-center">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => setIsMenuOpen(true)}
               className="text-foreground hover:text-primary transition-colors"
@@ -56,20 +56,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <Menu className="w-5 h-5" />
             </button>
 
-            <nav className="hidden md:flex items-center gap-8 ml-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm tracking-widest uppercase hover:text-primary transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          <div className="flex-1 md:w-1/3 flex justify-center">
             <Link href="/" className="block">
               <img 
                 src="/logo.png" 
@@ -80,11 +66,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
                 }}
               />
-              <span className="hidden font-serif text-2xl tracking-widest">VESPERA</span>
+              <span className="hidden font-serif text-2xl tracking-widest text-primary">VESPERA</span>
             </Link>
           </div>
 
-          <div className="flex items-center justify-end w-20 md:w-1/3 gap-6">
+          <div className="flex items-center gap-6">
             <button 
               onClick={() => setIsCartOpen(true)}
               className="text-sm tracking-widest uppercase hover:text-primary transition-colors flex items-center gap-2 group"
