@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useListCollection } from "@workspace/api-client-react";
 import { formatPrice } from "@/components/cart-drawer";
-import { Shield, Package, ShoppingCart, Clock, CheckCircle, XCircle, ArrowLeft, Eye, Plus, Pencil, Trash2, Upload, X, ImageIcon, ChevronUp, ChevronDown } from "lucide-react";
+import { Shield, Package, ShoppingCart, Clock, CheckCircle, XCircle, ArrowLeft, Eye, Plus, Pencil, Trash2, Upload, X, ImageIcon, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
 
 const ADMIN_EMAILS = ["admin@vespera.com", "avkvasp1@gmail.com"];
 
@@ -868,86 +868,79 @@ function AdminDashboard() {
               </Button>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border/20">
-                    <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Order</th>
-                    <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Image</th>
-                    <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Name</th>
-                    <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Price</th>
-                    <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Stock</th>
-                    <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Featured</th>
-                    <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {productsLoading ? (
-                    <tr><td colSpan={7} className="py-8 text-center text-muted-foreground">Loading...</td></tr>
-                  ) : pieces?.map((piece, index) => (
-                    <tr key={piece.id} className="border-b border-border/10 hover:bg-secondary/5 transition-colors">
-                      <td className="py-3 px-4">
-                        <div className="flex flex-col items-center gap-0.5">
-                          <button
-                            onClick={() => handleMoveProduct(index, "up")}
-                            disabled={index === 0}
-                            className={`p-1 transition-colors ${index === 0 ? "text-muted-foreground/20 cursor-not-allowed" : "text-muted-foreground hover:text-primary"}`}
-                            title="Move up"
-                          >
-                            <ChevronUp className="w-4 h-4" />
-                          </button>
-                          <span className="text-xs text-muted-foreground/50">{index + 1}</span>
-                          <button
-                            onClick={() => handleMoveProduct(index, "down")}
-                            disabled={!pieces || index === pieces.length - 1}
-                            className={`p-1 transition-colors ${!pieces || index === pieces.length - 1 ? "text-muted-foreground/20 cursor-not-allowed" : "text-muted-foreground hover:text-primary"}`}
-                            title="Move down"
-                          >
-                            <ChevronDown className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="w-12 h-12 bg-secondary overflow-hidden">
-                          {piece.primaryImage ? (
-                            <img src={piece.primaryImage} alt={piece.title} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <ImageIcon className="w-5 h-5 text-muted-foreground/30" />
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 font-serif">{piece.title}</td>
-                      <td className="py-3 px-4">{formatPrice(piece.price)}</td>
-                      <td className="py-3 px-4">{piece.stockCount}</td>
-                      <td className="py-3 px-4">
-                        <span className={`text-xs px-2 py-1 ${piece.isFeatured ? "bg-primary/20 text-primary" : "bg-secondary/40 text-muted-foreground"}`}>
-                          {piece.isFeatured ? "Yes" : "No"}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleEditProduct(piece)}
-                            className="text-muted-foreground hover:text-primary transition-colors p-1"
-                            title="Edit"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => setDeletingProduct({ id: piece.id, title: piece.title })}
-                            className="text-muted-foreground hover:text-red-400 transition-colors p-1"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="space-y-0">
+              {productsLoading ? (
+                <p className="py-8 text-center text-muted-foreground">Loading...</p>
+              ) : pieces?.map((piece, index) => (
+                <div
+                  key={piece.id}
+                  className="flex items-center gap-3 md:gap-4 py-3 px-2 md:px-4 border-b border-border/10 hover:bg-secondary/5 transition-colors group"
+                >
+                  <div className="flex flex-col items-center gap-0 shrink-0">
+                    <button
+                      onClick={() => handleMoveProduct(index, "up")}
+                      disabled={index === 0}
+                      className={`p-1 rounded transition-colors ${index === 0 ? "text-muted-foreground/15 cursor-not-allowed" : "text-muted-foreground/50 hover:text-primary hover:bg-primary/10"}`}
+                      title="Move up"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <GripVertical className="w-4 h-4 text-muted-foreground/25" />
+                    <button
+                      onClick={() => handleMoveProduct(index, "down")}
+                      disabled={!pieces || index === pieces.length - 1}
+                      className={`p-1 rounded transition-colors ${!pieces || index === pieces.length - 1 ? "text-muted-foreground/15 cursor-not-allowed" : "text-muted-foreground/50 hover:text-primary hover:bg-primary/10"}`}
+                      title="Move down"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <span className="text-xs text-muted-foreground/30 w-5 text-center shrink-0">{index + 1}</span>
+
+                  <div className="w-12 h-12 bg-secondary overflow-hidden shrink-0">
+                    {piece.primaryImage ? (
+                      <img src={piece.primaryImage} alt={piece.title} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ImageIcon className="w-5 h-5 text-muted-foreground/30" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="font-serif text-sm truncate">{piece.title}</p>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground/50">
+                      <span>{formatPrice(piece.price)}</span>
+                      <span>·</span>
+                      <span>Stock: {piece.stockCount}</span>
+                      {piece.isFeatured && (
+                        <>
+                          <span>·</span>
+                          <span className="text-primary/70">Featured</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleEditProduct(piece)}
+                      className="text-muted-foreground hover:text-primary transition-colors p-2"
+                      title="Edit"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setDeletingProduct({ id: piece.id, title: piece.title })}
+                      className="text-muted-foreground hover:text-red-400 transition-colors p-2"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
