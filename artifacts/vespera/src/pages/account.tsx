@@ -3,7 +3,7 @@ import { useUser, useClerk, Show } from "@clerk/react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, Mail, Calendar } from "lucide-react";
+import { LogOut, User, Mail, Calendar, Phone } from "lucide-react";
 
 function AccountContent() {
   const { user } = useUser();
@@ -45,6 +45,13 @@ function AccountContent() {
                 <span className="text-sm text-muted-foreground">Email</span>
                 <span className="text-sm ml-auto">{user.primaryEmailAddress?.emailAddress}</span>
               </div>
+              {user.primaryPhoneNumber?.phoneNumber && (
+                <div className="flex items-center gap-3 py-3 border-b border-border/10">
+                  <Phone className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Phone</span>
+                  <span className="text-sm ml-auto">{user.primaryPhoneNumber.phoneNumber}</span>
+                </div>
+              )}
               <div className="flex items-center gap-3 py-3 border-b border-border/10">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Member since</span>

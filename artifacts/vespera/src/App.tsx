@@ -17,6 +17,7 @@ import ClientCare from "@/pages/client-care";
 import Legal from "@/pages/legal";
 import Account from "@/pages/account";
 import Admin from "@/pages/admin";
+import { useUserSync } from "@/hooks/use-user-sync";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -105,6 +106,11 @@ function AppRoutes() {
   );
 }
 
+function UserSyncProvider({ children }: { children: React.ReactNode }) {
+  useUserSync();
+  return <>{children}</>;
+}
+
 function ClerkProviderWithRoutes() {
   const [, setLocation] = useLocation();
 
@@ -117,16 +123,18 @@ function ClerkProviderWithRoutes() {
     >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
-        <TooltipProvider>
-          <CartProvider>
-            <Switch>
-              <Route path="/sign-in/*?" component={SignInPage} />
-              <Route path="/sign-up/*?" component={SignUpPage} />
-              <Route component={AppRoutes} />
-            </Switch>
-          </CartProvider>
-          <Toaster />
-        </TooltipProvider>
+        <UserSyncProvider>
+          <TooltipProvider>
+            <CartProvider>
+              <Switch>
+                <Route path="/sign-in/*?" component={SignInPage} />
+                <Route path="/sign-up/*?" component={SignUpPage} />
+                <Route component={AppRoutes} />
+              </Switch>
+            </CartProvider>
+            <Toaster />
+          </TooltipProvider>
+        </UserSyncProvider>
       </QueryClientProvider>
     </ClerkProvider>
   );

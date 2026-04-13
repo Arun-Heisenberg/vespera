@@ -4,11 +4,15 @@ import { z } from "zod/v4";
 
 export const customersTable = pgTable("customers", {
   id: serial("id").primaryKey(),
-  email: text("email").notNull().unique(),
+  clerkUserId: text("clerk_user_id").unique(),
+  email: text("email"),
+  phone: text("phone"),
   fullName: text("full_name").notNull(),
+  avatarUrl: text("avatar_url"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const insertCustomerSchema = createInsertSchema(customersTable).omit({ id: true, createdAt: true });
+export const insertCustomerSchema = createInsertSchema(customersTable).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertCustomer = z.infer<typeof insertCustomerSchema>;
 export type Customer = typeof customersTable.$inferSelect;

@@ -55,11 +55,13 @@ Luxury e-commerce flagship for curated evening minaudières targeting Indian aud
 - `POST /checkout` — create Razorpay order
 - `POST /checkout/verify` — verify Razorpay payment signature
 
-**Authentication:** Clerk (whitelabel). Frontend uses `@clerk/react` with `ClerkProvider` wrapping wouter routes. Backend uses `@clerk/express` with `clerkMiddleware()`. Clerk proxy middleware at `/api/__clerk` for production. Checkout routes (`POST /checkout`, `POST /checkout/verify`) require authentication via `requireAuth` middleware.
+**Authentication:** Clerk (whitelabel). Frontend uses `@clerk/react` with `ClerkProvider` wrapping wouter routes. Backend uses `@clerk/express` with `clerkMiddleware()`. Clerk proxy middleware at `/api/__clerk` for production. Checkout routes (`POST /checkout`, `POST /checkout/verify`) require authentication via `requireAuth` middleware. Phone number login can be enabled via Auth pane in workspace toolbar.
+
+**User Data Sync:** On sign-in, user data (email, phone, name, avatar) is automatically synced to the `customers` table via `POST /api/users/sync`. The `GET /api/users/me` endpoint returns the current user's data.
 
 **Admin:** Client-side role gating via Clerk `publicMetadata.role === "admin"` or hardcoded admin emails. Admin panel at `/admin` shows product overview and product table.
 
-**Auth Pages:** `/sign-in`, `/sign-up` (Clerk components), `/account` (profile page with sign-out).
+**Auth Pages:** `/sign-in`, `/sign-up` (Clerk components), `/account` (profile page with sign-out, shows phone if available).
 
 **Razorpay:** Requires `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` secrets. Prices in INR. Frontend loads Razorpay JS popup for checkout.
 
