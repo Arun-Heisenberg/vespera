@@ -63,10 +63,7 @@ export default function OurStory() {
               <h2 className="text-3xl font-serif">Architecture in Miniature</h2>
               <div className="prose prose-invert text-muted-foreground font-sans">
                 <p className="leading-relaxed">
-                  Vespera was founded on a singular premise: that the evening bag should be approached not as a soft accessory, but as a rigid sculptural object. A piece of architecture meant to be held.
-                </p>
-                <p className="leading-relaxed">
-                  The minaudière requires discipline. Its boundaries are finite. It demands that we edit what we carry down to the absolute essentials, elevating the act of possession into something deliberate and considered.
+                  Our designs redefine elegance through precise, small-scale structural mastery. Each clutch is a balanced silhouette, featuring the signature rigid pearl-bead handles and structured envelope bases that echo high-fashion couture. We transform classic accessories into petite architectural statements, ensuring every piece is a perfectly proportioned masterpiece for the modern young trendsetter.
                 </p>
               </div>
             </motion.div>
@@ -95,10 +92,7 @@ export default function OurStory() {
               <h2 className="text-3xl font-serif">Material Honesty</h2>
               <div className="prose prose-invert text-muted-foreground font-sans">
                 <p className="leading-relaxed">
-                  We work with materials that possess inherent structural integrity—machined brass, polished resin, carved obsidian, and tempered glass. We do not disguise them. 
-                </p>
-                <p className="leading-relaxed">
-                  The weight of a Vespera piece is intentional. It anchors you in the present moment. The cool touch of metal against the hand serves as a tactile reminder of the object's permanence.
+                  We curate an opulent palette of textures, from the romantic whisper of delicate lace and tulle to the sophisticated tactile depth of premium tweed. Every shimmering sequin and luminous pearl is hand-selected to create a multi-dimensional finish that radiates pure luxury. Our commitment to quality ensures that each piece offers a tactile experience of sophistication, blending durable craftsmanship with an ethereal, high-end aesthetic.
                 </p>
               </div>
             </motion.div>
