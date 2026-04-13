@@ -25,58 +25,46 @@ export default function Collection() {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 25 },
     show: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
     }
   };
 
   return (
-    <div className="flex flex-col luxury-noise">
-      <div className="relative py-6 md:py-8 overflow-hidden">
+    <div className="flex flex-col">
+      <div className="relative py-10 md:py-16 overflow-hidden">
         <div className="absolute inset-0 luxury-glow z-0" />
-        <div className="max-w-xl mx-auto text-center px-4 relative z-10">
-          <motion.h1 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-2xl md:text-3xl font-serif mb-2"
-          >
-            Our Collection
-          </motion.h1>
+        <div className="max-w-2xl mx-auto text-center px-6 relative z-10">
           <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            className="gold-divider w-10 mx-auto mb-2"
-          />
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-muted-foreground font-sans text-xs tracking-wide"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            Wearable sculptures merging architectural forms with artisan techniques.
-          </motion.p>
+            <span className="text-[10px] uppercase tracking-[0.4em] text-primary/50 block mb-3 font-light">The Collection</span>
+            <h1 className="text-3xl md:text-5xl font-serif mb-4">
+              Evening Minaudières
+            </h1>
+            <p className="text-foreground/40 text-sm md:text-base font-light max-w-md mx-auto">
+              Wearable sculptures merging architectural forms with artisan techniques.
+            </p>
+          </motion.div>
         </div>
       </div>
 
       <div className="gold-divider w-full" />
 
-      <div className="container mx-auto px-4 md:px-8 py-6 md:py-10 relative z-10">
+      <div className="w-full px-5 md:px-10 py-10 md:py-16 relative z-10">
         {isLoading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
             {Array(6).fill(0).map((_, i) => (
-              <div key={i} className="card-luxury p-2 pb-3">
-                <Skeleton className="aspect-[4/5] w-full bg-secondary/40 rounded-none" />
-                <div className="pt-3 px-1">
-                  <Skeleton className="h-4 w-2/3 bg-secondary/40 rounded-none" />
-                  <div className="flex justify-between mt-1.5">
-                    <Skeleton className="h-3 w-1/3 bg-secondary/40 rounded-none" />
-                    <Skeleton className="h-3 w-1/4 bg-secondary/40 rounded-none" />
-                  </div>
+              <div key={i}>
+                <Skeleton className="aspect-[3/4] w-full bg-secondary/30 rounded-none" />
+                <div className="pt-5">
+                  <Skeleton className="h-5 w-2/3 bg-secondary/30 rounded-none" />
+                  <Skeleton className="h-4 w-1/3 bg-secondary/30 rounded-none mt-2" />
                 </div>
               </div>
             ))}
@@ -86,18 +74,18 @@ export default function Collection() {
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5"
+            className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
           >
             {pieces?.map((piece) => (
-              <motion.div key={piece.id} variants={itemVariants} className="group card-luxury p-2 pb-3">
-                <Link href={`/collection/${piece.slug}`} className="block relative aspect-[4/5] bg-secondary overflow-hidden">
-                  <div className="absolute inset-0 bg-secondary flex items-center justify-center -z-10">
-                    <span className="font-serif text-muted-foreground/15 text-xs tracking-widest uppercase">Vespera</span>
+              <motion.div key={piece.id} variants={itemVariants} className="group">
+                <Link href={`/collection/${piece.slug}`} className="block relative aspect-[3/4] bg-secondary/50 overflow-hidden">
+                  <div className="absolute inset-0 bg-secondary/50 flex items-center justify-center -z-10">
+                    <span className="font-serif text-muted-foreground/10 text-sm tracking-[0.3em] uppercase">Vespera</span>
                   </div>
                   
                   <motion.img 
-                    whileHover={{ scale: 1.04 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                     src={piece.primaryImage}
                     alt={piece.title}
                     className="w-full h-full object-cover relative z-10"
@@ -107,7 +95,7 @@ export default function Collection() {
                   />
                   
                   {piece.images && piece.images.length > 0 && (
-                    <div className="absolute inset-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-600 bg-background">
+                    <div className="absolute inset-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                       <img 
                         src={piece.images[0]}
                         alt={`${piece.title} detail`}
@@ -120,35 +108,35 @@ export default function Collection() {
                   )}
                   
                   {piece.stockCount <= 2 && piece.stockCount > 0 && (
-                    <div className="absolute top-2 right-2 z-30">
-                      <span className="bg-background/80 backdrop-blur-md border border-primary/20 text-primary/80 px-2 py-0.5 text-[9px] uppercase tracking-[0.12em]">
+                    <div className="absolute top-3 left-3 z-30">
+                      <span className="bg-background/80 backdrop-blur-md text-foreground/70 px-3 py-1 text-[9px] uppercase tracking-[0.15em] font-light">
                         Limited
                       </span>
                     </div>
                   )}
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 z-[25] flex items-end justify-center pb-4">
-                    <span className="bg-background/80 backdrop-blur-sm text-foreground px-4 py-1.5 text-[9px] uppercase tracking-[0.15em] font-medium border border-primary/20">
+                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-background/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-[25]" />
+                  
+                  <div className="absolute bottom-5 left-0 right-0 z-30 flex justify-center opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-foreground font-light">
                       View Details
                     </span>
                   </div>
                 </Link>
                 
-                <div className="flex flex-col pt-3 px-1">
-                  <div className="flex justify-between items-baseline mb-1">
-                    <h3 className="font-serif text-sm md:text-base group-hover:text-primary transition-colors truncate">
-                      <Link href={`/collection/${piece.slug}`}>{piece.title}</Link>
-                    </h3>
-                    <span className="font-sans text-xs tracking-wide whitespace-nowrap ml-2 text-primary/80">
+                <div className="pt-4 md:pt-5">
+                  <h3 className="font-serif text-base md:text-lg mb-1 group-hover:text-primary transition-colors duration-400">
+                    <Link href={`/collection/${piece.slug}`}>{piece.title}</Link>
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] text-muted-foreground/40 tracking-[0.15em] uppercase font-light truncate">{piece.material}</p>
+                    <span className="text-sm text-foreground/60 font-light whitespace-nowrap ml-2">
                       {formatPrice(piece.price)}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <p className="text-[10px] text-muted-foreground/50 tracking-wider uppercase truncate">{piece.material}</p>
-                    {piece.stockCount === 0 && (
-                      <span className="text-[9px] uppercase tracking-[0.12em] text-destructive/80">Sold Out</span>
-                    )}
-                  </div>
+                  {piece.stockCount === 0 && (
+                    <span className="text-[9px] uppercase tracking-[0.15em] text-destructive/70 mt-1 block font-light">Sold Out</span>
+                  )}
                 </div>
               </motion.div>
             ))}

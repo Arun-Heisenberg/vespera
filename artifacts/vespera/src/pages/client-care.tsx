@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { Mail, Phone, Clock, MapPin, ChevronRight } from "lucide-react";
+import { Mail, Phone, Clock, MapPin, ChevronDown, ArrowRight } from "lucide-react";
 
 const faqs = [
   {
@@ -51,76 +51,85 @@ export default function ClientCare() {
 
   return (
     <div className="flex flex-col">
-      <section className="container mx-auto px-4 md:px-8 py-6 md:py-8 max-w-4xl">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-6"
-        >
-          <h1 className="text-2xl md:text-3xl font-serif mb-2">Client Care</h1>
-          <p className="text-muted-foreground font-sans text-xs max-w-md mx-auto">
-            Questions about your order, our products, or anything else? We're here to help.
-          </p>
-        </motion.div>
+      <section className="relative py-12 md:py-20 overflow-hidden">
+        <div className="absolute inset-0 luxury-glow z-0" />
+        <div className="relative z-10 text-center px-6 max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <span className="text-[10px] uppercase tracking-[0.4em] text-primary/50 block mb-3 font-light">We're Here For You</span>
+            <h1 className="text-3xl md:text-5xl font-serif mb-4">Client Care</h1>
+            <p className="text-foreground/40 text-sm md:text-base font-light max-w-md mx-auto">
+              Questions about your order, our products, or anything else? We're here to help.
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
+      <div className="gold-divider w-full" />
+
+      <section className="w-full px-5 md:px-10 py-12 md:py-16 max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8"
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-16 md:mb-20"
         >
-          <a href="mailto:care@vespera.in" className="border border-border/20 p-4 text-center group hover:border-primary/30 transition-colors">
-            <Mail className="w-4 h-4 text-primary mx-auto mb-2" />
-            <h3 className="font-serif text-sm mb-1">Email</h3>
-            <span className="text-[11px] text-muted-foreground group-hover:text-primary transition-colors">care@vespera.in</span>
-          </a>
-          <a href="tel:+911234567890" className="border border-border/20 p-4 text-center group hover:border-primary/30 transition-colors">
-            <Phone className="w-4 h-4 text-primary mx-auto mb-2" />
-            <h3 className="font-serif text-sm mb-1">Phone</h3>
-            <span className="text-[11px] text-muted-foreground group-hover:text-primary transition-colors">+91 12345 67890</span>
-          </a>
-          <div className="border border-border/20 p-4 text-center group hover:border-primary/30 transition-colors">
-            <Clock className="w-4 h-4 text-primary mx-auto mb-2" />
-            <h3 className="font-serif text-sm mb-1">Hours</h3>
-            <p className="text-[11px] text-muted-foreground">Mon – Sat, 10 AM – 7 PM IST</p>
-          </div>
-          <div className="border border-border/20 p-4 text-center group hover:border-primary/30 transition-colors">
-            <MapPin className="w-4 h-4 text-primary mx-auto mb-2" />
-            <h3 className="font-serif text-sm mb-1">Studio</h3>
-            <p className="text-[11px] text-muted-foreground">Mumbai, Maharashtra, India</p>
-          </div>
+          {[
+            { icon: Mail, title: "Email", detail: "care@vespera.in", href: "mailto:care@vespera.in" },
+            { icon: Phone, title: "Phone", detail: "+91 12345 67890", href: "tel:+911234567890" },
+            { icon: Clock, title: "Hours", detail: "Mon – Sat, 10 AM – 7 PM IST" },
+            { icon: MapPin, title: "Studio", detail: "Mumbai, Maharashtra, India" },
+          ].map((item, i) => {
+            const Wrapper = item.href ? 'a' : 'div';
+            return (
+              <Wrapper
+                key={item.title}
+                {...(item.href ? { href: item.href } : {})}
+                className="group border border-border/10 p-6 md:p-8 text-center hover:border-primary/20 transition-all duration-500"
+              >
+                <item.icon className="w-5 h-5 text-primary/60 mx-auto mb-4" strokeWidth={1.5} />
+                <h3 className="font-serif text-sm md:text-base mb-2">{item.title}</h3>
+                <span className="text-[11px] md:text-xs text-foreground/40 group-hover:text-primary/70 transition-colors duration-300 font-light">{item.detail}</span>
+              </Wrapper>
+            );
+          })}
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
+          transition={{ duration: 0.6 }}
+          className="mb-16 md:mb-20"
         >
-          <h2 className="text-xl font-serif text-center mb-2">Frequently Asked Questions</h2>
-          <p className="text-[11px] text-muted-foreground text-center mb-5 max-w-sm mx-auto">
-            Common questions about orders, shipping, returns, and more.
-          </p>
+          <div className="text-center mb-10">
+            <span className="text-[10px] uppercase tracking-[0.4em] text-primary/50 block mb-3 font-light">Common Questions</span>
+            <h2 className="text-2xl md:text-3xl font-serif">Frequently Asked Questions</h2>
+          </div>
 
-          <div className="max-w-2xl mx-auto divide-y divide-border/20">
+          <div className="max-w-2xl mx-auto">
             {faqs.map((faq, i) => (
-              <div key={i}>
+              <div key={i} className="border-b border-border/10">
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between py-3.5 text-left group"
+                  className="w-full flex items-center justify-between py-5 md:py-6 text-left group"
                 >
-                  <span className="font-sans text-sm pr-6 group-hover:text-primary transition-colors">{faq.question}</span>
-                  <ChevronRight className={`w-3.5 h-3.5 text-muted-foreground shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-90" : ""}`} />
+                  <span className="text-sm md:text-base pr-8 group-hover:text-primary transition-colors duration-300 font-light">{faq.question}</span>
+                  <ChevronDown 
+                    className={`w-4 h-4 text-foreground/30 shrink-0 transition-transform duration-400 ${openFaq === i ? "rotate-180" : ""}`} 
+                    strokeWidth={1.5}
+                  />
                 </button>
                 <motion.div
                   initial={false}
                   animate={{ height: openFaq === i ? "auto" : 0, opacity: openFaq === i ? 1 : 0 }}
-                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="overflow-hidden"
                 >
-                  <p className="text-xs text-muted-foreground leading-relaxed pb-4 pr-6">
+                  <p className="text-sm text-foreground/40 leading-relaxed pb-6 pr-8 font-light">
                     {faq.answer}
                   </p>
                 </motion.div>
@@ -133,29 +142,34 @@ export default function ClientCare() {
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
+          transition={{ duration: 0.6 }}
+          className="mb-16 md:mb-20"
         >
-          <h2 className="text-xl font-serif text-center mb-5">Product Care</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl mx-auto">
-            <div className="border border-border/20 p-5">
-              <h3 className="font-serif text-sm mb-2">Storage</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Store in the dust bag provided, away from direct sunlight and moisture. Avoid stacking pieces.
-              </p>
-            </div>
-            <div className="border border-border/20 p-5">
-              <h3 className="font-serif text-sm mb-2">Cleaning</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Wipe with a soft, dry microfibre cloth. For metal, use a jewellery polishing cloth. No chemical cleaners.
-              </p>
-            </div>
-            <div className="border border-border/20 p-5">
-              <h3 className="font-serif text-sm mb-2">Handling</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Open and close clasps with care. Keep away from perfume, hairspray, and abrasive surfaces.
-              </p>
-            </div>
+          <div className="text-center mb-10">
+            <span className="text-[10px] uppercase tracking-[0.4em] text-primary/50 block mb-3 font-light">Preservation</span>
+            <h2 className="text-2xl md:text-3xl font-serif">Product Care</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto">
+            {[
+              { title: "Storage", desc: "Store in the dust bag provided, away from direct sunlight and moisture. Avoid stacking pieces." },
+              { title: "Cleaning", desc: "Wipe with a soft, dry microfibre cloth. For metal, use a jewellery polishing cloth. No chemical cleaners." },
+              { title: "Handling", desc: "Open and close clasps with care. Keep away from perfume, hairspray, and abrasive surfaces." },
+            ].map((item, i) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="border border-border/10 p-6 md:p-8 hover:border-primary/15 transition-all duration-500"
+              >
+                <h3 className="font-serif text-base md:text-lg mb-3">{item.title}</h3>
+                <p className="text-sm text-foreground/40 leading-relaxed font-light">
+                  {item.desc}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
 
@@ -163,18 +177,20 @@ export default function ClientCare() {
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center max-w-lg mx-auto border border-border/20 p-8"
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-lg mx-auto"
         >
-          <h3 className="text-lg font-serif mb-3">Still Have Questions?</h3>
-          <p className="text-muted-foreground mb-4 font-sans text-xs">
+          <div className="w-px h-8 bg-gradient-to-b from-transparent via-primary/30 to-transparent mx-auto mb-6" />
+          <h3 className="text-2xl font-serif mb-3">Still Have Questions?</h3>
+          <p className="text-foreground/40 mb-8 text-sm font-light">
             Our team will get back to you within 24 hours.
           </p>
           <a
             href="mailto:care@vespera.in"
-            className="inline-block px-6 py-2.5 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-semibold hover:bg-primary/90 transition-colors"
+            className="group inline-flex items-center gap-3 px-10 py-4 border border-foreground/20 text-foreground hover:border-primary hover:text-primary transition-all duration-500 tracking-[0.25em] uppercase text-[11px] font-light"
           >
             Email Us
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" strokeWidth={1.5} />
           </a>
         </motion.div>
       </section>
