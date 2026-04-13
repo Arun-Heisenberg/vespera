@@ -39,6 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setIsMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, [location]);
 
   useEffect(() => {
