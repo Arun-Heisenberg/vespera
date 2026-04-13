@@ -40,7 +40,7 @@ export default function Home() {
             <img 
               src="/logo.png" 
               alt="Vespera" 
-              className="h-20 md:h-28 object-contain drop-shadow-[0_0_40px_rgba(180,150,50,0.08)]"
+              className="h-20 md:h-28 object-contain brightness-125 drop-shadow-[0_0_40px_rgba(180,150,50,0.12)]"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
                 (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
