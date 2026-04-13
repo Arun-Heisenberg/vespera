@@ -19,7 +19,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-      <section className="relative min-h-[50vh] md:min-h-[55vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-background z-0" />
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
@@ -40,7 +40,7 @@ export default function Home() {
             <img 
               src="/logo.png" 
               alt="Vespera" 
-              className="h-20 md:h-28 object-contain brightness-125 drop-shadow-[0_0_40px_rgba(180,150,50,0.12)]"
+              className="h-28 md:h-40 object-contain brightness-125 drop-shadow-[0_0_40px_rgba(180,150,50,0.12)]"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
                 (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
@@ -55,7 +55,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="text-base md:text-lg font-serif text-foreground/50 max-w-lg mb-8 italic leading-relaxed"
           >
-            Sculptural silhouettes for the evening.
+            Luxury clutches crafted for unforgettable evenings.
           </motion.p>
           
           <motion.div
