@@ -58,11 +58,11 @@ export default function Collection() {
 
       <div className="w-full px-5 md:px-10 py-8 md:py-12 relative z-10">
         {isLoading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
-            {Array(6).fill(0).map((_, i) => (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {Array(8).fill(0).map((_, i) => (
               <div key={i}>
                 <Skeleton className="aspect-[3/4] w-full bg-secondary/30 rounded-none" />
-                <div className="pt-5">
+                <div className="pt-4">
                   <Skeleton className="h-5 w-2/3 bg-secondary/30 rounded-none" />
                   <Skeleton className="h-4 w-1/3 bg-secondary/30 rounded-none mt-2" />
                 </div>
@@ -74,7 +74,7 @@ export default function Collection() {
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
           >
             {pieces?.map((piece) => (
               <motion.div key={piece.id} variants={itemVariants} className="group">
@@ -124,13 +124,13 @@ export default function Collection() {
                   </div>
                 </Link>
                 
-                <div className="pt-4 md:pt-5">
-                  <h3 className="font-serif text-base md:text-lg mb-1 group-hover:text-primary transition-colors duration-400">
+                <div className="pt-4">
+                  <h3 className="font-serif text-lg md:text-xl mb-1 group-hover:text-primary transition-colors duration-400">
                     <Link href={`/collection/${piece.slug}`}>{piece.title}</Link>
                   </h3>
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] text-muted-foreground/40 tracking-[0.15em] uppercase font-light truncate">{piece.material}</p>
-                    <span className="text-sm text-foreground/60 font-light whitespace-nowrap ml-2">
+                    <p className="text-[11px] text-muted-foreground/40 tracking-[0.15em] uppercase font-light truncate">{piece.material}</p>
+                    <span className="text-base text-foreground/60 font-light whitespace-nowrap ml-2">
                       {formatPrice(piece.price)}
                     </span>
                   </div>

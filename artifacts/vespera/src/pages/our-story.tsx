@@ -48,7 +48,7 @@ export default function OurStory() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="aspect-[3/4] w-full relative overflow-hidden">
+              <div className="aspect-[4/5] w-full max-w-md mx-auto relative overflow-hidden">
                 <img 
                   src="/images/story-chapter-one.png" 
                   alt="Architecture in Miniature — structured luxury clutch" 
@@ -82,7 +82,7 @@ export default function OurStory() {
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className="md:order-2"
             >
-              <div className="aspect-square w-full relative overflow-hidden">
+              <div className="aspect-square w-full max-w-md mx-auto relative overflow-hidden">
                 <img 
                   src="/images/story-chapter-two.png" 
                   alt="Material Honesty — premium fabrics and textures" 
