@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Show, useUser } from "@clerk/react";
 import { useCart } from "./cart-context";
 import { CartDrawer } from "./cart-drawer";
+import { MobileBottomNav } from "./mobile-nav";
 import { Menu, User, Shield } from "lucide-react";
 import {
   Sheet,
@@ -236,7 +237,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </motion.div>
       </main>
 
-      <footer className="relative mt-24">
+      <footer className="relative mt-24 mobile-safe-bottom md:pb-0">
         <div className="gold-divider w-full" />
         <div className="relative py-20 luxury-noise">
           <div className="absolute inset-0 bg-gradient-to-b from-card/30 to-background z-0" />
@@ -273,6 +274,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </footer>
 
+      <MobileBottomNav />
       <CartDrawer />
     </div>
   );

@@ -61,7 +61,7 @@ export default function Product() {
   const allImages = piece ? [piece.primaryImage, ...(piece.images || [])] : [];
 
   return (
-    <div className="luxury-noise">
+    <div className="luxury-noise pb-20 md:pb-0">
       <div className="container mx-auto px-6 md:px-12 py-8 md:py-16 relative z-10">
         <Link href="/collection" className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-primary transition-colors mb-12 group">
           <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" /> Back to Collection
@@ -221,6 +221,31 @@ export default function Product() {
           </div>
         ) : null}
       </div>
+
+      {piece && piece.stockCount > 0 && (
+        <div className="fixed bottom-16 left-0 right-0 z-40 md:hidden">
+          <div className="gold-divider w-full" />
+          <div className="bg-background/95 backdrop-blur-lg px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+            <div className="flex items-center gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="font-serif text-sm truncate">{piece.title}</p>
+                <p className="text-primary text-sm">{formatPrice(piece.price)}</p>
+              </div>
+              <Button
+                onClick={handleAddToBag}
+                disabled={isAdded}
+                className="h-12 px-8 rounded-none bg-primary text-primary-foreground text-xs uppercase tracking-[0.15em] font-medium shrink-0"
+              >
+                {isAdded ? (
+                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4" /> Added</span>
+                ) : (
+                  "Add to Bag"
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -202,4 +202,19 @@
     border-color: hsl(46 65% 52% / 0.25);
     box-shadow: 0 8px 40px hsl(46 65% 52% / 0.06), 0 0 0 1px hsl(46 65% 52% / 0.08);
   }
+
+  .mobile-safe-bottom {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+@media (max-width: 767px) {
+  .mobile-safe-bottom {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  }
 }
