@@ -19,7 +19,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-      <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[50vh] md:min-h-[55vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-background z-0" />
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
