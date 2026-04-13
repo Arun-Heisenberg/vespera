@@ -61,7 +61,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMenuOpen(true)}
-              className="text-foreground hover:text-primary transition-colors md:hidden"
+              className="text-foreground hover:text-primary transition-colors"
               aria-label="Open menu"
             >
               <Menu className="w-5 h-5" />
@@ -79,35 +79,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
               />
               <span className="hidden font-serif text-xl tracking-widest text-primary">VESPERA</span>
             </Link>
-
-            <nav className="hidden md:flex items-center gap-6 ml-8">
-              {navLinks.slice(0, 3).map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`text-[11px] tracking-[0.15em] uppercase transition-colors duration-300 ${
-                    location === link.href || location.startsWith(link.href + "/")
-                      ? "text-primary"
-                      : "text-foreground/70 hover:text-primary"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
           </div>
 
           <div className="flex items-center gap-3 md:gap-5">
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className="hidden md:flex items-center gap-1 text-[11px] tracking-[0.12em] uppercase text-foreground/70 hover:text-primary transition-colors"
-              >
-                <Shield className="w-3.5 h-3.5" />
-                Admin
-              </Link>
-            )}
-
             <Show when="signed-in">
               <Link
                 href="/account"
