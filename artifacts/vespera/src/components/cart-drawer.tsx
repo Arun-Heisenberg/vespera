@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { X, Plus, Minus, ShoppingBag, Loader2 } from "lucide-react";
 import { useCreateCheckoutSession, useVerifyPayment } from "@workspace/api-client-react";
+import { useToast } from "@/hooks/use-toast";
 
 export function formatPrice(price: number) {
   return new Intl.NumberFormat("en-IN", {
@@ -50,12 +51,16 @@ export function CartDrawer() {
   const checkout = useCreateCheckoutSession();
   const verify = useVerifyPayment();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
   const handleCheckout = async () => {
     if (items.length === 0) return;
 
     const scriptLoaded = await loadRazorpayScript();
-    if (!scriptLoaded) return;
+    if (!scriptLoaded) {
+      toast({ title: "Unable to load payment gateway. Please try again.", variant: "destructive" });
+      return;
+    }
 
     checkout.mutate(
       {
@@ -90,7 +95,12 @@ export function CartDrawer() {
                       clearCart();
                       setIsCartOpen(false);
                       setLocation("/?checkout=success");
+                    } else {
+                      toast({ title: "Payment verification failed. Please contact support.", variant: "destructive" });
                     }
+                  },
+                  onError: () => {
+                    toast({ title: "Payment verification error. Please contact support.", variant: "destructive" });
                   }
                 }
               );
@@ -103,6 +113,9 @@ export function CartDrawer() {
 
           const rzp = new window.Razorpay(options);
           rzp.open();
+        },
+        onError: () => {
+          toast({ title: "Failed to initiate checkout. Please try again.", variant: "destructive" });
         }
       }
     );
