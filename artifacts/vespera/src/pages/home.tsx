@@ -18,40 +18,48 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section */}
-      <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
-        {/* Dark cinematic background */}
-        <div className="absolute inset-0 bg-background z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background/90" />
-        </div>
-        
-        <div className="container relative z-10 px-6 flex flex-col items-center text-center mt-12">
+      <section className="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden luxury-noise">
+        <div className="absolute inset-0 bg-background z-0" />
+        <div className="absolute inset-0 luxury-glow z-0" />
+        <div className="absolute inset-0 luxury-vignette z-0" />
+
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-primary/[0.04] z-0" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full border border-primary/[0.06] z-0" />
+
+        <div className="container relative z-10 px-6 flex flex-col items-center text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
             animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
             transition={{ duration: 1.5, ease: "easeOut" }}
-            className="mb-8"
+            className="mb-10"
           >
             <img 
               src="/logo.png" 
               alt="Vespera" 
-              className="h-24 md:h-32 object-contain"
+              className="h-28 md:h-36 object-contain drop-shadow-[0_0_40px_rgba(212,175,55,0.15)]"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
                 (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
               }}
             />
-            <h1 className="hidden text-5xl md:text-7xl font-serif tracking-widest text-primary">VESPERA</h1>
+            <h1 className="hidden text-5xl md:text-7xl font-serif tracking-widest shimmer-text">VESPERA</h1>
           </motion.div>
           
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.8 }}
-            className="text-lg md:text-xl font-serif text-muted-foreground max-w-xl mb-12 italic"
+            className="text-lg md:text-xl font-serif text-muted-foreground max-w-xl mb-4 italic"
           >
             Sculptural silhouettes for the evening.
           </motion.p>
+
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1.2, delay: 1.0 }}
+            className="gold-divider w-24 mb-12"
+          />
           
           <motion.div
             initial={{ opacity: 0 }}
@@ -60,45 +68,68 @@ export default function Home() {
           >
             <Link 
               href="/collection" 
-              className="inline-flex items-center justify-center px-10 py-4 border border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-500 tracking-widest uppercase text-sm font-medium"
+              className="group inline-flex items-center justify-center px-12 py-4 border border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-500 tracking-widest uppercase text-sm font-medium relative overflow-hidden"
             >
-              Explore Collection
+              <span className="relative z-10">Explore Collection</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
             </Link>
           </motion.div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2, delay: 1.5 }}
+          className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
+        >
+          <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60">Scroll</span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="w-[1px] h-6 bg-gradient-to-b from-primary/40 to-transparent"
+          />
+        </motion.div>
       </section>
 
-      {/* Featured Collection */}
-      <section className="py-24 md:py-32 bg-background border-t border-border/10">
-        <div className="container mx-auto px-6 md:px-12">
+      <div className="gold-divider w-full" />
+
+      <section className="relative py-28 md:py-36 luxury-noise">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-card/30 to-background z-0" />
+        
+        <div className="container mx-auto px-6 md:px-12 relative z-10">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
-            className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6"
+            className="flex flex-col md:flex-row justify-between items-end mb-20 gap-6"
           >
             <div>
+              <span className="text-[10px] uppercase tracking-[0.3em] text-primary/60 block mb-3">Curated Selection</span>
               <h2 className="text-3xl md:text-4xl font-serif mb-4">Featured Pieces</h2>
+              <div className="gold-divider w-16 mt-4 mb-4" />
               <p className="text-muted-foreground font-sans text-sm max-w-md">
                 Pieces distinguished by uncommon materials and singular forms. Available in limited quantities.
               </p>
             </div>
             <Link 
               href="/collection"
-              className="text-xs uppercase tracking-widest text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline pb-1"
+              className="text-xs uppercase tracking-widest text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline pb-1 flex items-center gap-2"
             >
               View Full Collection
+              <span className="text-primary/40">→</span>
             </Link>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
             {isLoading ? (
               Array(3).fill(0).map((_, i) => (
-                <div key={i} className="flex flex-col gap-4">
+                <div key={i} className="card-luxury p-3 pb-6">
                   <Skeleton className="aspect-[3/4] w-full bg-secondary/40 rounded-none" />
-                  <Skeleton className="h-6 w-2/3 bg-secondary/40 rounded-none" />
-                  <Skeleton className="h-4 w-1/3 bg-secondary/40 rounded-none" />
+                  <div className="pt-5 px-2">
+                    <Skeleton className="h-6 w-2/3 bg-secondary/40 rounded-none" />
+                    <Skeleton className="h-4 w-1/3 bg-secondary/40 rounded-none mt-3" />
+                  </div>
                 </div>
               ))
             ) : (
@@ -108,12 +139,12 @@ export default function Home() {
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.8, delay: i * 0.2 }}
-                  className="group block"
+                  transition={{ duration: 0.8, delay: i * 0.15 }}
+                  className="group card-luxury p-3 pb-6"
                 >
-                  <Link href={`/collection/${piece.slug}`} className="block overflow-hidden relative aspect-[3/4] bg-secondary mb-6">
+                  <Link href={`/collection/${piece.slug}`} className="block overflow-hidden relative aspect-[3/4] bg-secondary">
                     <div className="absolute inset-0 bg-secondary flex items-center justify-center -z-10">
-                      <span className="font-serif text-muted-foreground/30 text-sm tracking-widest uppercase">Vespera</span>
+                      <span className="font-serif text-muted-foreground/20 text-sm tracking-widest uppercase">Vespera</span>
                     </div>
                     
                     <motion.img 
@@ -127,25 +158,56 @@ export default function Home() {
                       }}
                     />
                     
-                    <div className="absolute inset-0 bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center">
-                      <span className="bg-background/90 text-foreground px-6 py-2 text-xs uppercase tracking-widest font-medium backdrop-blur-sm">
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-end justify-center pb-8">
+                      <span className="bg-background/80 backdrop-blur-sm text-foreground px-8 py-2.5 text-[10px] uppercase tracking-[0.2em] font-medium border border-primary/20">
                         View Details
                       </span>
                     </div>
                   </Link>
                   
-                  <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start pt-5 px-2">
                     <div>
-                      <h3 className="font-serif text-xl mb-1 group-hover:text-primary transition-colors">
+                      <h3 className="font-serif text-xl mb-1 group-hover:text-primary transition-colors duration-500">
                         <Link href={`/collection/${piece.slug}`}>{piece.title}</Link>
                       </h3>
-                      <p className="text-xs text-muted-foreground tracking-wide font-sans">{piece.material}</p>
+                      <p className="text-[11px] text-muted-foreground/60 tracking-wider font-sans uppercase">{piece.material}</p>
                     </div>
-                    <span className="font-sans text-sm tracking-wide">{formatPrice(piece.price)}</span>
+                    <span className="font-sans text-sm tracking-wide text-primary/80">{formatPrice(piece.price)}</span>
                   </div>
                 </motion.div>
               ))
             )}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative py-24 md:py-32 overflow-hidden luxury-noise">
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-card/20 to-background z-0" />
+        <div className="absolute top-0 left-0 right-0 gold-divider" />
+        <div className="absolute bottom-0 left-0 right-0 gold-divider" />
+        
+        <div className="container mx-auto px-6 md:px-12 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 text-center">
+            {[
+              { label: "Artisan Crafted", desc: "Each piece shaped by master craftsmen using centuries-old techniques" },
+              { label: "Limited Editions", desc: "Numbered collections ensuring exclusivity for our distinguished clientele" },
+              { label: "Indian Heritage", desc: "Rooted in the rich tradition of Indian luxury and contemporary design" },
+            ].map((item, i) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: i * 0.15 }}
+                className="flex flex-col items-center"
+              >
+                <div className="w-8 h-8 border border-primary/20 rotate-45 flex items-center justify-center mb-6">
+                  <div className="w-1.5 h-1.5 bg-primary/60 rotate-45" />
+                </div>
+                <h3 className="font-serif text-lg mb-3 tracking-wide">{item.label}</h3>
+                <p className="text-muted-foreground text-xs leading-relaxed max-w-[240px]">{item.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

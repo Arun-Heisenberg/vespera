@@ -21,7 +21,7 @@ export default function Collection() {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15
+        staggerChildren: 0.12
       }
     }
   };
@@ -39,106 +39,135 @@ export default function Collection() {
   };
 
   return (
-    <div className="container mx-auto px-6 md:px-12 py-12 md:py-20">
-      <div className="max-w-2xl mx-auto text-center mb-20 md:mb-32">
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-4xl md:text-5xl font-serif mb-6"
-        >
-          Our Collection
-        </motion.h1>
-        <motion.p 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-muted-foreground font-sans text-sm tracking-wide leading-relaxed"
-        >
-          Each piece is conceived as a wearable sculpture, merging rigorous architectural forms with delicate artisan techniques. Limited quantities are available below.
-        </motion.p>
+    <div className="flex flex-col luxury-noise">
+      <div className="relative py-16 md:py-24 overflow-hidden">
+        <div className="absolute inset-0 luxury-glow z-0" />
+        <div className="max-w-2xl mx-auto text-center px-6 relative z-10">
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            className="text-[10px] uppercase tracking-[0.3em] text-primary/60 block mb-4"
+          >
+            The Vespera Edit
+          </motion.span>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-4xl md:text-5xl font-serif mb-6"
+          >
+            Our Collection
+          </motion.h1>
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="gold-divider w-16 mx-auto mb-6"
+          />
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-muted-foreground font-sans text-sm tracking-wide leading-relaxed"
+          >
+            Each piece is conceived as a wearable sculpture, merging rigorous architectural forms with delicate artisan techniques. Limited quantities are available below.
+          </motion.p>
+        </div>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-          {Array(6).fill(0).map((_, i) => (
-            <div key={i} className="flex flex-col gap-4">
-              <Skeleton className="aspect-[3/4] w-full bg-secondary/40 rounded-none" />
-              <Skeleton className="h-6 w-2/3 bg-secondary/40 rounded-none mt-2" />
-              <div className="flex justify-between mt-1">
-                <Skeleton className="h-4 w-1/3 bg-secondary/40 rounded-none" />
-                <Skeleton className="h-4 w-1/4 bg-secondary/40 rounded-none" />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 lg:gap-y-24"
-        >
-          {pieces?.map((piece) => (
-            <motion.div key={piece.id} variants={itemVariants} className="group">
-              <Link href={`/collection/${piece.slug}`} className="block relative aspect-[4/5] bg-secondary mb-6 overflow-hidden">
-                <div className="absolute inset-0 bg-secondary flex items-center justify-center -z-10">
-                  <span className="font-serif text-muted-foreground/30 text-sm tracking-widest uppercase">Vespera</span>
-                </div>
-                
-                <motion.img 
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  src={piece.primaryImage}
-                  alt={piece.title}
-                  className="w-full h-full object-cover relative z-10 transition-opacity duration-500"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.opacity = '0';
-                  }}
-                />
-                
-                {piece.images && piece.images.length > 0 && (
-                  <div className="absolute inset-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out bg-background">
-                    <img 
-                      src={piece.images[0]}
-                      alt={`${piece.title} detail`}
-                      className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-1000"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
+      <div className="gold-divider w-full" />
+
+      <div className="container mx-auto px-6 md:px-12 py-16 md:py-24 relative z-10">
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array(6).fill(0).map((_, i) => (
+              <div key={i} className="card-luxury p-3 pb-6">
+                <Skeleton className="aspect-[3/4] w-full bg-secondary/40 rounded-none" />
+                <div className="pt-5 px-2">
+                  <Skeleton className="h-6 w-2/3 bg-secondary/40 rounded-none" />
+                  <div className="flex justify-between mt-3">
+                    <Skeleton className="h-4 w-1/3 bg-secondary/40 rounded-none" />
+                    <Skeleton className="h-4 w-1/4 bg-secondary/40 rounded-none" />
                   </div>
-                )}
-                
-                {piece.stockCount <= 2 && piece.stockCount > 0 && (
-                  <div className="absolute top-4 right-4 z-30">
-                    <span className="bg-background/80 backdrop-blur-md border border-border/50 text-foreground px-3 py-1 text-[10px] uppercase tracking-widest">
-                      Limited Stock
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {pieces?.map((piece) => (
+              <motion.div key={piece.id} variants={itemVariants} className="group card-luxury p-3 pb-6">
+                <Link href={`/collection/${piece.slug}`} className="block relative aspect-[4/5] bg-secondary overflow-hidden">
+                  <div className="absolute inset-0 bg-secondary flex items-center justify-center -z-10">
+                    <span className="font-serif text-muted-foreground/20 text-sm tracking-widest uppercase">Vespera</span>
+                  </div>
+                  
+                  <motion.img 
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    src={piece.primaryImage}
+                    alt={piece.title}
+                    className="w-full h-full object-cover relative z-10 transition-opacity duration-500"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.opacity = '0';
+                    }}
+                  />
+                  
+                  {piece.images && piece.images.length > 0 && (
+                    <div className="absolute inset-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out bg-background">
+                      <img 
+                        src={piece.images[0]}
+                        alt={`${piece.title} detail`}
+                        className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-1000"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                  
+                  {piece.stockCount <= 2 && piece.stockCount > 0 && (
+                    <div className="absolute top-4 right-4 z-30">
+                      <span className="bg-background/80 backdrop-blur-md border border-primary/20 text-primary/80 px-3 py-1.5 text-[10px] uppercase tracking-[0.15em]">
+                        Limited Stock
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-[25] flex items-end justify-center pb-6">
+                    <span className="bg-background/80 backdrop-blur-sm text-foreground px-8 py-2.5 text-[10px] uppercase tracking-[0.2em] font-medium border border-primary/20">
+                      View Details
                     </span>
                   </div>
-                )}
-              </Link>
-              
-              <div className="flex flex-col">
-                <div className="flex justify-between items-baseline mb-2">
-                  <h3 className="font-serif text-xl group-hover:text-primary transition-colors">
-                    <Link href={`/collection/${piece.slug}`}>{piece.title}</Link>
-                  </h3>
-                  <span className="font-sans text-sm tracking-wide whitespace-nowrap ml-4">
-                    {formatPrice(piece.price)}
-                  </span>
+                </Link>
+                
+                <div className="flex flex-col pt-5 px-2">
+                  <div className="flex justify-between items-baseline mb-2">
+                    <h3 className="font-serif text-xl group-hover:text-primary transition-colors duration-500">
+                      <Link href={`/collection/${piece.slug}`}>{piece.title}</Link>
+                    </h3>
+                    <span className="font-sans text-sm tracking-wide whitespace-nowrap ml-4 text-primary/80">
+                      {formatPrice(piece.price)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <p className="text-[11px] text-muted-foreground/60 tracking-wider uppercase">{piece.material}</p>
+                    {piece.stockCount === 0 && (
+                      <span className="text-[10px] uppercase tracking-[0.15em] text-destructive/80">Sold Out</span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-xs text-muted-foreground tracking-wide uppercase">{piece.material}</p>
-                  {piece.stockCount === 0 && (
-                    <span className="text-[10px] uppercase tracking-widest text-destructive">Sold Out</span>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 }

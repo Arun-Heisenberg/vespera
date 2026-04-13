@@ -236,34 +236,40 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </motion.div>
       </main>
 
-      <footer className="border-t border-border/20 py-16 mt-24">
-        <div className="container mx-auto px-6 md:px-12 flex flex-col items-center">
-          <img 
-            src="/logo.png" 
-            alt="Vespera" 
-            className="h-8 md:h-10 object-contain mb-8 opacity-80 grayscale"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-              (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-            }}
-          />
-          <span className="hidden font-serif text-3xl tracking-widest mb-8 text-muted-foreground">VESPERA</span>
-          
-          <div className="flex flex-wrap justify-center gap-8 mb-12">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+      <footer className="relative mt-24">
+        <div className="gold-divider w-full" />
+        <div className="relative py-20 luxury-noise">
+          <div className="absolute inset-0 bg-gradient-to-b from-card/30 to-background z-0" />
+          <div className="container mx-auto px-6 md:px-12 flex flex-col items-center relative z-10">
+            <img 
+              src="/logo.png" 
+              alt="Vespera" 
+              className="h-8 md:h-10 object-contain mb-8 opacity-60"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+                (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            <span className="hidden font-serif text-3xl tracking-widest mb-8 text-muted-foreground">VESPERA</span>
+            
+            <div className="flex flex-wrap justify-center gap-8 mb-10">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground/60 hover:text-primary transition-colors duration-300"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
 
-          <p className="text-xs text-muted-foreground/50 tracking-wide">
-            © {new Date().getFullYear()} Vespera. All rights reserved. Sculptural evening wear.
-          </p>
+            <div className="gold-divider w-24 mb-8" />
+
+            <p className="text-[10px] text-muted-foreground/50 tracking-[0.15em] uppercase">
+              © {new Date().getFullYear()} Vespera. All rights reserved.
+            </p>
+          </div>
         </div>
       </footer>
 
