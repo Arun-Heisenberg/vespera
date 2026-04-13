@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
+import { Show, useUser } from "@clerk/react";
 import { useCart } from "./cart-context";
 import { CartDrawer } from "./cart-drawer";
-import { Menu, X } from "lucide-react";
+import { Menu, User, Shield } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -19,11 +20,20 @@ const navLinks = [
   { href: "/legal", label: "Legal" },
 ];
 
+function useIsAdmin() {
+  const { user } = useUser();
+  if (!user) return false;
+  const email = user.primaryEmailAddress?.emailAddress || "";
+  const metaRole = (user.publicMetadata as any)?.role;
+  return metaRole === "admin" || email === "admin@vespera.com";
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { totalItems, setIsCartOpen } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -70,7 +80,32 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 md:gap-6">
+            <Show when="signed-in">
+              <Link
+                href="/account"
+                className="hover:text-primary transition-colors"
+                aria-label="My Account"
+              >
+                <User className="w-5 h-5" />
+              </Link>
+            </Show>
+            <Show when="signed-out">
+              <Link
+                href="/sign-in"
+                className="text-sm tracking-widest uppercase hover:text-primary transition-colors hidden md:inline"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/sign-in"
+                className="hover:text-primary transition-colors md:hidden"
+                aria-label="Sign In"
+              >
+                <User className="w-5 h-5" />
+              </Link>
+            </Show>
+
             <button 
               onClick={() => setIsCartOpen(true)}
               className="text-sm tracking-widest uppercase hover:text-primary transition-colors flex items-center gap-2 group"
@@ -118,6 +153,56 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </Link>
               </motion.div>
             ))}
+
+            <Show when="signed-in">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: navLinks.length * 0.08 }}
+              >
+                <Link
+                  href="/account"
+                  className={`block py-4 text-lg tracking-widest uppercase transition-colors border-b border-border/10 ${
+                    location === "/account" ? "text-primary" : "text-foreground hover:text-primary"
+                  }`}
+                >
+                  My Account
+                </Link>
+              </motion.div>
+            </Show>
+
+            <Show when="signed-out">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: navLinks.length * 0.08 }}
+              >
+                <Link
+                  href="/sign-in"
+                  className="block py-4 text-lg tracking-widest uppercase transition-colors border-b border-border/10 text-foreground hover:text-primary"
+                >
+                  Sign In
+                </Link>
+              </motion.div>
+            </Show>
+
+            {isAdmin && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: (navLinks.length + 1) * 0.08 }}
+              >
+                <Link
+                  href="/admin"
+                  className={`flex items-center gap-2 py-4 text-lg tracking-widest uppercase transition-colors border-b border-border/10 ${
+                    location === "/admin" ? "text-primary" : "text-foreground hover:text-primary"
+                  }`}
+                >
+                  <Shield className="w-4 h-4" />
+                  Admin
+                </Link>
+              </motion.div>
+            )}
           </nav>
 
           <div className="p-8 border-t border-border/20">

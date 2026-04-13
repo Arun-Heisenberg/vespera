@@ -3,6 +3,7 @@ import { db, collectionTable } from "@workspace/db";
 import { inArray } from "drizzle-orm";
 import Razorpay from "razorpay";
 import crypto from "crypto";
+import { requireAuth } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
 
@@ -13,7 +14,7 @@ function getRazorpayInstance() {
   return new Razorpay({ key_id: keyId, key_secret: keySecret });
 }
 
-router.post("/checkout", async (req, res): Promise<void> => {
+router.post("/checkout", requireAuth, async (req, res): Promise<void> => {
   const { items } = req.body as { items?: Array<{ pieceId: number; quantity: number }> };
 
   if (!items || !Array.isArray(items) || items.length === 0) {
@@ -66,7 +67,7 @@ router.post("/checkout", async (req, res): Promise<void> => {
   }
 });
 
-router.post("/checkout/verify", async (req, res): Promise<void> => {
+router.post("/checkout/verify", requireAuth, async (req, res): Promise<void> => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body as {
     razorpay_order_id?: string;
     razorpay_payment_id?: string;

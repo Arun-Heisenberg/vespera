@@ -55,7 +55,13 @@ Luxury e-commerce flagship for curated evening minaudières targeting Indian aud
 - `POST /checkout` — create Razorpay order
 - `POST /checkout/verify` — verify Razorpay payment signature
 
+**Authentication:** Clerk (whitelabel). Frontend uses `@clerk/react` with `ClerkProvider` wrapping wouter routes. Backend uses `@clerk/express` with `clerkMiddleware()`. Clerk proxy middleware at `/api/__clerk` for production. Checkout routes (`POST /checkout`, `POST /checkout/verify`) require authentication via `requireAuth` middleware.
+
+**Admin:** Client-side role gating via Clerk `publicMetadata.role === "admin"` or hardcoded admin emails. Admin panel at `/admin` shows product overview and product table.
+
+**Auth Pages:** `/sign-in`, `/sign-up` (Clerk components), `/account` (profile page with sign-out).
+
 **Razorpay:** Requires `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` secrets. Prices in INR. Frontend loads Razorpay JS popup for checkout.
 
 ### API Server (api, at `/api`)
-Express 5 backend.
+Express 5 backend with Clerk auth middleware.
