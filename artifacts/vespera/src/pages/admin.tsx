@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useUser, Show } from "@clerk/react";
+import { useUser, useAuth, Show } from "@clerk/react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -101,16 +101,21 @@ const emptyForm: ProductFormData = {
 function useAdminOrders() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const { getToken } = useAuth();
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}api/admin/orders`.replace("//api", "/api"), { credentials: "include" })
-      .then((r) => r.json())
-      .then((data) => {
+    (async () => {
+      try {
+        const token = await getToken();
+        const headers: Record<string, string> = {};
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+        const r = await fetch(`${import.meta.env.BASE_URL}api/admin/orders`.replace("//api", "/api"), { credentials: "include", headers });
+        const data = await r.json();
         if (Array.isArray(data)) setOrders(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+      } catch {}
+      setLoading(false);
+    })();
+  }, [getToken]);
 
   return { orders, loading };
 }
@@ -118,6 +123,7 @@ function useAdminOrders() {
 function useAdminOrderDetail(orderId: number | null) {
   const [detail, setDetail] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(false);
+  const { getToken } = useAuth();
 
   useEffect(() => {
     if (!orderId) {
@@ -125,14 +131,18 @@ function useAdminOrderDetail(orderId: number | null) {
       return;
     }
     setLoading(true);
-    fetch(`${import.meta.env.BASE_URL}api/admin/orders/${orderId}`.replace("//api", "/api"), { credentials: "include" })
-      .then((r) => r.json())
-      .then((data) => {
+    (async () => {
+      try {
+        const token = await getToken();
+        const headers: Record<string, string> = {};
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+        const r = await fetch(`${import.meta.env.BASE_URL}api/admin/orders/${orderId}`.replace("//api", "/api"), { credentials: "include", headers });
+        const data = await r.json();
         setDetail(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [orderId]);
+      } catch {}
+      setLoading(false);
+    })();
+  }, [orderId, getToken]);
 
   return { detail, loading };
 }
@@ -284,6 +294,7 @@ function ProductFormModal({
   onSaved: () => void;
 }) {
   const isEdit = product?.id !== undefined;
+  const { getToken } = useAuth();
   const [form, setForm] = useState<ProductFormData>(product ? { ...product } : { ...emptyForm });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -323,13 +334,17 @@ function ProductFormModal({
     };
 
     try {
+      const token = await getToken();
       const url = isEdit
         ? `${import.meta.env.BASE_URL}api/admin/collection/${product!.id}`.replace("//api", "/api")
         : `${import.meta.env.BASE_URL}api/admin/collection`.replace("//api", "/api");
 
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
       const res = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         credentials: "include",
         body: JSON.stringify(body),
       });
@@ -720,11 +735,23 @@ function OrderDetailView({ orderId, onBack }: { orderId: number; onBack: () => v
 function AdminDashboard() {
   const { data: pieces, isLoading: productsLoading, refetch } = useListCollection();
   const { orders, loading: ordersLoading } = useAdminOrders();
+  const { getToken } = useAuth();
   const [activeTab, setActiveTab] = useState<"overview" | "products" | "orders">("overview");
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<(ProductFormData & { id: number }) | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<{ id: number; title: string } | null>(null);
+
+  const authFetch = useCallback(async (url: string, options: RequestInit = {}) => {
+    const token = await getToken();
+    const headers: Record<string, string> = {
+      ...(options.headers as Record<string, string> || {}),
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    return fetch(url, { ...options, credentials: "include", headers });
+  }, [getToken]);
 
   const totalRevenue = orders
     .filter((o) => o.paymentStatus === "paid")
@@ -757,9 +784,9 @@ function AdminDashboard() {
   const handleDeleteProduct = async () => {
     if (!deletingProduct) return;
     try {
-      const res = await fetch(
+      const res = await authFetch(
         `${import.meta.env.BASE_URL}api/admin/collection/${deletingProduct.id}`.replace("//api", "/api"),
-        { method: "DELETE", credentials: "include" }
+        { method: "DELETE" }
       );
       if (res.ok) {
         refetch();
@@ -778,12 +805,11 @@ function AdminDashboard() {
     [reordered[index], reordered[newIndex]] = [reordered[newIndex], reordered[index]];
     const orderedIds = reordered.map((p) => p.id);
     try {
-      const res = await fetch(
+      const res = await authFetch(
         `${import.meta.env.BASE_URL}api/admin/collection/reorder`.replace("//api", "/api"),
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
           body: JSON.stringify({ orderedIds }),
         }
       );
@@ -876,25 +902,7 @@ function AdminDashboard() {
                   key={piece.id}
                   className="flex items-center gap-3 md:gap-4 py-3 px-2 md:px-4 border-b border-border/10 hover:bg-secondary/5 transition-colors group"
                 >
-                  <div className="flex flex-col items-center gap-0 shrink-0">
-                    <button
-                      onClick={() => handleMoveProduct(index, "up")}
-                      disabled={index === 0}
-                      className={`p-1 rounded transition-colors ${index === 0 ? "text-muted-foreground/15 cursor-not-allowed" : "text-muted-foreground/50 hover:text-primary hover:bg-primary/10"}`}
-                      title="Move up"
-                    >
-                      <ArrowUp className="w-3.5 h-3.5" />
-                    </button>
-                    <GripVertical className="w-4 h-4 text-muted-foreground/25" />
-                    <button
-                      onClick={() => handleMoveProduct(index, "down")}
-                      disabled={!pieces || index === pieces.length - 1}
-                      className={`p-1 rounded transition-colors ${!pieces || index === pieces.length - 1 ? "text-muted-foreground/15 cursor-not-allowed" : "text-muted-foreground/50 hover:text-primary hover:bg-primary/10"}`}
-                      title="Move down"
-                    >
-                      <ArrowDown className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                  <GripVertical className="w-5 h-5 text-muted-foreground/25 shrink-0" />
 
                   <span className="text-xs text-muted-foreground/30 w-5 text-center shrink-0">{index + 1}</span>
 
@@ -924,6 +932,23 @@ function AdminDashboard() {
                   </div>
 
                   <div className="flex items-center gap-1 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleMoveProduct(index, "up")}
+                      disabled={index === 0}
+                      className={`p-2 rounded transition-colors ${index === 0 ? "text-muted-foreground/15 cursor-not-allowed" : "text-muted-foreground hover:text-primary hover:bg-primary/10"}`}
+                      title="Move up"
+                    >
+                      <ArrowUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleMoveProduct(index, "down")}
+                      disabled={!pieces || index === pieces.length - 1}
+                      className={`p-2 rounded transition-colors ${!pieces || index === pieces.length - 1 ? "text-muted-foreground/15 cursor-not-allowed" : "text-muted-foreground hover:text-primary hover:bg-primary/10"}`}
+                      title="Move down"
+                    >
+                      <ArrowDown className="w-4 h-4" />
+                    </button>
+                    <div className="w-px h-5 bg-border/20 mx-1" />
                     <button
                       onClick={() => handleEditProduct(piece)}
                       className="text-muted-foreground hover:text-primary transition-colors p-2"
