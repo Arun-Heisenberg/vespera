@@ -126,10 +126,22 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <SheetContent side="left" className="w-full sm:max-w-sm bg-background border-r-border/50 p-0 flex flex-col">
           <SheetHeader className="p-6 border-b border-border/20 text-left">
-            <SheetTitle className="font-serif text-xl font-normal text-foreground">Menu</SheetTitle>
-            <SheetDescription className="text-muted-foreground font-sans text-sm">
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            <SheetDescription className="sr-only">
               Navigate the Vespera experience.
             </SheetDescription>
+            <Link href="/" onClick={() => setIsMenuOpen(false)} className="block">
+              <img 
+                src="/logo.png" 
+                alt="Vespera" 
+                className="h-6 md:h-8 object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+              <span className="hidden font-serif text-xl tracking-widest text-primary">VESPERA</span>
+            </Link>
           </SheetHeader>
 
           <nav className="flex-1 flex flex-col p-6 gap-1">
