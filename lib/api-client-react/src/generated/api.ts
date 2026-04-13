@@ -22,7 +22,8 @@ import type {
   CollectionPiece,
   ErrorResponse,
   HealthStatus,
-  WebhookResponse,
+  VerifyPaymentRequest,
+  VerifyPaymentResponse,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -350,7 +351,7 @@ export function useGetFeaturedPieces<
 }
 
 /**
- * @summary Create a Stripe checkout session
+ * @summary Create a Razorpay checkout order
  */
 export const getCreateCheckoutSessionUrl = () => {
   return `/api/checkout`;
@@ -413,7 +414,7 @@ export type CreateCheckoutSessionMutationBody = BodyType<CheckoutRequest>;
 export type CreateCheckoutSessionMutationError = ErrorType<ErrorResponse>;
 
 /**
- * @summary Create a Stripe checkout session
+ * @summary Create a Razorpay checkout order
  */
 export const useCreateCheckoutSession = <
   TError = ErrorType<ErrorResponse>,
@@ -436,39 +437,42 @@ export const useCreateCheckoutSession = <
 };
 
 /**
- * @summary Stripe webhook handler
+ * @summary Verify Razorpay payment signature
  */
-export const getStripeWebhookUrl = () => {
-  return `/api/webhook`;
+export const getVerifyPaymentUrl = () => {
+  return `/api/checkout/verify`;
 };
 
-export const stripeWebhook = async (
+export const verifyPayment = async (
+  verifyPaymentRequest: VerifyPaymentRequest,
   options?: RequestInit,
-): Promise<WebhookResponse> => {
-  return customFetch<WebhookResponse>(getStripeWebhookUrl(), {
+): Promise<VerifyPaymentResponse> => {
+  return customFetch<VerifyPaymentResponse>(getVerifyPaymentUrl(), {
     ...options,
     method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(verifyPaymentRequest),
   });
 };
 
-export const getStripeWebhookMutationOptions = <
-  TError = ErrorType<unknown>,
+export const getVerifyPaymentMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof stripeWebhook>>,
+    Awaited<ReturnType<typeof verifyPayment>>,
     TError,
-    void,
+    { data: BodyType<VerifyPaymentRequest> },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof stripeWebhook>>,
+  Awaited<ReturnType<typeof verifyPayment>>,
   TError,
-  void,
+  { data: BodyType<VerifyPaymentRequest> },
   TContext
 > => {
-  const mutationKey = ["stripeWebhook"];
+  const mutationKey = ["verifyPayment"];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
@@ -478,40 +482,42 @@ export const getStripeWebhookMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof stripeWebhook>>,
-    void
-  > = () => {
-    return stripeWebhook(requestOptions);
+    Awaited<ReturnType<typeof verifyPayment>>,
+    { data: BodyType<VerifyPaymentRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return verifyPayment(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type StripeWebhookMutationResult = NonNullable<
-  Awaited<ReturnType<typeof stripeWebhook>>
+export type VerifyPaymentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof verifyPayment>>
 >;
-
-export type StripeWebhookMutationError = ErrorType<unknown>;
+export type VerifyPaymentMutationBody = BodyType<VerifyPaymentRequest>;
+export type VerifyPaymentMutationError = ErrorType<ErrorResponse>;
 
 /**
- * @summary Stripe webhook handler
+ * @summary Verify Razorpay payment signature
  */
-export const useStripeWebhook = <
-  TError = ErrorType<unknown>,
+export const useVerifyPayment = <
+  TError = ErrorType<ErrorResponse>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof stripeWebhook>>,
+    Awaited<ReturnType<typeof verifyPayment>>,
     TError,
-    void,
+    { data: BodyType<VerifyPaymentRequest> },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationResult<
-  Awaited<ReturnType<typeof stripeWebhook>>,
+  Awaited<ReturnType<typeof verifyPayment>>,
   TError,
-  void,
+  { data: BodyType<VerifyPaymentRequest> },
   TContext
 > => {
-  return useMutation(getStripeWebhookMutationOptions(options));
+  return useMutation(getVerifyPaymentMutationOptions(options));
 };

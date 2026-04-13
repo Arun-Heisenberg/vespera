@@ -39,6 +39,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Link href="/our-story" className="text-sm tracking-widest uppercase hover:text-primary transition-colors">
               Our Story
             </Link>
+            <Link href="/client-care" className="text-sm tracking-widest uppercase hover:text-primary transition-colors">
+              Client Care
+            </Link>
+            <Link href="/legal" className="text-sm tracking-widest uppercase hover:text-primary transition-colors">
+              Legal
+            </Link>
           </nav>
 
           {/* Logo Center */}
@@ -77,12 +83,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Mobile Nav Below Header */}
-        <div className="md:hidden flex justify-center gap-8 pt-4 pb-2 border-t border-border/10 mt-4 bg-background/95 backdrop-blur-md absolute w-full top-full left-0 opacity-0 -translate-y-4 pointer-events-none transition-all peer-focus-within:opacity-100 peer-focus-within:translate-y-0 peer-focus-within:pointer-events-auto">
+        <div className="md:hidden flex justify-center gap-6 pt-4 pb-2 border-t border-border/10 mt-4 bg-background/95 backdrop-blur-md absolute w-full top-full left-0 opacity-0 -translate-y-4 pointer-events-none transition-all peer-focus-within:opacity-100 peer-focus-within:translate-y-0 peer-focus-within:pointer-events-auto">
           <Link href="/collection" className="text-xs tracking-widest uppercase hover:text-primary">
             Collection
           </Link>
           <Link href="/our-story" className="text-xs tracking-widest uppercase hover:text-primary">
             Our Story
+          </Link>
+          <Link href="/client-care" className="text-xs tracking-widest uppercase hover:text-primary">
+            Client Care
+          </Link>
+          <Link href="/legal" className="text-xs tracking-widest uppercase hover:text-primary">
+            Legal
           </Link>
         </div>
       </header>

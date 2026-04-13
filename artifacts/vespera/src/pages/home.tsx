@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
         {/* Dark cinematic background */}
         <div className="absolute inset-0 bg-background z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background/90" />

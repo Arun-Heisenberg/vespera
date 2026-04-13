@@ -26,11 +26,11 @@ const faqs = [
   },
   {
     question: "What payment methods do you accept?",
-    answer: "We accept all major credit and debit cards (Visa, Mastercard, American Express, RuPay), UPI, net banking, and international cards via our secure payment gateway powered by Stripe."
+    answer: "We accept all major credit and debit cards (Visa, Mastercard, American Express, RuPay), UPI, net banking, and international cards via our secure payment gateway powered by Razorpay."
   },
   {
     question: "Is my payment information secure?",
-    answer: "Absolutely. All transactions are processed through Stripe, a PCI DSS Level 1 certified payment processor. We never store your card details on our servers."
+    answer: "Absolutely. All transactions are processed through Razorpay, a PCI DSS Level 1 certified payment processor. We never store your card details on our servers."
   },
   {
     question: "Do you ship internationally?",

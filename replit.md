@@ -38,24 +38,24 @@ Luxury e-commerce flagship for curated evening minaudières targeting Indian aud
 - `/our-story` — Our Story (About): Narrative editorial page with philosophy and "Shop Now" CTA
 - `/client-care` — Client Care: Contact info, FAQ accordion, product care guide, email CTA
 - `/legal` — Legal: Terms & Conditions, Privacy Policy, Shipping Policy with smooth-scroll nav
-- Cart: Sliding side-drawer ("Shopping Bag") accessible from any page → Stripe checkout
+- Cart: Sliding side-drawer ("Shopping Bag") accessible from any page → Razorpay checkout popup
 
 **Palette:** Obsidian (#0A0A0A), Alabaster (#FFFFFF), Champagne (#D4AF37)
 **Fonts:** Playfair Display (serif headlines), Inter (body)
 
 **DB Schema:**
 - `collection`: id, title, description, price, stock_count, primary_image, images, material, dimensions, occasion_styling, artisan_notes, is_featured, slug
-- `orders`: id, status, total_amount, stripe_session_id, shipping_details, created_at
+- `orders`: id, status, total_amount, razorpay_order_id, shipping_details, created_at
 - `customers`: id, email, full_name, created_at
 
 **API Routes (under /api):**
 - `GET /collection` — list all pieces
 - `GET /collection/featured` — featured pieces for home page
 - `GET /collection/:id` — single piece
-- `POST /checkout` — create Stripe checkout session
-- `POST /webhook` — Stripe webhook handler
+- `POST /checkout` — create Razorpay order
+- `POST /checkout/verify` — verify Razorpay payment signature
 
-**Stripe:** Requires `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` secrets. Checkout gracefully degrades if not configured.
+**Razorpay:** Requires `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` secrets. Prices in INR. Frontend loads Razorpay JS popup for checkout.
 
 ### API Server (api, at `/api`)
 Express 5 backend.

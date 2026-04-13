@@ -6,7 +6,7 @@ export const ordersTable = pgTable("orders", {
   id: serial("id").primaryKey(),
   status: text("status").notNull().default("pending"),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
-  stripeSessionId: text("stripe_session_id"),
+  razorpayOrderId: text("razorpay_order_id"),
   shippingDetails: jsonb("shipping_details").$type<Record<string, string>>(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

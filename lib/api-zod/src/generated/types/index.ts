@@ -12,4 +12,5 @@ export * from "./checkoutResponse";
 export * from "./collectionPiece";
 export * from "./errorResponse";
 export * from "./healthStatus";
-export * from "./webhookResponse";
+export * from "./verifyPaymentRequest";
+export * from "./verifyPaymentResponse";

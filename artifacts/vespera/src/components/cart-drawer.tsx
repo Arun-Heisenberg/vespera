@@ -11,24 +11,52 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { X, Plus, Minus, ShoppingBag, Loader2 } from "lucide-react";
-import { useCreateCheckoutSession } from "@workspace/api-client-react";
+import { useCreateCheckoutSession, useVerifyPayment } from "@workspace/api-client-react";
 
 export function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "USD",
+    currency: "INR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(price);
 }
 
-export function CartDrawer() {
-  const { items, isCartOpen, setIsCartOpen, removeItem, updateQuantity, totalPrice } = useCart();
-  const checkout = useCreateCheckoutSession();
+declare global {
+  interface Window {
+    Razorpay: new (options: Record<string, unknown>) => {
+      open: () => void;
+      on: (event: string, callback: () => void) => void;
+    };
+  }
+}
 
-  const handleCheckout = () => {
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
+export function CartDrawer() {
+  const { items, isCartOpen, setIsCartOpen, removeItem, updateQuantity, totalPrice, clearCart } = useCart();
+  const checkout = useCreateCheckoutSession();
+  const verify = useVerifyPayment();
+  const [, setLocation] = useLocation();
+
+  const handleCheckout = async () => {
     if (items.length === 0) return;
-    
+
+    const scriptLoaded = await loadRazorpayScript();
+    if (!scriptLoaded) return;
+
     checkout.mutate(
       {
         data: {
@@ -40,7 +68,41 @@ export function CartDrawer() {
       },
       {
         onSuccess: (data) => {
-          window.location.href = data.url;
+          const options: Record<string, unknown> = {
+            key: data.keyId,
+            amount: data.amount,
+            currency: data.currency,
+            name: "Vespera",
+            description: "Sculptural Evening Minaudières",
+            order_id: data.orderId,
+            handler: (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+              verify.mutate(
+                {
+                  data: {
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                  }
+                },
+                {
+                  onSuccess: (result) => {
+                    if (result.verified) {
+                      clearCart();
+                      setIsCartOpen(false);
+                      setLocation("/?checkout=success");
+                    }
+                  }
+                }
+              );
+            },
+            prefill: {},
+            theme: {
+              color: "#C9A96E",
+            },
+          };
+
+          const rzp = new window.Razorpay(options);
+          rzp.open();
         }
       }
     );

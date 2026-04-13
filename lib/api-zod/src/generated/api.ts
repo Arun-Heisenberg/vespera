@@ -83,7 +83,7 @@ export const GetFeaturedPiecesResponse = zod.array(
 );
 
 /**
- * @summary Create a Stripe checkout session
+ * @summary Create a Razorpay checkout order
  */
 export const CreateCheckoutSessionBody = zod.object({
   items: zod.array(
@@ -95,12 +95,21 @@ export const CreateCheckoutSessionBody = zod.object({
 });
 
 export const CreateCheckoutSessionResponse = zod.object({
-  url: zod.string(),
+  orderId: zod.string(),
+  keyId: zod.string(),
+  amount: zod.number(),
+  currency: zod.string(),
 });
 
 /**
- * @summary Stripe webhook handler
+ * @summary Verify Razorpay payment signature
  */
-export const StripeWebhookResponse = zod.object({
-  received: zod.boolean(),
+export const VerifyPaymentBody = zod.object({
+  razorpay_order_id: zod.string(),
+  razorpay_payment_id: zod.string(),
+  razorpay_signature: zod.string(),
+});
+
+export const VerifyPaymentResponse = zod.object({
+  verified: zod.boolean(),
 });

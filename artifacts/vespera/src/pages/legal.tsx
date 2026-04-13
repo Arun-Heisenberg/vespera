@@ -12,11 +12,11 @@ const sections = [
       },
       {
         heading: "2. Products & Pricing",
-        text: "All product descriptions, images, and specifications on this website are as accurate as possible. However, slight variations may occur due to the handcrafted nature of our pieces. Prices are listed in USD and are inclusive of applicable taxes unless stated otherwise. Vespera reserves the right to modify prices at any time without prior notice. Price changes will not affect orders that have already been confirmed."
+        text: "All product descriptions, images, and specifications on this website are as accurate as possible. However, slight variations may occur due to the handcrafted nature of our pieces. Prices are listed in INR and are inclusive of applicable taxes unless stated otherwise. Vespera reserves the right to modify prices at any time without prior notice. Price changes will not affect orders that have already been confirmed."
       },
       {
         heading: "3. Orders & Payment",
-        text: "An order is confirmed only after successful payment processing. We reserve the right to cancel or refuse any order at our discretion, including orders that appear fraudulent or unauthorised. In the event of cancellation, a full refund will be issued to the original payment method. All payments are securely processed through Stripe. We do not store your credit or debit card information on our servers."
+        text: "An order is confirmed only after successful payment processing. We reserve the right to cancel or refuse any order at our discretion, including orders that appear fraudulent or unauthorised. In the event of cancellation, a full refund will be issued to the original payment method. All payments are securely processed through Razorpay. We do not store your credit or debit card information on our servers."
       },
       {
         heading: "4. Shipping & Delivery",
@@ -54,7 +54,7 @@ const sections = [
       },
       {
         heading: "3. Data Sharing",
-        text: "We share your data only with trusted service providers essential to our operations: Stripe for payment processing, courier partners for order delivery, and hosting providers for website infrastructure. All third-party providers are contractually obligated to protect your data and use it solely for the services they provide to us."
+        text: "We share your data only with trusted service providers essential to our operations: Razorpay for payment processing, courier partners for order delivery, and hosting providers for website infrastructure. All third-party providers are contractually obligated to protect your data and use it solely for the services they provide to us."
       },
       {
         heading: "4. Data Security",
