@@ -902,9 +902,25 @@ function AdminDashboard() {
                   key={piece.id}
                   className="flex items-center gap-3 md:gap-4 py-3 px-2 md:px-4 border-b border-border/10 hover:bg-secondary/5 transition-colors group"
                 >
-                  <GripVertical className="w-5 h-5 text-muted-foreground/25 shrink-0" />
-
-                  <span className="text-xs text-muted-foreground/30 w-5 text-center shrink-0">{index + 1}</span>
+                  <div className="flex flex-col items-center shrink-0">
+                    <button
+                      onClick={() => handleMoveProduct(index, "up")}
+                      disabled={index === 0}
+                      className={`p-1 rounded transition-colors ${index === 0 ? "text-muted-foreground/15 cursor-not-allowed" : "text-muted-foreground/50 hover:text-primary hover:bg-primary/10"}`}
+                      title="Move up"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="text-[10px] text-muted-foreground/30 leading-none">{index + 1}</span>
+                    <button
+                      onClick={() => handleMoveProduct(index, "down")}
+                      disabled={!pieces || index === pieces.length - 1}
+                      className={`p-1 rounded transition-colors ${!pieces || index === pieces.length - 1 ? "text-muted-foreground/15 cursor-not-allowed" : "text-muted-foreground/50 hover:text-primary hover:bg-primary/10"}`}
+                      title="Move down"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
 
                   <div className="w-12 h-12 bg-secondary overflow-hidden shrink-0">
                     {piece.primaryImage ? (
@@ -932,23 +948,6 @@ function AdminDashboard() {
                   </div>
 
                   <div className="flex items-center gap-1 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => handleMoveProduct(index, "up")}
-                      disabled={index === 0}
-                      className={`p-2 rounded transition-colors ${index === 0 ? "text-muted-foreground/15 cursor-not-allowed" : "text-muted-foreground hover:text-primary hover:bg-primary/10"}`}
-                      title="Move up"
-                    >
-                      <ArrowUp className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleMoveProduct(index, "down")}
-                      disabled={!pieces || index === pieces.length - 1}
-                      className={`p-2 rounded transition-colors ${!pieces || index === pieces.length - 1 ? "text-muted-foreground/15 cursor-not-allowed" : "text-muted-foreground hover:text-primary hover:bg-primary/10"}`}
-                      title="Move down"
-                    >
-                      <ArrowDown className="w-4 h-4" />
-                    </button>
-                    <div className="w-px h-5 bg-border/20 mx-1" />
                     <button
                       onClick={() => handleEditProduct(piece)}
                       className="text-muted-foreground hover:text-primary transition-colors p-2"
