@@ -48,11 +48,13 @@ export default function OurStory() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="aspect-[3/4] bg-gradient-to-br from-secondary via-card to-secondary w-full relative overflow-hidden">
-                <div className="absolute inset-6 border border-primary/5" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-12 h-12 border border-primary/10 rotate-45" />
-                </div>
+              <div className="aspect-[3/4] w-full relative overflow-hidden">
+                <img 
+                  src="/images/story-chapter-one.png" 
+                  alt="Architecture in Miniature — structured luxury clutch" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent" />
               </div>
             </motion.div>
             
@@ -80,11 +82,13 @@ export default function OurStory() {
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className="md:order-2"
             >
-              <div className="aspect-square bg-gradient-to-bl from-secondary via-card to-secondary w-full relative overflow-hidden">
-                <div className="absolute inset-6 border border-primary/5" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 border border-primary/8 rounded-full" />
-                </div>
+              <div className="aspect-square w-full relative overflow-hidden">
+                <img 
+                  src="/images/story-chapter-two.png" 
+                  alt="Material Honesty — premium fabrics and textures" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent" />
               </div>
             </motion.div>
 

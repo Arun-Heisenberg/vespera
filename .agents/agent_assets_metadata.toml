@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "VO3-F_CX-oYtX7zgSv-_A"
+uri = "file://artifacts/vespera/public/images/story-chapter-one.png"
+type = "image"
+title = "luxury clutch architecture"
+
+[[generated]]
+id = "JdWuvuRYQBhuEj2ufmzep"
+uri = "file://artifacts/vespera/public/images/story-chapter-two.png"
+type = "image"
+title = "luxury material textures"
