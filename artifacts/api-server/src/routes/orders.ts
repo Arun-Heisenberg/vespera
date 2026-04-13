@@ -107,7 +107,8 @@ router.get("/orders/:id", async (req, res): Promise<void> => {
 });
 
 router.get("/admin/orders/:id", requireAdmin, async (req, res): Promise<void> => {
-  const orderId = parseInt(req.params.id, 10);
+  const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const orderId = parseInt(rawId, 10);
   if (isNaN(orderId)) {
     res.status(400).json({ error: "Invalid order ID" });
     return;

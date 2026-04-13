@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, pool, collectionTable, ordersTable, orderItemsTable, paymentsTable, customersTable } from "@workspace/db";
-import { inArray, eq, count } from "drizzle-orm";
+import { inArray, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import Razorpay from "razorpay";
 import crypto from "crypto";
@@ -20,10 +20,9 @@ async function generateOrderNumber(): Promise<string> {
   const now = new Date();
   const date = now.toISOString().slice(0, 10).replace(/-/g, "");
   const prefix = `VES-${date}`;
-  const [result] = await db
-    .select({ total: count() })
-    .from(ordersTable);
-  const seq = (result?.total ?? 0) + 1;
+  const result = await db.execute(sql`SELECT nextval('order_number_seq') AS seq`);
+  const rows = result as unknown as Array<{ seq: string }>;
+  const seq = Number(rows[0].seq);
   return `${prefix}-${String(seq).padStart(4, "0")}`;
 }
 
@@ -108,7 +107,7 @@ router.post("/checkout", requireAuth, async (req, res): Promise<void> => {
       return;
     }
 
-    const orderNumber = generateOrderNumber();
+    const orderNumber = await generateOrderNumber();
     const totalAmountRupees = (totalAmountPaise / 100).toFixed(2);
 
     const razorpayOrder = await razorpay.orders.create({
@@ -207,7 +206,7 @@ router.post("/checkout/verify", requireAuth, async (req, res): Promise<void> => 
       if (razorpay) {
         try {
           const paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
-          paymentMethod = (paymentDetails as Record<string, unknown>).method as string | undefined;
+          paymentMethod = (paymentDetails as unknown as Record<string, unknown>).method as string | undefined;
         } catch {
           req.log.warn({ paymentId: razorpay_payment_id }, "Could not fetch payment method from Razorpay");
         }
