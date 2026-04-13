@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+import { useUser } from "@clerk/clerk-react";
 import { CollectionPiece } from "@workspace/api-client-react/src/generated/api.schemas";
 
 export interface CartItem {
@@ -32,6 +33,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   });
   
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const { isSignedIn } = useUser();
+  const prevSignedIn = useRef(isSignedIn);
+
+  useEffect(() => {
+    if (prevSignedIn.current === true && isSignedIn === false) {
+      setItems([]);
+      localStorage.removeItem("vespera-cart");
+    }
+    prevSignedIn.current = isSignedIn;
+  }, [isSignedIn]);
 
   useEffect(() => {
     localStorage.setItem("vespera-cart", JSON.stringify(items));
