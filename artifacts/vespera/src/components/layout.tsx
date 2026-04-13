@@ -271,7 +271,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <img 
               src="/logo.png" 
               alt="Vespera" 
-              className="h-7 md:h-8 object-contain mb-8 opacity-50 brightness-125"
+              className="h-12 md:h-16 object-contain mb-8 opacity-50 brightness-125"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
                 (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
