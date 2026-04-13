@@ -121,12 +121,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Link href="/our-story" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
               Our Story
             </Link>
-            <a href="#" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
+            <Link href="/client-care" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
               Client Care
-            </a>
-            <a href="#" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
+            </Link>
+            <Link href="/legal" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
               Legal
-            </a>
+            </Link>
           </div>
 
           <p className="text-xs text-muted-foreground/50 tracking-wide">

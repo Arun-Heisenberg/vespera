@@ -11,6 +11,8 @@ import Home from "@/pages/home";
 import Collection from "@/pages/collection";
 import Product from "@/pages/product";
 import OurStory from "@/pages/our-story";
+import ClientCare from "@/pages/client-care";
+import Legal from "@/pages/legal";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,6 +31,8 @@ function Router() {
         <Route path="/collection" component={Collection} />
         <Route path="/collection/:slug" component={Product} />
         <Route path="/our-story" component={OurStory} />
+        <Route path="/client-care" component={ClientCare} />
+        <Route path="/legal" component={Legal} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
