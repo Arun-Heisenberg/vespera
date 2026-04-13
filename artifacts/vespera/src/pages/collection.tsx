@@ -35,7 +35,7 @@ export default function Collection() {
 
   return (
     <div className="flex flex-col">
-      <div className="relative py-10 md:py-16 overflow-hidden">
+      <div className="relative py-8 md:py-12 overflow-hidden">
         <div className="absolute inset-0 luxury-glow z-0" />
         <div className="max-w-2xl mx-auto text-center px-6 relative z-10">
           <motion.div
@@ -56,7 +56,7 @@ export default function Collection() {
 
       <div className="gold-divider w-full" />
 
-      <div className="w-full px-5 md:px-10 py-10 md:py-16 relative z-10">
+      <div className="w-full px-5 md:px-10 py-8 md:py-12 relative z-10">
         {isLoading ? (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
             {Array(6).fill(0).map((_, i) => (

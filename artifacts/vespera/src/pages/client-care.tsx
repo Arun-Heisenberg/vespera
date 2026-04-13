@@ -51,7 +51,7 @@ export default function ClientCare() {
 
   return (
     <div className="flex flex-col">
-      <section className="relative py-12 md:py-20 overflow-hidden">
+      <section className="relative py-8 md:py-14 overflow-hidden">
         <div className="absolute inset-0 luxury-glow z-0" />
         <div className="relative z-10 text-center px-6 max-w-2xl mx-auto">
           <motion.div
@@ -70,12 +70,12 @@ export default function ClientCare() {
 
       <div className="gold-divider w-full" />
 
-      <section className="w-full px-5 md:px-10 py-12 md:py-16 max-w-5xl mx-auto">
+      <section className="w-full px-5 md:px-10 py-8 md:py-12 max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-16 md:mb-20"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10 md:mb-14"
         >
           {[
             { icon: Mail, title: "Email", detail: "care@vespera.in", href: "mailto:care@vespera.in" },
@@ -103,9 +103,9 @@ export default function ClientCare() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mb-16 md:mb-20"
+          className="mb-10 md:mb-14"
         >
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             <span className="text-[10px] uppercase tracking-[0.4em] text-primary/50 block mb-3 font-light">Common Questions</span>
             <h2 className="text-2xl md:text-3xl font-serif">Frequently Asked Questions</h2>
           </div>
@@ -143,9 +143,9 @@ export default function ClientCare() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mb-16 md:mb-20"
+          className="mb-10 md:mb-14"
         >
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             <span className="text-[10px] uppercase tracking-[0.4em] text-primary/50 block mb-3 font-light">Preservation</span>
             <h2 className="text-2xl md:text-3xl font-serif">Product Care</h2>
           </div>
@@ -178,7 +178,7 @@ export default function ClientCare() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center max-w-lg mx-auto mb-16 md:mb-20"
+          className="text-center max-w-lg mx-auto mb-10 md:mb-14"
         >
           <span className="text-[10px] uppercase tracking-[0.4em] text-primary/50 block mb-3 font-light">Stay Connected</span>
           <h2 className="text-2xl md:text-3xl font-serif mb-6">Follow Us</h2>

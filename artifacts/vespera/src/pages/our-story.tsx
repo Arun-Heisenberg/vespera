@@ -16,7 +16,7 @@ export default function OurStory() {
 
   return (
     <div className="flex flex-col">
-      <section className="relative py-16 md:py-24 overflow-hidden">
+      <section className="relative py-10 md:py-16 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 luxury-glow" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1px] h-[60%] bg-gradient-to-b from-transparent via-primary/8 to-transparent" />
@@ -39,9 +39,9 @@ export default function OurStory() {
 
       <div className="gold-divider w-full" />
 
-      <section className="py-16 md:py-24 relative">
+      <section className="py-10 md:py-16 relative">
         <div className="w-full px-5 md:px-10 max-w-6xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 items-center mb-20 md:mb-32">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center mb-14 md:mb-20">
             <motion.div 
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -72,7 +72,7 @@ export default function OurStory() {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 items-center mb-20 md:mb-32">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center mb-14 md:mb-20">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -104,7 +104,7 @@ export default function OurStory() {
             </motion.div>
           </div>
 
-          <div className="gold-divider w-full mb-16" />
+          <div className="gold-divider w-full mb-10" />
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }}

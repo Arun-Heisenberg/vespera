@@ -88,7 +88,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative py-16 md:py-24">
+      <section className="relative py-10 md:py-16">
         <div className="gold-divider w-full absolute top-0" />
         
         <div className="w-full px-5 md:px-10 relative z-10">
@@ -97,7 +97,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4"
+            className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4"
           >
             <div>
               <span className="text-[10px] uppercase tracking-[0.4em] text-primary/50 block mb-3 font-light">Curated Selection</span>
@@ -174,7 +174,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative py-16 md:py-20 overflow-hidden">
+      <section className="relative py-10 md:py-14 overflow-hidden">
         <div className="gold-divider w-full absolute top-0" />
         <div className="gold-divider w-full absolute bottom-0" />
         <div className="absolute inset-0 bg-gradient-to-b from-card/30 via-card/10 to-card/30 z-0" />
@@ -214,7 +214,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative py-16 md:py-24">
+      <section className="relative py-10 md:py-16">
         <div className="w-full px-5 md:px-10 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center max-w-6xl mx-auto">
             <motion.div
