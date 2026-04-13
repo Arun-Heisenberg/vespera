@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useListCollection } from "@workspace/api-client-react";
 import { formatPrice } from "@/components/cart-drawer";
-import { Shield, Package, ShoppingCart, Clock, CheckCircle, XCircle, ArrowLeft, Eye, Plus, Pencil, Trash2, Upload, X, ImageIcon, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
+import { Shield, Package, ShoppingCart, Clock, CheckCircle, XCircle, ArrowLeft, Eye, Plus, Pencil, Trash2, Upload, X, ImageIcon, GripVertical } from "lucide-react";
 
 const ADMIN_EMAILS = ["admin@vespera.com", "avkvasp1@gmail.com"];
 
@@ -741,6 +741,8 @@ function AdminDashboard() {
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<(ProductFormData & { id: number }) | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<{ id: number; title: string } | null>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   const authFetch = useCallback(async (url: string, options: RequestInit = {}) => {
     const token = await getToken();
@@ -803,6 +805,27 @@ function AdminDashboard() {
     if (newIndex < 0 || newIndex >= pieces.length) return;
     const reordered = [...pieces];
     [reordered[index], reordered[newIndex]] = [reordered[newIndex], reordered[index]];
+    const orderedIds = reordered.map((p) => p.id);
+    try {
+      const res = await authFetch(
+        `${import.meta.env.BASE_URL}api/admin/collection/reorder`.replace("//api", "/api"),
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderedIds }),
+        }
+      );
+      if (res.ok) {
+        refetch();
+      }
+    } catch {}
+  };
+
+  const handleDragReorder = async (fromIndex: number, toIndex: number) => {
+    if (!pieces) return;
+    const reordered = [...pieces];
+    const [moved] = reordered.splice(fromIndex, 1);
+    reordered.splice(toIndex, 0, moved);
     const orderedIds = reordered.map((p) => p.id);
     try {
       const res = await authFetch(
@@ -900,27 +923,35 @@ function AdminDashboard() {
               ) : pieces?.map((piece, index) => (
                 <div
                   key={piece.id}
-                  className="flex items-center gap-3 md:gap-4 py-3 px-2 md:px-4 border-b border-border/10 hover:bg-secondary/5 transition-colors group"
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.effectAllowed = "move";
+                    e.dataTransfer.setData("text/plain", String(index));
+                    setDragIndex(index);
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = "move";
+                    if (dragOverIndex !== index) setDragOverIndex(index);
+                  }}
+                  onDragLeave={() => setDragOverIndex(null)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const from = parseInt(e.dataTransfer.getData("text/plain"), 10);
+                    if (!isNaN(from) && from !== index) {
+                      handleDragReorder(from, index);
+                    }
+                    setDragIndex(null);
+                    setDragOverIndex(null);
+                  }}
+                  onDragEnd={() => { setDragIndex(null); setDragOverIndex(null); }}
+                  className={`flex items-center gap-3 md:gap-4 py-3 px-2 md:px-4 border-b border-border/10 transition-colors group ${dragIndex === index ? "opacity-40" : ""} ${dragOverIndex === index && dragIndex !== index ? "bg-primary/10 border-t-2 border-t-primary" : "hover:bg-secondary/5"}`}
                 >
-                  <div className="flex flex-col items-center shrink-0">
-                    <button
-                      onClick={() => handleMoveProduct(index, "up")}
-                      disabled={index === 0}
-                      className={`p-1 rounded transition-colors ${index === 0 ? "text-muted-foreground/15 cursor-not-allowed" : "text-muted-foreground/50 hover:text-primary hover:bg-primary/10"}`}
-                      title="Move up"
-                    >
-                      <ArrowUp className="w-3.5 h-3.5" />
-                    </button>
-                    <span className="text-[10px] text-muted-foreground/30 leading-none">{index + 1}</span>
-                    <button
-                      onClick={() => handleMoveProduct(index, "down")}
-                      disabled={!pieces || index === pieces.length - 1}
-                      className={`p-1 rounded transition-colors ${!pieces || index === pieces.length - 1 ? "text-muted-foreground/15 cursor-not-allowed" : "text-muted-foreground/50 hover:text-primary hover:bg-primary/10"}`}
-                      title="Move down"
-                    >
-                      <ArrowDown className="w-3.5 h-3.5" />
-                    </button>
+                  <div className="cursor-grab active:cursor-grabbing shrink-0 touch-none">
+                    <GripVertical className="w-5 h-5 text-muted-foreground/25" />
                   </div>
+
+                  <span className="text-xs text-muted-foreground/30 w-5 text-center shrink-0">{index + 1}</span>
 
                   <div className="w-12 h-12 bg-secondary overflow-hidden shrink-0">
                     {piece.primaryImage ? (
