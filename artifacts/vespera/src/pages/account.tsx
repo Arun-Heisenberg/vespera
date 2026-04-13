@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { LogOut, User, Mail, Calendar, Phone, Package, Clock, CheckCircle } from "lucide-react";
 import { formatPrice } from "@/components/cart-drawer";
+import { useCart } from "@/components/cart-context";
 
 interface OrderItem {
   id: number;
@@ -47,6 +48,7 @@ function AccountContent() {
   const { user } = useUser();
   const { signOut } = useClerk();
   const [, setLocation] = useLocation();
+  const { clearCart } = useCart();
   const { orders, loading: ordersLoading } = useOrders();
   const [activeTab, setActiveTab] = useState<"profile" | "orders">("profile");
 
@@ -125,7 +127,7 @@ function AccountContent() {
             <Button
               variant="outline"
               className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
-              onClick={() => signOut(() => setLocation("/"))}
+              onClick={() => { clearCart(); localStorage.removeItem("vespera-cart"); signOut(() => setLocation("/")); }}
             >
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
