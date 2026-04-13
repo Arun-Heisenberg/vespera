@@ -33,11 +33,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
           {/* Desktop Nav Left */}
           <nav className="hidden md:flex items-center gap-8 w-1/3">
-            <Link href="/atelier" className="text-sm tracking-widest uppercase hover:text-primary transition-colors">
-              Atelier
+            <Link href="/collection" className="text-sm tracking-widest uppercase hover:text-primary transition-colors">
+              Collection
             </Link>
-            <Link href="/archive" className="text-sm tracking-widest uppercase hover:text-primary transition-colors">
-              Archive
+            <Link href="/our-story" className="text-sm tracking-widest uppercase hover:text-primary transition-colors">
+              Our Story
             </Link>
           </nav>
 
@@ -64,7 +64,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               className="text-sm tracking-widest uppercase hover:text-primary transition-colors flex items-center gap-2 group"
               aria-label={`Cart with ${totalItems} items`}
             >
-              <span className="hidden md:inline">Selection</span>
+              <span className="hidden md:inline">Bag</span>
               <span className="relative flex items-center justify-center w-6 h-6 border border-transparent group-hover:border-primary/30 rounded-full transition-all">
                 {totalItems > 0 ? (
                   <span className="text-xs font-medium text-primary">{totalItems}</span>
@@ -78,11 +78,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
         {/* Mobile Nav Below Header */}
         <div className="md:hidden flex justify-center gap-8 pt-4 pb-2 border-t border-border/10 mt-4 bg-background/95 backdrop-blur-md absolute w-full top-full left-0 opacity-0 -translate-y-4 pointer-events-none transition-all peer-focus-within:opacity-100 peer-focus-within:translate-y-0 peer-focus-within:pointer-events-auto">
-          <Link href="/atelier" className="text-xs tracking-widest uppercase hover:text-primary">
-            Atelier
+          <Link href="/collection" className="text-xs tracking-widest uppercase hover:text-primary">
+            Collection
           </Link>
-          <Link href="/archive" className="text-xs tracking-widest uppercase hover:text-primary">
-            Archive
+          <Link href="/our-story" className="text-xs tracking-widest uppercase hover:text-primary">
+            Our Story
           </Link>
         </div>
       </header>
@@ -115,11 +115,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <span className="hidden font-serif text-3xl tracking-widest mb-8 text-muted-foreground">VESPERA</span>
           
           <div className="flex flex-wrap justify-center gap-8 mb-12">
-            <Link href="/atelier" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
-              Atelier
+            <Link href="/collection" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
+              Collection
             </Link>
-            <Link href="/archive" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
-              Archive
+            <Link href="/our-story" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
+              Our Story
             </Link>
             <a href="#" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
               Client Care
@@ -130,7 +130,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </div>
 
           <p className="text-xs text-muted-foreground/50 tracking-wide">
-            © {new Date().getFullYear()} Vespera Paris. All rights reserved. Sculptural evening wear.
+            © {new Date().getFullYear()} Vespera. All rights reserved. Sculptural evening wear.
           </p>
         </div>
       </footer>

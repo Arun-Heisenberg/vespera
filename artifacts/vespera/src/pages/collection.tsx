@@ -5,9 +5,9 @@ import { useListCollection } from "@workspace/api-client-react";
 import { formatPrice } from "@/components/cart-drawer";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function Atelier() {
+export default function Collection() {
   useEffect(() => {
-    document.title = "The Atelier | Vespera";
+    document.title = "Collection | Vespera";
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
       metaDesc.setAttribute("content", "Explore the Vespera collection. Sculptural evening minaudières crafted with uncommon materials and singular forms.");
@@ -47,7 +47,7 @@ export default function Atelier() {
           transition={{ duration: 0.8 }}
           className="text-4xl md:text-5xl font-serif mb-6"
         >
-          The Atelier
+          Our Collection
         </motion.h1>
         <motion.p 
           initial={{ opacity: 0 }}
@@ -55,7 +55,7 @@ export default function Atelier() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-muted-foreground font-sans text-sm tracking-wide leading-relaxed"
         >
-          Each piece is conceived as a wearable sculpture, merging rigorous architectural forms with delicate artisan techniques. Limited allocations are available below.
+          Each piece is conceived as a wearable sculpture, merging rigorous architectural forms with delicate artisan techniques. Limited quantities are available below.
         </motion.p>
       </div>
 
@@ -81,7 +81,7 @@ export default function Atelier() {
         >
           {pieces?.map((piece) => (
             <motion.div key={piece.id} variants={itemVariants} className="group">
-              <Link href={`/atelier/${piece.slug}`} className="block relative aspect-[4/5] bg-secondary mb-6 overflow-hidden">
+              <Link href={`/collection/${piece.slug}`} className="block relative aspect-[4/5] bg-secondary mb-6 overflow-hidden">
                 <div className="absolute inset-0 bg-secondary flex items-center justify-center -z-10">
                   <span className="font-serif text-muted-foreground/30 text-sm tracking-widest uppercase">Vespera</span>
                 </div>
@@ -97,7 +97,6 @@ export default function Atelier() {
                   }}
                 />
                 
-                {/* Secondary image on hover if available */}
                 {piece.images && piece.images.length > 0 && (
                   <div className="absolute inset-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out bg-background">
                     <img 
@@ -114,7 +113,7 @@ export default function Atelier() {
                 {piece.stockCount <= 2 && piece.stockCount > 0 && (
                   <div className="absolute top-4 right-4 z-30">
                     <span className="bg-background/80 backdrop-blur-md border border-border/50 text-foreground px-3 py-1 text-[10px] uppercase tracking-widest">
-                      Low Allocation
+                      Limited Stock
                     </span>
                   </div>
                 )}
@@ -123,7 +122,7 @@ export default function Atelier() {
               <div className="flex flex-col">
                 <div className="flex justify-between items-baseline mb-2">
                   <h3 className="font-serif text-xl group-hover:text-primary transition-colors">
-                    <Link href={`/atelier/${piece.slug}`}>{piece.title}</Link>
+                    <Link href={`/collection/${piece.slug}`}>{piece.title}</Link>
                   </h3>
                   <span className="font-sans text-sm tracking-wide whitespace-nowrap ml-4">
                     {formatPrice(piece.price)}
@@ -132,7 +131,7 @@ export default function Atelier() {
                 <div className="flex justify-between items-center">
                   <p className="text-xs text-muted-foreground tracking-wide uppercase">{piece.material}</p>
                   {piece.stockCount === 0 && (
-                    <span className="text-[10px] uppercase tracking-widest text-destructive">Waitlist</span>
+                    <span className="text-[10px] uppercase tracking-widest text-destructive">Sold Out</span>
                   )}
                 </div>
               </div>

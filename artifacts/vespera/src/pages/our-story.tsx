@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 
-export default function Archive() {
+export default function OurStory() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    document.title = "The Archive | Vespera";
+    document.title = "Our Story | Vespera";
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
       metaDesc.setAttribute("content", "The curation philosophy and narrative behind Vespera's evening minaudières.");
@@ -28,7 +28,7 @@ export default function Archive() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
           >
-            <span className="text-xs uppercase tracking-widest text-primary mb-6 block">Philosophy</span>
+            <span className="text-xs uppercase tracking-widest text-primary mb-6 block">Our Philosophy</span>
             <h1 className="text-5xl md:text-7xl font-serif mb-8 leading-tight">
               The Object <br />
               <span className="italic text-muted-foreground">as Event</span>
@@ -49,7 +49,6 @@ export default function Archive() {
               className="md:col-span-5"
             >
               <div className="aspect-[3/4] bg-secondary w-full relative">
-                {/* Decorative border frame */}
                 <div className="absolute -inset-4 border border-border/30 z-0"></div>
               </div>
             </motion.div>
@@ -82,7 +81,6 @@ export default function Archive() {
               className="md:col-span-6 md:order-2"
             >
               <div className="aspect-square bg-secondary w-full relative">
-                {/* Decorative border frame */}
                 <div className="absolute -inset-4 border border-border/30 z-0"></div>
               </div>
             </motion.div>
@@ -114,15 +112,15 @@ export default function Archive() {
             transition={{ duration: 1 }}
             className="text-center mt-32 max-w-2xl mx-auto border border-border/20 p-12 md:p-24"
           >
-            <h3 className="text-2xl font-serif mb-6">Experience the Collection</h3>
+            <h3 className="text-2xl font-serif mb-6">Explore the Collection</h3>
             <p className="text-muted-foreground mb-10 font-sans text-sm">
-              Discover the current pieces available in our atelier. Allocations are strictly limited to preserve the artisan process.
+              Discover the current pieces available in our collection. Quantities are limited to preserve the artisan process.
             </p>
             <button 
-              onClick={() => setLocation('/atelier')}
+              onClick={() => setLocation('/collection')}
               className="px-8 py-3 bg-primary text-primary-foreground uppercase tracking-widest text-xs font-semibold hover:bg-primary/90 transition-colors"
             >
-              Enter Atelier
+              Shop Now
             </button>
           </motion.div>
         </div>

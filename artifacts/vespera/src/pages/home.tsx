@@ -59,10 +59,10 @@ export default function Home() {
             transition={{ duration: 1, delay: 1.2 }}
           >
             <Link 
-              href="/atelier" 
+              href="/collection" 
               className="inline-flex items-center justify-center px-10 py-4 border border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-500 tracking-widest uppercase text-sm font-medium"
             >
-              Enter Discovery
+              Explore Collection
             </Link>
           </motion.div>
         </div>
@@ -79,13 +79,13 @@ export default function Home() {
             className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6"
           >
             <div>
-              <h2 className="text-3xl md:text-4xl font-serif mb-4">Curated Selection</h2>
+              <h2 className="text-3xl md:text-4xl font-serif mb-4">Featured Pieces</h2>
               <p className="text-muted-foreground font-sans text-sm max-w-md">
-                Pieces distinguished by uncommon materials and singular forms. Available in limited allocation within the Atelier.
+                Pieces distinguished by uncommon materials and singular forms. Available in limited quantities.
               </p>
             </div>
             <Link 
-              href="/atelier"
+              href="/collection"
               className="text-xs uppercase tracking-widest text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline pb-1"
             >
               View Full Collection
@@ -94,7 +94,6 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
             {isLoading ? (
-              // Loading skeletons
               Array(3).fill(0).map((_, i) => (
                 <div key={i} className="flex flex-col gap-4">
                   <Skeleton className="aspect-[3/4] w-full bg-secondary/40 rounded-none" />
@@ -112,8 +111,7 @@ export default function Home() {
                   transition={{ duration: 0.8, delay: i * 0.2 }}
                   className="group block"
                 >
-                  <Link href={`/atelier/${piece.slug}`} className="block overflow-hidden relative aspect-[3/4] bg-secondary mb-6">
-                    {/* Placeholder for when image fails */}
+                  <Link href={`/collection/${piece.slug}`} className="block overflow-hidden relative aspect-[3/4] bg-secondary mb-6">
                     <div className="absolute inset-0 bg-secondary flex items-center justify-center -z-10">
                       <span className="font-serif text-muted-foreground/30 text-sm tracking-widest uppercase">Vespera</span>
                     </div>
@@ -139,7 +137,7 @@ export default function Home() {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-serif text-xl mb-1 group-hover:text-primary transition-colors">
-                        <Link href={`/atelier/${piece.slug}`}>{piece.title}</Link>
+                        <Link href={`/collection/${piece.slug}`}>{piece.title}</Link>
                       </h3>
                       <p className="text-xs text-muted-foreground tracking-wide font-sans">{piece.material}</p>
                     </div>

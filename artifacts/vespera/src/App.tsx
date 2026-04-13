@@ -8,9 +8,9 @@ import { CartProvider } from "@/components/cart-context";
 import { Layout } from "@/components/layout";
 
 import Home from "@/pages/home";
-import Atelier from "@/pages/atelier";
+import Collection from "@/pages/collection";
 import Product from "@/pages/product";
-import Archive from "@/pages/archive";
+import OurStory from "@/pages/our-story";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,9 +26,9 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={Home} />
-        <Route path="/atelier" component={Atelier} />
-        <Route path="/atelier/:slug" component={Product} />
-        <Route path="/archive" component={Archive} />
+        <Route path="/collection" component={Collection} />
+        <Route path="/collection/:slug" component={Product} />
+        <Route path="/our-story" component={OurStory} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

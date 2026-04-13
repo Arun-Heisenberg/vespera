@@ -50,9 +50,9 @@ export function CartDrawer() {
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
       <SheetContent className="w-full sm:max-w-lg bg-background border-l-border/50 p-0 flex flex-col">
         <SheetHeader className="p-6 border-b border-border/20 text-left">
-          <SheetTitle className="font-serif text-2xl font-normal text-foreground">Your Selection</SheetTitle>
+          <SheetTitle className="font-serif text-2xl font-normal text-foreground">Shopping Bag</SheetTitle>
           <SheetDescription className="text-muted-foreground font-sans text-sm">
-            Review your pieces before acquiring.
+            Review your selected pieces before checkout.
           </SheetDescription>
         </SheetHeader>
 
@@ -68,13 +68,13 @@ export function CartDrawer() {
                 <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center">
                   <ShoppingBag className="w-6 h-6 text-muted-foreground" />
                 </div>
-                <p className="text-muted-foreground font-sans">Your selection is empty.</p>
+                <p className="text-muted-foreground font-sans">Your bag is empty.</p>
                 <Button 
                   variant="outline" 
                   className="mt-4 border-primary/20 text-primary hover:bg-primary/10"
                   onClick={() => setIsCartOpen(false)}
                 >
-                  Return to Atelier
+                  Continue Shopping
                 </Button>
               </motion.div>
             ) : (
@@ -146,7 +146,7 @@ export function CartDrawer() {
         {items.length > 0 && (
           <div className="border-t border-border/20 p-6 bg-background">
             <div className="flex justify-between mb-6 font-sans">
-              <span className="text-muted-foreground uppercase tracking-widest text-xs font-semibold">Total Selection</span>
+              <span className="text-muted-foreground uppercase tracking-widest text-xs font-semibold">Total</span>
               <span className="font-medium tracking-wide">{formatPrice(totalPrice)}</span>
             </div>
             
@@ -157,10 +157,10 @@ export function CartDrawer() {
             >
               {checkout.isPending ? (
                 <span className="flex items-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" /> Preparing Collection...
+                  <Loader2 className="w-5 h-5 animate-spin" /> Processing...
                 </span>
               ) : (
-                "Acquire Collection"
+                "Proceed to Checkout"
               )}
             </Button>
           </div>

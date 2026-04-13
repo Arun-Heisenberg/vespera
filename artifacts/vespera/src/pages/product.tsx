@@ -14,7 +14,6 @@ export default function Product() {
   const [isAdded, setIsAdded] = useState(false);
   const { addItem } = useCart();
   
-  // Since we only have slug in URL, we need to find the piece ID from the list
   const { data: pieces, isLoading: isListLoading } = useListCollection();
   const pieceId = pieces?.find(p => p.slug === slug)?.id;
   
@@ -36,12 +35,11 @@ export default function Product() {
   }, [piece]);
 
   useEffect(() => {
-    // Reset state when piece changes
     setActiveImageIndex(0);
     setIsAdded(false);
   }, [slug]);
 
-  const handleAcquire = () => {
+  const handleAddToBag = () => {
     if (!piece) return;
     addItem(piece);
     setIsAdded(true);
@@ -52,9 +50,9 @@ export default function Product() {
     return (
       <div className="container mx-auto px-6 py-32 text-center">
         <h1 className="text-3xl font-serif mb-6">Piece Not Found</h1>
-        <p className="text-muted-foreground mb-8">This silhouette is no longer available in the atelier.</p>
-        <Link href="/atelier" className="text-primary uppercase tracking-widest text-sm hover:underline underline-offset-4">
-          Return to Collection
+        <p className="text-muted-foreground mb-8">This piece is no longer available in our collection.</p>
+        <Link href="/collection" className="text-primary uppercase tracking-widest text-sm hover:underline underline-offset-4">
+          Back to Collection
         </Link>
       </div>
     );
@@ -64,8 +62,8 @@ export default function Product() {
 
   return (
     <div className="container mx-auto px-6 md:px-12 py-8 md:py-16">
-      <Link href="/atelier" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors mb-12">
-        <ArrowLeft className="w-3 h-3" /> Back to Atelier
+      <Link href="/collection" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors mb-12">
+        <ArrowLeft className="w-3 h-3" /> Back to Collection
       </Link>
 
       {isLoading ? (
@@ -153,14 +151,14 @@ export default function Product() {
 
               {piece.stockCount > 0 ? (
                 <Button 
-                  onClick={handleAcquire}
+                  onClick={handleAddToBag}
                   disabled={isAdded}
                   className="w-full h-16 rounded-none bg-primary text-primary-foreground hover:bg-primary/90 text-sm uppercase tracking-widest font-medium transition-all mb-4"
                 >
                   {isAdded ? (
-                    <span className="flex items-center gap-2"><Check className="w-5 h-5" /> Added to Selection</span>
+                    <span className="flex items-center gap-2"><Check className="w-5 h-5" /> Added to Bag</span>
                   ) : (
-                    "Acquire Piece"
+                    "Add to Bag"
                   )}
                 </Button>
               ) : (
@@ -189,7 +187,7 @@ export default function Product() {
                 <div>
                   <h3 className="font-serif text-xl mb-4 flex items-center gap-3">
                     <span className="w-8 h-[1px] bg-primary"></span>
-                    Artisan Notes
+                    Craftsmanship Notes
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed pl-11">
                     {piece.artisanNotes}
@@ -201,7 +199,7 @@ export default function Product() {
                 <div>
                   <h3 className="font-serif text-xl mb-4 flex items-center gap-3">
                     <span className="w-8 h-[1px] bg-border"></span>
-                    Occasion Styling
+                    Styling Suggestions
                   </h3>
                   <ul className="space-y-3 pl-11">
                     {piece.occasionStyling.map((style, i) => (
