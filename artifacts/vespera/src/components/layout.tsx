@@ -71,7 +71,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <img 
                 src="/logo.png" 
                 alt="Vespera" 
-                className="h-5 md:h-7 object-contain"
+                className="h-8 md:h-10 object-contain"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                   (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
