@@ -106,20 +106,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             </Show>
 
-            <button 
-              onClick={() => setIsCartOpen(true)}
-              className="text-sm tracking-widest uppercase hover:text-primary transition-colors flex items-center gap-2 group"
-              aria-label={`Cart with ${totalItems} items`}
-            >
-              <span className="hidden md:inline">Bag</span>
-              <span className="relative flex items-center justify-center w-6 h-6 border border-transparent group-hover:border-primary/30 rounded-full transition-all">
-                {totalItems > 0 ? (
+            {totalItems > 0 && (
+              <button 
+                onClick={() => setIsCartOpen(true)}
+                className="text-sm tracking-widest uppercase hover:text-primary transition-colors flex items-center gap-2 group"
+                aria-label={`Cart with ${totalItems} items`}
+              >
+                <span className="hidden md:inline">Bag</span>
+                <span className="relative flex items-center justify-center w-6 h-6 border border-transparent group-hover:border-primary/30 rounded-full transition-all">
                   <span className="text-xs font-medium text-primary">{totalItems}</span>
-                ) : (
-                  <span className="text-xs">0</span>
-                )}
-              </span>
-            </button>
+                </span>
+              </button>
+            )}
           </div>
         </div>
       </header>
