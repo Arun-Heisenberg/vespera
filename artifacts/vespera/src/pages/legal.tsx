@@ -116,15 +116,15 @@ export default function Legal() {
 
   return (
     <div className="flex flex-col">
-      <section className="container mx-auto px-6 md:px-12 py-16 md:py-24 max-w-4xl">
+      <section className="container mx-auto px-6 md:px-12 py-10 md:py-14 max-w-4xl">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          transition={{ duration: 0.6 }}
+          className="text-center mb-10"
         >
-          <span className="text-xs uppercase tracking-widest text-primary mb-4 block">Policies</span>
-          <h1 className="text-4xl md:text-5xl font-serif mb-6">Legal</h1>
+          <span className="text-xs uppercase tracking-widest text-primary mb-3 block">Policies</span>
+          <h1 className="text-3xl md:text-4xl font-serif mb-4">Legal</h1>
           <p className="text-muted-foreground font-sans text-sm max-w-lg mx-auto leading-relaxed">
             Please review our policies below. By using this website and purchasing our products, you agree to be bound by these terms.
           </p>
@@ -133,8 +133,8 @@ export default function Legal() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-4 mb-16"
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="flex flex-wrap justify-center gap-3 mb-10"
         >
           {sections.map((section) => (
             <button
@@ -147,19 +147,19 @@ export default function Legal() {
           ))}
         </motion.div>
 
-        <div className="space-y-24">
+        <div className="space-y-16">
           {sections.map((section, sectionIndex) => (
             <motion.div
               key={section.id}
               id={section.id}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.8, delay: sectionIndex * 0.1 }}
-              className="scroll-mt-32"
+              viewport={{ once: true, margin: "-30px" }}
+              transition={{ duration: 0.6, delay: sectionIndex * 0.08 }}
+              className="scroll-mt-24"
             >
-              <h2 className="text-3xl font-serif mb-10 pb-4 border-b border-border/20">{section.title}</h2>
-              <div className="space-y-8">
+              <h2 className="text-2xl font-serif mb-6 pb-3 border-b border-border/20">{section.title}</h2>
+              <div className="space-y-6">
                 {section.content.map((item, i) => (
                   <div key={i}>
                     <h3 className="font-sans text-sm font-semibold uppercase tracking-wide mb-3 text-foreground/90">{item.heading}</h3>
@@ -175,8 +175,8 @@ export default function Legal() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="mt-24 pt-12 border-t border-border/20 text-center"
+          transition={{ duration: 0.6 }}
+          className="mt-14 pt-8 border-t border-border/20 text-center"
         >
           <p className="text-xs text-muted-foreground tracking-wide mb-2">
             Last updated: {new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })}
