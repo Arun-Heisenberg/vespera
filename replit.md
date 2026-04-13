@@ -43,17 +43,33 @@ Luxury e-commerce flagship for curated evening minaudières targeting Indian aud
 **Palette:** Obsidian (#0A0A0A), Alabaster (#FFFFFF), Champagne (#D4AF37)
 **Fonts:** Playfair Display (serif headlines), Inter (body)
 
-**DB Schema:**
-- `collection`: id, title, description, price, stock_count, primary_image, images, material, dimensions, occasion_styling, artisan_notes, is_featured, slug
-- `orders`: id, status, total_amount, razorpay_order_id, shipping_details, created_at
-- `customers`: id, email, full_name, created_at
+**DB Schema (8 tables):**
+- `collection`: id, title, description, price, stock_count, primary_image, images, material, dimensions, occasion_styling, artisan_notes, is_featured, slug, sku, weight_grams, category_id (FK→categories), is_active, created_at, updated_at
+- `orders`: id, order_number (unique), customer_id (FK→customers), status, payment_status, total_amount, razorpay_order_id, razorpay_payment_id, shipping_address (JSONB), billing_address (JSONB), shipping_details (JSONB), created_at, updated_at
+- `customers`: id, email, full_name, clerk_user_id, phone, avatar_url, default_address_id, created_at, updated_at
+- `categories`: id, name, slug (unique), description, display_order, created_at
+- `addresses`: id, customer_id (FK→customers), label, full_name, phone, address_line_1/2, city, state, pincode, country, is_default, created_at, updated_at
+- `order_items`: id, order_id (FK→orders), product_id (FK→collection), title, quantity, unit_price, total_price
+- `payments`: id, order_id (FK→orders), razorpay_order_id, razorpay_payment_id, razorpay_signature, amount, currency, method, status, paid_at, created_at
+- `wishlists`: id, customer_id (FK→customers), product_id (FK→collection), created_at (unique on customer+product)
 
 **API Routes (under /api):**
 - `GET /collection` — list all pieces
 - `GET /collection/featured` — featured pieces for home page
 - `GET /collection/:id` — single piece
-- `POST /checkout` — create Razorpay order
-- `POST /checkout/verify` — verify Razorpay payment signature
+- `POST /checkout` — create Razorpay order + order record + order_items + payment record (auth required)
+- `POST /checkout/verify` — verify Razorpay payment signature, update order+payment status (auth required)
+- `GET /orders` — customer order history (auth required)
+- `GET /orders/:id` — order detail with items and payment (auth required)
+- `GET /admin/orders` — all orders with customer info (admin)
+- `GET /wishlist` — customer wishlist (auth required)
+- `POST /wishlist` — add to wishlist (auth required)
+- `DELETE /wishlist/:productId` — remove from wishlist (auth required)
+- `GET /addresses` — customer addresses (auth required)
+- `POST /addresses` — create address (auth required)
+- `DELETE /addresses/:id` — delete address (auth required)
+- `POST /users/sync` — sync Clerk user data to customers table
+- `GET /users/me` — get current user's customer record
 
 **Authentication:** Clerk (whitelabel). Frontend uses `@clerk/react` with `ClerkProvider` wrapping wouter routes. Backend uses `@clerk/express` with `clerkMiddleware()`. Clerk proxy middleware at `/api/__clerk` for production. Checkout routes (`POST /checkout`, `POST /checkout/verify`) require authentication via `requireAuth` middleware. Phone number login can be enabled via Auth pane in workspace toolbar.
 

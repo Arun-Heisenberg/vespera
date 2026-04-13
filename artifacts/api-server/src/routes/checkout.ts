@@ -1,8 +1,10 @@
 import { Router, type IRouter } from "express";
-import { db, collectionTable } from "@workspace/db";
-import { inArray } from "drizzle-orm";
+import { db, pool, collectionTable, ordersTable, orderItemsTable, paymentsTable, customersTable } from "@workspace/db";
+import { inArray, eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/node-postgres";
 import Razorpay from "razorpay";
 import crypto from "crypto";
+import { getAuth } from "@clerk/express";
 import { requireAuth } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
@@ -12,6 +14,13 @@ function getRazorpayInstance() {
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
   if (!keyId || !keySecret) return null;
   return new Razorpay({ key_id: keyId, key_secret: keySecret });
+}
+
+function generateOrderNumber(): string {
+  const now = new Date();
+  const date = now.toISOString().slice(0, 10).replace(/-/g, "");
+  const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `VES-${date}-${rand}`;
 }
 
 router.post("/checkout", requireAuth, async (req, res): Promise<void> => {
@@ -30,37 +39,115 @@ router.post("/checkout", requireAuth, async (req, res): Promise<void> => {
   }
 
   try {
+    const auth = getAuth(req);
+    const clerkUserId = auth?.userId;
+
+    let customerId: number | null = null;
+    if (clerkUserId) {
+      const [customer] = await db
+        .select()
+        .from(customersTable)
+        .where(eq(customersTable.clerkUserId, clerkUserId))
+        .limit(1);
+      if (customer) customerId = customer.id;
+    }
+
     const pieceIds = items.map((i) => i.pieceId);
     const pieces = await db
       .select()
       .from(collectionTable)
       .where(inArray(collectionTable.id, pieceIds));
 
-    let totalAmount = 0;
+    let totalAmountPaise = 0;
+    const orderItemsData: Array<{
+      productId: number;
+      title: string;
+      quantity: number;
+      unitPrice: string;
+      totalPrice: string;
+    }> = [];
+
     for (const item of items) {
       const piece = pieces.find((p) => p.id === item.pieceId);
       if (!piece) {
         res.status(400).json({ error: `Piece ${item.pieceId} not found` });
         return;
       }
-      totalAmount += Math.round(parseFloat(piece.price) * 100) * item.quantity;
+      const unitPricePaise = Math.round(parseFloat(piece.price) * 100);
+      totalAmountPaise += unitPricePaise * item.quantity;
+      orderItemsData.push({
+        productId: piece.id,
+        title: piece.title,
+        quantity: item.quantity,
+        unitPrice: piece.price,
+        totalPrice: (parseFloat(piece.price) * item.quantity).toFixed(2),
+      });
     }
 
-    const order = await razorpay.orders.create({
-      amount: totalAmount,
+    if (!customerId) {
+      res.status(400).json({ error: "Customer profile not found. Please try signing out and back in." });
+      return;
+    }
+
+    const orderNumber = generateOrderNumber();
+    const totalAmountRupees = (totalAmountPaise / 100).toFixed(2);
+
+    const razorpayOrder = await razorpay.orders.create({
+      amount: totalAmountPaise,
       currency: "INR",
-      receipt: `order_${Date.now()}`,
+      receipt: orderNumber,
       notes: {
         items: JSON.stringify(items),
       },
     });
 
-    res.json({
-      orderId: order.id,
-      keyId: process.env.RAZORPAY_KEY_ID!,
-      amount: totalAmount,
-      currency: "INR",
-    });
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const txDb = drizzle(client);
+
+      const [order] = await txDb
+        .insert(ordersTable)
+        .values({
+          orderNumber,
+          customerId,
+          status: "pending",
+          paymentStatus: "unpaid",
+          totalAmount: totalAmountRupees,
+          razorpayOrderId: razorpayOrder.id,
+        })
+        .returning();
+
+      await txDb.insert(orderItemsTable).values(
+        orderItemsData.map((item) => ({
+          orderId: order.id,
+          ...item,
+        }))
+      );
+
+      await txDb.insert(paymentsTable).values({
+        orderId: order.id,
+        razorpayOrderId: razorpayOrder.id,
+        amount: totalAmountRupees,
+        currency: "INR",
+        status: "created",
+      });
+
+      await client.query("COMMIT");
+
+      res.json({
+        orderId: razorpayOrder.id,
+        keyId: process.env.RAZORPAY_KEY_ID!,
+        amount: totalAmountPaise,
+        currency: "INR",
+        orderNumber,
+      });
+    } catch (txErr) {
+      await client.query("ROLLBACK");
+      throw txErr;
+    } finally {
+      client.release();
+    }
   } catch (err) {
     req.log.error({ err }, "Razorpay checkout error");
     res.status(500).json({ error: "Failed to create checkout order" });
@@ -94,8 +181,28 @@ router.post("/checkout/verify", requireAuth, async (req, res): Promise<void> => 
     const verified = expectedSignature === razorpay_signature;
 
     if (verified) {
+      await db
+        .update(ordersTable)
+        .set({ paymentStatus: "paid", status: "confirmed", razorpayPaymentId: razorpay_payment_id, updatedAt: new Date() })
+        .where(eq(ordersTable.razorpayOrderId, razorpay_order_id));
+
+      await db
+        .update(paymentsTable)
+        .set({
+          razorpayPaymentId: razorpay_payment_id,
+          razorpaySignature: razorpay_signature,
+          status: "captured",
+          paidAt: new Date(),
+        })
+        .where(eq(paymentsTable.razorpayOrderId, razorpay_order_id));
+
       req.log.info({ orderId: razorpay_order_id, paymentId: razorpay_payment_id }, "Payment verified");
     } else {
+      await db
+        .update(paymentsTable)
+        .set({ status: "failed" })
+        .where(eq(paymentsTable.razorpayOrderId, razorpay_order_id));
+
       req.log.warn({ orderId: razorpay_order_id }, "Payment verification failed");
     }
 
