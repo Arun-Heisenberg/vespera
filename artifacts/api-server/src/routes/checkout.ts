@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, pool, collectionTable, ordersTable, orderItemsTable, paymentsTable, customersTable } from "@workspace/db";
-import { inArray, eq } from "drizzle-orm";
+import { inArray, eq, count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import Razorpay from "razorpay";
 import crypto from "crypto";
@@ -16,11 +16,15 @@ function getRazorpayInstance() {
   return new Razorpay({ key_id: keyId, key_secret: keySecret });
 }
 
-function generateOrderNumber(): string {
+async function generateOrderNumber(): Promise<string> {
   const now = new Date();
   const date = now.toISOString().slice(0, 10).replace(/-/g, "");
-  const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
-  return `VES-${date}-${rand}`;
+  const prefix = `VES-${date}`;
+  const [result] = await db
+    .select({ total: count() })
+    .from(ordersTable);
+  const seq = (result?.total ?? 0) + 1;
+  return `${prefix}-${String(seq).padStart(4, "0")}`;
 }
 
 interface CheckoutAddress {
@@ -198,6 +202,17 @@ router.post("/checkout/verify", requireAuth, async (req, res): Promise<void> => 
     const verified = expectedSignature === razorpay_signature;
 
     if (verified) {
+      let paymentMethod: string | undefined;
+      const razorpay = getRazorpayInstance();
+      if (razorpay) {
+        try {
+          const paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
+          paymentMethod = (paymentDetails as Record<string, unknown>).method as string | undefined;
+        } catch {
+          req.log.warn({ paymentId: razorpay_payment_id }, "Could not fetch payment method from Razorpay");
+        }
+      }
+
       await db
         .update(ordersTable)
         .set({ paymentStatus: "paid", status: "confirmed", razorpayPaymentId: razorpay_payment_id, updatedAt: new Date() })
@@ -209,11 +224,12 @@ router.post("/checkout/verify", requireAuth, async (req, res): Promise<void> => 
           razorpayPaymentId: razorpay_payment_id,
           razorpaySignature: razorpay_signature,
           status: "captured",
+          method: paymentMethod || null,
           paidAt: new Date(),
         })
         .where(eq(paymentsTable.razorpayOrderId, razorpay_order_id));
 
-      req.log.info({ orderId: razorpay_order_id, paymentId: razorpay_payment_id }, "Payment verified");
+      req.log.info({ orderId: razorpay_order_id, paymentId: razorpay_payment_id, method: paymentMethod }, "Payment verified");
     } else {
       await db
         .update(paymentsTable)
