@@ -62,8 +62,8 @@ export default function Product() {
 
   return (
     <div className="luxury-noise pb-20 md:pb-0">
-      <div className="container mx-auto px-6 md:px-12 py-8 md:py-16 relative z-10">
-        <Link href="/collection" className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-primary transition-colors mb-12 group">
+      <div className="container mx-auto px-4 md:px-8 py-4 md:py-8 relative z-10">
+        <Link href="/collection" className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] text-muted-foreground hover:text-primary transition-colors mb-6 group">
           <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" /> Back to Collection
         </Link>
 

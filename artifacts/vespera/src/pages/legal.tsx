@@ -116,54 +116,53 @@ export default function Legal() {
 
   return (
     <div className="flex flex-col">
-      <section className="container mx-auto px-6 md:px-12 py-10 md:py-14 max-w-4xl">
+      <section className="container mx-auto px-4 md:px-8 py-6 md:py-8 max-w-3xl">
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-10"
+          transition={{ duration: 0.5 }}
+          className="text-center mb-5"
         >
-          <span className="text-xs uppercase tracking-widest text-primary mb-3 block">Policies</span>
-          <h1 className="text-3xl md:text-4xl font-serif mb-4">Legal</h1>
-          <p className="text-muted-foreground font-sans text-sm max-w-lg mx-auto leading-relaxed">
-            Please review our policies below. By using this website and purchasing our products, you agree to be bound by these terms.
+          <h1 className="text-2xl md:text-3xl font-serif mb-2">Legal</h1>
+          <p className="text-muted-foreground font-sans text-xs max-w-md mx-auto">
+            Review our policies below. By using this website, you agree to these terms.
           </p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.15 }}
-          className="flex flex-wrap justify-center gap-3 mb-10"
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="flex flex-wrap justify-center gap-2 mb-6"
         >
           {sections.map((section) => (
             <button
               key={section.id}
               onClick={() => scrollToSection(section.id)}
-              className="px-5 py-2 border border-border/30 text-xs uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
+              className="px-4 py-1.5 border border-border/30 text-[11px] uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
             >
               {section.title}
             </button>
           ))}
         </motion.div>
 
-        <div className="space-y-16">
+        <div className="space-y-10">
           {sections.map((section, sectionIndex) => (
             <motion.div
               key={section.id}
               id={section.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-30px" }}
-              transition={{ duration: 0.6, delay: sectionIndex * 0.08 }}
-              className="scroll-mt-24"
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: sectionIndex * 0.06 }}
+              className="scroll-mt-16"
             >
-              <h2 className="text-2xl font-serif mb-6 pb-3 border-b border-border/20">{section.title}</h2>
-              <div className="space-y-6">
+              <h2 className="text-xl font-serif mb-4 pb-2 border-b border-border/20">{section.title}</h2>
+              <div className="space-y-4">
                 {section.content.map((item, i) => (
                   <div key={i}>
-                    <h3 className="font-sans text-sm font-semibold uppercase tracking-wide mb-3 text-foreground/90">{item.heading}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
+                    <h3 className="font-sans text-xs font-semibold uppercase tracking-wide mb-1.5 text-foreground/90">{item.heading}</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{item.text}</p>
                   </div>
                 ))}
               </div>
@@ -175,14 +174,14 @@ export default function Legal() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mt-14 pt-8 border-t border-border/20 text-center"
+          transition={{ duration: 0.5 }}
+          className="mt-8 pt-5 border-t border-border/20 text-center"
         >
-          <p className="text-xs text-muted-foreground tracking-wide mb-2">
+          <p className="text-[11px] text-muted-foreground tracking-wide mb-1">
             Last updated: {new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })}
           </p>
-          <p className="text-xs text-muted-foreground/60">
-            For questions about these policies, contact us at{" "}
+          <p className="text-[11px] text-muted-foreground/60">
+            Questions? Contact{" "}
             <a href="mailto:care@vespera.in" className="text-primary hover:underline underline-offset-4">care@vespera.in</a>
           </p>
         </motion.div>

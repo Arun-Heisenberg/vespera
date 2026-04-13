@@ -5,7 +5,7 @@ import { Show, useUser } from "@clerk/react";
 import { useCart } from "./cart-context";
 import { CartDrawer } from "./cart-drawer";
 import { MobileBottomNav } from "./mobile-nav";
-import { Menu, User, Shield } from "lucide-react";
+import { Menu, User, Shield, ShoppingBag } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -26,7 +26,7 @@ function useIsAdmin() {
   if (!user) return false;
   const email = user.primaryEmailAddress?.emailAddress || "";
   const metaRole = (user.publicMetadata as any)?.role;
-  return metaRole === "admin" || email === "admin@vespera.com";
+  return metaRole === "admin" || email === "admin@vespera.com" || email === "avkvasp1@gmail.com";
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -38,7 +38,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 30);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -51,17 +51,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background text-foreground">
       <header 
-        className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${
+        className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${
           scrolled 
-            ? "bg-background/90 backdrop-blur-md border-border/20 py-4" 
-            : "bg-transparent border-transparent py-6"
+            ? "bg-background/90 backdrop-blur-md border-border/20 py-2.5" 
+            : "bg-transparent border-transparent py-3.5"
         }`}
       >
-        <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="container mx-auto px-4 md:px-8 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMenuOpen(true)}
-              className="text-foreground hover:text-primary transition-colors"
+              className="text-foreground hover:text-primary transition-colors md:hidden"
               aria-label="Open menu"
             >
               <Menu className="w-5 h-5" />
@@ -71,30 +71,56 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <img 
                 src="/logo.png" 
                 alt="Vespera" 
-                className="h-6 md:h-8 object-contain"
+                className="h-5 md:h-7 object-contain"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                   (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
                 }}
               />
-              <span className="hidden font-serif text-2xl tracking-widest text-primary">VESPERA</span>
+              <span className="hidden font-serif text-xl tracking-widest text-primary">VESPERA</span>
             </Link>
+
+            <nav className="hidden md:flex items-center gap-6 ml-8">
+              {navLinks.slice(0, 3).map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-[11px] tracking-[0.15em] uppercase transition-colors duration-300 ${
+                    location === link.href || location.startsWith(link.href + "/")
+                      ? "text-primary"
+                      : "text-foreground/70 hover:text-primary"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
           </div>
 
-          <div className="flex items-center gap-4 md:gap-6">
+          <div className="flex items-center gap-3 md:gap-5">
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="hidden md:flex items-center gap-1 text-[11px] tracking-[0.12em] uppercase text-foreground/70 hover:text-primary transition-colors"
+              >
+                <Shield className="w-3.5 h-3.5" />
+                Admin
+              </Link>
+            )}
+
             <Show when="signed-in">
               <Link
                 href="/account"
                 className="hover:text-primary transition-colors"
                 aria-label="My Account"
               >
-                <User className="w-5 h-5" />
+                <User className="w-4.5 h-4.5" />
               </Link>
             </Show>
             <Show when="signed-out">
               <Link
                 href="/sign-in"
-                className="text-sm tracking-widest uppercase hover:text-primary transition-colors hidden md:inline"
+                className="text-[11px] tracking-[0.12em] uppercase hover:text-primary transition-colors hidden md:inline"
               >
                 Sign In
               </Link>
@@ -103,46 +129,46 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 className="hover:text-primary transition-colors md:hidden"
                 aria-label="Sign In"
               >
-                <User className="w-5 h-5" />
+                <User className="w-4.5 h-4.5" />
               </Link>
             </Show>
 
-            {totalItems > 0 && (
-              <button 
-                onClick={() => setIsCartOpen(true)}
-                className="text-sm tracking-widest uppercase hover:text-primary transition-colors flex items-center gap-2 group"
-                aria-label={`Cart with ${totalItems} items`}
-              >
-                <span className="hidden md:inline">Bag</span>
-                <span className="relative flex items-center justify-center w-6 h-6 border border-transparent group-hover:border-primary/30 rounded-full transition-all">
-                  <span className="text-xs font-medium text-primary">{totalItems}</span>
+            <button 
+              onClick={() => setIsCartOpen(true)}
+              className="hover:text-primary transition-colors flex items-center gap-1.5 group relative"
+              aria-label={`Cart with ${totalItems} items`}
+            >
+              <ShoppingBag className="w-4.5 h-4.5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 flex items-center justify-center bg-primary text-primary-foreground text-[9px] font-semibold rounded-full px-1">
+                  {totalItems}
                 </span>
-              </button>
-            )}
+              )}
+            </button>
           </div>
         </div>
       </header>
 
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <SheetContent side="left" className="w-full sm:max-w-sm bg-background border-r-border/50 p-0 flex flex-col">
-          <SheetHeader className="p-8 border-b border-border/20 text-left">
-            <SheetTitle className="font-serif text-2xl font-normal text-foreground">Menu</SheetTitle>
+          <SheetHeader className="p-6 border-b border-border/20 text-left">
+            <SheetTitle className="font-serif text-xl font-normal text-foreground">Menu</SheetTitle>
             <SheetDescription className="text-muted-foreground font-sans text-sm">
               Navigate the Vespera experience.
             </SheetDescription>
           </SheetHeader>
 
-          <nav className="flex-1 flex flex-col p-8 gap-2">
+          <nav className="flex-1 flex flex-col p-6 gap-1">
             {navLinks.map((link, i) => (
               <motion.div
                 key={link.href}
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: i * 0.08 }}
+                transition={{ duration: 0.25, delay: i * 0.06 }}
               >
                 <Link
                   href={link.href}
-                  className={`block py-4 text-lg tracking-widest uppercase transition-colors border-b border-border/10 ${
+                  className={`block py-3.5 text-base tracking-widest uppercase transition-colors border-b border-border/10 ${
                     location === link.href
                       ? "text-primary"
                       : "text-foreground hover:text-primary"
@@ -155,13 +181,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             <Show when="signed-in">
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: navLinks.length * 0.08 }}
+                transition={{ duration: 0.25, delay: navLinks.length * 0.06 }}
               >
                 <Link
                   href="/account"
-                  className={`block py-4 text-lg tracking-widest uppercase transition-colors border-b border-border/10 ${
+                  className={`block py-3.5 text-base tracking-widest uppercase transition-colors border-b border-border/10 ${
                     location === "/account" ? "text-primary" : "text-foreground hover:text-primary"
                   }`}
                 >
@@ -172,13 +198,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             <Show when="signed-out">
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: navLinks.length * 0.08 }}
+                transition={{ duration: 0.25, delay: navLinks.length * 0.06 }}
               >
                 <Link
                   href="/sign-in"
-                  className="block py-4 text-lg tracking-widest uppercase transition-colors border-b border-border/10 text-foreground hover:text-primary"
+                  className="block py-3.5 text-base tracking-widest uppercase transition-colors border-b border-border/10 text-foreground hover:text-primary"
                 >
                   Sign In
                 </Link>
@@ -187,13 +213,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             {isAdmin && (
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: (navLinks.length + 1) * 0.08 }}
+                transition={{ duration: 0.25, delay: (navLinks.length + 1) * 0.06 }}
               >
                 <Link
                   href="/admin"
-                  className={`flex items-center gap-2 py-4 text-lg tracking-widest uppercase transition-colors border-b border-border/10 ${
+                  className={`flex items-center gap-2 py-3.5 text-base tracking-widest uppercase transition-colors border-b border-border/10 ${
                     location === "/admin" ? "text-primary" : "text-foreground hover:text-primary"
                   }`}
                 >
@@ -204,7 +230,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             )}
           </nav>
 
-          <div className="p-8 border-t border-border/20">
+          <div className="p-6 border-t border-border/20">
             <Link
               href="/"
               className="flex items-center justify-center"
@@ -213,61 +239,61 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <img 
                 src="/logo.png" 
                 alt="Vespera" 
-                className="h-8 object-contain opacity-60 grayscale"
+                className="h-6 object-contain opacity-50 grayscale"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                   (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
                 }}
               />
-              <span className="hidden font-serif text-xl tracking-widest text-muted-foreground">VESPERA</span>
+              <span className="hidden font-serif text-lg tracking-widest text-muted-foreground">VESPERA</span>
             </Link>
           </div>
         </SheetContent>
       </Sheet>
 
-      <main className="flex-1 pt-24 md:pt-32">
+      <main className="flex-1 pt-14 md:pt-16">
         <motion.div
           key={location}
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
         >
           {children}
         </motion.div>
       </main>
 
-      <footer className="relative mt-24 mobile-safe-bottom md:pb-0">
+      <footer className="relative mt-10 mobile-safe-bottom md:pb-0">
         <div className="gold-divider w-full" />
-        <div className="relative py-20 luxury-noise">
+        <div className="relative py-10 luxury-noise">
           <div className="absolute inset-0 bg-gradient-to-b from-card/30 to-background z-0" />
-          <div className="container mx-auto px-6 md:px-12 flex flex-col items-center relative z-10">
+          <div className="container mx-auto px-4 md:px-8 flex flex-col items-center relative z-10">
             <img 
               src="/logo.png" 
               alt="Vespera" 
-              className="h-8 md:h-10 object-contain mb-8 opacity-60"
+              className="h-6 md:h-7 object-contain mb-5 opacity-50"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
                 (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
               }}
             />
-            <span className="hidden font-serif text-3xl tracking-widest mb-8 text-muted-foreground">VESPERA</span>
+            <span className="hidden font-serif text-2xl tracking-widest mb-5 text-muted-foreground">VESPERA</span>
             
-            <div className="flex flex-wrap justify-center gap-8 mb-10">
+            <div className="flex flex-wrap justify-center gap-6 mb-6">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground/60 hover:text-primary transition-colors duration-300"
+                  className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground/60 hover:text-primary transition-colors duration-300"
                 >
                   {link.label}
                 </Link>
               ))}
             </div>
 
-            <div className="gold-divider w-24 mb-8" />
+            <div className="gold-divider w-16 mb-5" />
 
-            <p className="text-[10px] text-muted-foreground/50 tracking-[0.15em] uppercase">
+            <p className="text-[10px] text-muted-foreground/40 tracking-[0.15em] uppercase">
               © {new Date().getFullYear()} Vespera. All rights reserved.
             </p>
           </div>

@@ -51,81 +51,76 @@ export default function ClientCare() {
 
   return (
     <div className="flex flex-col">
-      <section className="container mx-auto px-6 md:px-12 py-10 md:py-14 max-w-5xl">
+      <section className="container mx-auto px-4 md:px-8 py-6 md:py-8 max-w-4xl">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-6"
+        >
+          <h1 className="text-2xl md:text-3xl font-serif mb-2">Client Care</h1>
+          <p className="text-muted-foreground font-sans text-xs max-w-md mx-auto">
+            Questions about your order, our products, or anything else? We're here to help.
+          </p>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-10"
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8"
         >
-          <span className="text-xs uppercase tracking-widest text-primary mb-3 block">Support</span>
-          <h1 className="text-3xl md:text-4xl font-serif mb-4">Client Care</h1>
-          <p className="text-muted-foreground font-sans text-sm max-w-lg mx-auto leading-relaxed">
-            We are here to assist you with any questions about your order, our products, or anything else. Reach out and we will respond promptly.
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.15 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-14"
-        >
-          <div className="border border-border/20 p-6 text-center group hover:border-primary/30 transition-colors">
-            <Mail className="w-5 h-5 text-primary mx-auto mb-3" />
-            <h3 className="font-serif text-base mb-1.5">Email</h3>
-            <a href="mailto:care@vespera.in" className="text-xs text-muted-foreground hover:text-primary transition-colors">
-              care@vespera.in
-            </a>
+          <a href="mailto:care@vespera.in" className="border border-border/20 p-4 text-center group hover:border-primary/30 transition-colors">
+            <Mail className="w-4 h-4 text-primary mx-auto mb-2" />
+            <h3 className="font-serif text-sm mb-1">Email</h3>
+            <span className="text-[11px] text-muted-foreground group-hover:text-primary transition-colors">care@vespera.in</span>
+          </a>
+          <a href="tel:+911234567890" className="border border-border/20 p-4 text-center group hover:border-primary/30 transition-colors">
+            <Phone className="w-4 h-4 text-primary mx-auto mb-2" />
+            <h3 className="font-serif text-sm mb-1">Phone</h3>
+            <span className="text-[11px] text-muted-foreground group-hover:text-primary transition-colors">+91 12345 67890</span>
+          </a>
+          <div className="border border-border/20 p-4 text-center group hover:border-primary/30 transition-colors">
+            <Clock className="w-4 h-4 text-primary mx-auto mb-2" />
+            <h3 className="font-serif text-sm mb-1">Hours</h3>
+            <p className="text-[11px] text-muted-foreground">Mon – Sat, 10 AM – 7 PM IST</p>
           </div>
-          <div className="border border-border/20 p-6 text-center group hover:border-primary/30 transition-colors">
-            <Phone className="w-5 h-5 text-primary mx-auto mb-3" />
-            <h3 className="font-serif text-base mb-1.5">Phone</h3>
-            <a href="tel:+911234567890" className="text-xs text-muted-foreground hover:text-primary transition-colors">
-              +91 12345 67890
-            </a>
-          </div>
-          <div className="border border-border/20 p-6 text-center group hover:border-primary/30 transition-colors">
-            <Clock className="w-5 h-5 text-primary mx-auto mb-3" />
-            <h3 className="font-serif text-base mb-1.5">Hours</h3>
-            <p className="text-xs text-muted-foreground">Mon – Sat, 10 AM – 7 PM IST</p>
-          </div>
-          <div className="border border-border/20 p-6 text-center group hover:border-primary/30 transition-colors">
-            <MapPin className="w-5 h-5 text-primary mx-auto mb-3" />
-            <h3 className="font-serif text-base mb-1.5">Studio</h3>
-            <p className="text-xs text-muted-foreground">Mumbai, Maharashtra, India</p>
+          <div className="border border-border/20 p-4 text-center group hover:border-primary/30 transition-colors">
+            <MapPin className="w-4 h-4 text-primary mx-auto mb-2" />
+            <h3 className="font-serif text-sm mb-1">Studio</h3>
+            <p className="text-[11px] text-muted-foreground">Mumbai, Maharashtra, India</p>
           </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-30px" }}
-          transition={{ duration: 0.6 }}
-          className="mb-14"
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
         >
-          <h2 className="text-2xl font-serif text-center mb-3">Frequently Asked Questions</h2>
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-md mx-auto">
-            Find answers to common questions about orders, shipping, returns, and more.
+          <h2 className="text-xl font-serif text-center mb-2">Frequently Asked Questions</h2>
+          <p className="text-[11px] text-muted-foreground text-center mb-5 max-w-sm mx-auto">
+            Common questions about orders, shipping, returns, and more.
           </p>
 
-          <div className="max-w-3xl mx-auto divide-y divide-border/20">
+          <div className="max-w-2xl mx-auto divide-y divide-border/20">
             {faqs.map((faq, i) => (
               <div key={i}>
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between py-5 text-left group"
+                  className="w-full flex items-center justify-between py-3.5 text-left group"
                 >
-                  <span className="font-sans text-sm pr-8 group-hover:text-primary transition-colors">{faq.question}</span>
-                  <ChevronRight className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-90" : ""}`} />
+                  <span className="font-sans text-sm pr-6 group-hover:text-primary transition-colors">{faq.question}</span>
+                  <ChevronRight className={`w-3.5 h-3.5 text-muted-foreground shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-90" : ""}`} />
                 </button>
                 <motion.div
                   initial={false}
                   animate={{ height: openFaq === i ? "auto" : 0, opacity: openFaq === i ? 1 : 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
                   className="overflow-hidden"
                 >
-                  <p className="text-sm text-muted-foreground leading-relaxed pb-5 pl-0 pr-8">
+                  <p className="text-xs text-muted-foreground leading-relaxed pb-4 pr-6">
                     {faq.answer}
                   </p>
                 </motion.div>
@@ -135,49 +130,49 @@ export default function ClientCare() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-30px" }}
-          transition={{ duration: 0.6 }}
-          className="mb-14"
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
         >
-          <h2 className="text-2xl font-serif text-center mb-8">Product Care</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <div className="border border-border/20 p-6">
-              <h3 className="font-serif text-base mb-3">Storage</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Store your minaudière in the dust bag provided, away from direct sunlight and moisture. Avoid stacking pieces to prevent surface scratches.
+          <h2 className="text-xl font-serif text-center mb-5">Product Care</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl mx-auto">
+            <div className="border border-border/20 p-5">
+              <h3 className="font-serif text-sm mb-2">Storage</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Store in the dust bag provided, away from direct sunlight and moisture. Avoid stacking pieces.
               </p>
             </div>
-            <div className="border border-border/20 p-6">
-              <h3 className="font-serif text-base mb-3">Cleaning</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Gently wipe with a soft, dry microfibre cloth. For metal surfaces, use a jewellery polishing cloth. Do not use chemical cleaners or submerge in water.
+            <div className="border border-border/20 p-5">
+              <h3 className="font-serif text-sm mb-2">Cleaning</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Wipe with a soft, dry microfibre cloth. For metal, use a jewellery polishing cloth. No chemical cleaners.
               </p>
             </div>
-            <div className="border border-border/20 p-6">
-              <h3 className="font-serif text-base mb-3">Handling</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Open and close clasps with care. Avoid placing heavy objects on your piece. Keep away from perfume, hairspray, and abrasive surfaces.
+            <div className="border border-border/20 p-5">
+              <h3 className="font-serif text-sm mb-2">Handling</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Open and close clasps with care. Keep away from perfume, hairspray, and abrasive surfaces.
               </p>
             </div>
           </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-30px" }}
-          transition={{ duration: 0.6 }}
-          className="text-center max-w-2xl mx-auto border border-border/20 p-10 md:p-14"
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-center max-w-lg mx-auto border border-border/20 p-8"
         >
-          <h3 className="text-xl font-serif mb-4">Still Have Questions?</h3>
-          <p className="text-muted-foreground mb-6 font-sans text-sm">
-            Our client care team is ready to assist you. Write to us and we will get back to you within 24 hours.
+          <h3 className="text-lg font-serif mb-3">Still Have Questions?</h3>
+          <p className="text-muted-foreground mb-4 font-sans text-xs">
+            Our team will get back to you within 24 hours.
           </p>
           <a
             href="mailto:care@vespera.in"
-            className="inline-block px-8 py-3 bg-primary text-primary-foreground uppercase tracking-widest text-xs font-semibold hover:bg-primary/90 transition-colors"
+            className="inline-block px-6 py-2.5 bg-primary text-primary-foreground uppercase tracking-widest text-[11px] font-semibold hover:bg-primary/90 transition-colors"
           >
             Email Us
           </a>
