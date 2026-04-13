@@ -263,7 +263,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </motion.div>
       </main>
 
-      <footer className="relative mt-8 md:mt-12 mobile-safe-bottom md:pb-0">
+      <footer className="relative mt-8 md:mt-12 pb-20 md:pb-0">
         <div className="gold-divider w-full" />
         <div className="relative py-8 md:py-10 luxury-noise">
           <div className="absolute inset-0 bg-gradient-to-b from-card/20 to-background z-0" />
