@@ -1,13 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { useCart } from "./cart-context";
 import { CartDrawer } from "./cart-drawer";
+import { Menu, X } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+
+const navLinks = [
+  { href: "/collection", label: "Collection" },
+  { href: "/our-story", label: "Our Story" },
+  { href: "/client-care", label: "Client Care" },
+  { href: "/legal", label: "Legal" },
+];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { totalItems, setIsCartOpen } = useCart();
-  const [scrolled, setScrolled] = React.useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,9 +33,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location]);
+
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background text-foreground">
-      {/* Header */}
       <header 
         className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${
           scrolled 
@@ -28,26 +47,28 @@ export function Layout({ children }: { children: React.ReactNode }) {
         }`}
       >
         <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
-          {/* Mobile Menu Toggle (Invisible placeholder for center alignment) */}
-          <div className="w-20 md:hidden"></div>
+          <div className="w-20 md:w-1/3 flex items-center">
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="text-foreground hover:text-primary transition-colors"
+              aria-label="Open menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
 
-          {/* Desktop Nav Left */}
-          <nav className="hidden md:flex items-center gap-8 w-1/3">
-            <Link href="/collection" className="text-sm tracking-widest uppercase hover:text-primary transition-colors">
-              Collection
-            </Link>
-            <Link href="/our-story" className="text-sm tracking-widest uppercase hover:text-primary transition-colors">
-              Our Story
-            </Link>
-            <Link href="/client-care" className="text-sm tracking-widest uppercase hover:text-primary transition-colors">
-              Client Care
-            </Link>
-            <Link href="/legal" className="text-sm tracking-widest uppercase hover:text-primary transition-colors">
-              Legal
-            </Link>
-          </nav>
+            <nav className="hidden md:flex items-center gap-8 ml-8">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm tracking-widest uppercase hover:text-primary transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
 
-          {/* Logo Center */}
           <div className="flex-1 md:w-1/3 flex justify-center">
             <Link href="/" className="block">
               <img 
@@ -63,7 +84,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
 
-          {/* Nav Right */}
           <div className="flex items-center justify-end w-20 md:w-1/3 gap-6">
             <button 
               onClick={() => setIsCartOpen(true)}
@@ -81,25 +101,60 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </button>
           </div>
         </div>
-
-        {/* Mobile Nav Below Header */}
-        <div className="md:hidden flex justify-center gap-6 pt-4 pb-2 border-t border-border/10 mt-4 bg-background/95 backdrop-blur-md absolute w-full top-full left-0 opacity-0 -translate-y-4 pointer-events-none transition-all peer-focus-within:opacity-100 peer-focus-within:translate-y-0 peer-focus-within:pointer-events-auto">
-          <Link href="/collection" className="text-xs tracking-widest uppercase hover:text-primary">
-            Collection
-          </Link>
-          <Link href="/our-story" className="text-xs tracking-widest uppercase hover:text-primary">
-            Our Story
-          </Link>
-          <Link href="/client-care" className="text-xs tracking-widest uppercase hover:text-primary">
-            Client Care
-          </Link>
-          <Link href="/legal" className="text-xs tracking-widest uppercase hover:text-primary">
-            Legal
-          </Link>
-        </div>
       </header>
 
-      {/* Main Content */}
+      <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        <SheetContent side="left" className="w-full sm:max-w-sm bg-background border-r-border/50 p-0 flex flex-col">
+          <SheetHeader className="p-8 border-b border-border/20 text-left">
+            <SheetTitle className="font-serif text-2xl font-normal text-foreground">Menu</SheetTitle>
+            <SheetDescription className="text-muted-foreground font-sans text-sm">
+              Navigate the Vespera experience.
+            </SheetDescription>
+          </SheetHeader>
+
+          <nav className="flex-1 flex flex-col p-8 gap-2">
+            {navLinks.map((link, i) => (
+              <motion.div
+                key={link.href}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.08 }}
+              >
+                <Link
+                  href={link.href}
+                  className={`block py-4 text-lg tracking-widest uppercase transition-colors border-b border-border/10 ${
+                    location === link.href
+                      ? "text-primary"
+                      : "text-foreground hover:text-primary"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              </motion.div>
+            ))}
+          </nav>
+
+          <div className="p-8 border-t border-border/20">
+            <Link
+              href="/"
+              className="flex items-center justify-center"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <img 
+                src="/logo.png" 
+                alt="Vespera" 
+                className="h-8 object-contain opacity-60 grayscale"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+              <span className="hidden font-serif text-xl tracking-widest text-muted-foreground">VESPERA</span>
+            </Link>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       <main className="flex-1 pt-24 md:pt-32">
         <motion.div
           key={location}
@@ -112,7 +167,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </motion.div>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-border/20 py-16 mt-24">
         <div className="container mx-auto px-6 md:px-12 flex flex-col items-center">
           <img 
@@ -127,18 +181,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <span className="hidden font-serif text-3xl tracking-widest mb-8 text-muted-foreground">VESPERA</span>
           
           <div className="flex flex-wrap justify-center gap-8 mb-12">
-            <Link href="/collection" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
-              Collection
-            </Link>
-            <Link href="/our-story" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
-              Our Story
-            </Link>
-            <Link href="/client-care" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
-              Client Care
-            </Link>
-            <Link href="/legal" className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors">
-              Legal
-            </Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-xs tracking-widest uppercase text-muted-foreground hover:text-primary transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
           <p className="text-xs text-muted-foreground/50 tracking-wide">
