@@ -23,8 +23,23 @@ function generateOrderNumber(): string {
   return `VES-${date}-${rand}`;
 }
 
+interface CheckoutAddress {
+  fullName: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
+}
+
 router.post("/checkout", requireAuth, async (req, res): Promise<void> => {
-  const { items } = req.body as { items?: Array<{ pieceId: number; quantity: number }> };
+  const { items, shippingAddress, billingAddress } = req.body as {
+    items?: Array<{ pieceId: number; quantity: number }>;
+    shippingAddress?: CheckoutAddress;
+    billingAddress?: CheckoutAddress;
+  };
 
   if (!items || !Array.isArray(items) || items.length === 0) {
     res.status(400).json({ error: "Cart is empty" });
@@ -115,6 +130,8 @@ router.post("/checkout", requireAuth, async (req, res): Promise<void> => {
           paymentStatus: "unpaid",
           totalAmount: totalAmountRupees,
           razorpayOrderId: razorpayOrder.id,
+          shippingAddress: shippingAddress || null,
+          billingAddress: billingAddress || null,
         })
         .returning();
 

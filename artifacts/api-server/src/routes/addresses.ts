@@ -1,7 +1,8 @@
 import { Router, type IRouter } from "express";
 import { getAuth } from "@clerk/express";
-import { db, addressesTable, customersTable } from "@workspace/db";
+import { db, pool, addressesTable, customersTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/node-postgres";
 
 const router: IRouter = Router();
 
@@ -76,31 +77,50 @@ router.post("/addresses", async (req, res): Promise<void> => {
       return;
     }
 
-    if (isDefault) {
-      await db
-        .update(addressesTable)
-        .set({ isDefault: false })
-        .where(eq(addressesTable.customerId, customerId));
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const txDb = drizzle(client);
+
+      if (isDefault) {
+        await txDb
+          .update(addressesTable)
+          .set({ isDefault: false })
+          .where(eq(addressesTable.customerId, customerId));
+      }
+
+      const [address] = await txDb
+        .insert(addressesTable)
+        .values({
+          customerId,
+          label: label || "Home",
+          fullName,
+          phone,
+          addressLine1,
+          addressLine2: addressLine2 || null,
+          city,
+          state,
+          pincode,
+          country: country || "India",
+          isDefault: isDefault || false,
+        })
+        .returning();
+
+      if (isDefault) {
+        await txDb
+          .update(customersTable)
+          .set({ defaultAddressId: address.id })
+          .where(eq(customersTable.id, customerId));
+      }
+
+      await client.query("COMMIT");
+      res.json(address);
+    } catch (txErr) {
+      await client.query("ROLLBACK");
+      throw txErr;
+    } finally {
+      client.release();
     }
-
-    const [address] = await db
-      .insert(addressesTable)
-      .values({
-        customerId,
-        label: label || "Home",
-        fullName,
-        phone,
-        addressLine1,
-        addressLine2: addressLine2 || null,
-        city,
-        state,
-        pincode,
-        country: country || "India",
-        isDefault: isDefault || false,
-      })
-      .returning();
-
-    res.json(address);
   } catch (err) {
     req.log.error({ err }, "Create address error");
     res.status(500).json({ error: "Failed to create address" });
@@ -129,9 +149,22 @@ router.delete("/addresses/:id", async (req, res): Promise<void> => {
       return;
     }
 
+    const [existing] = await db
+      .select({ isDefault: addressesTable.isDefault })
+      .from(addressesTable)
+      .where(and(eq(addressesTable.id, addressId), eq(addressesTable.customerId, customerId)))
+      .limit(1);
+
     await db
       .delete(addressesTable)
       .where(and(eq(addressesTable.id, addressId), eq(addressesTable.customerId, customerId)));
+
+    if (existing?.isDefault) {
+      await db
+        .update(customersTable)
+        .set({ defaultAddressId: null })
+        .where(eq(customersTable.id, customerId));
+    }
 
     res.json({ status: "deleted" });
   } catch (err) {
