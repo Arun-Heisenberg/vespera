@@ -3,6 +3,10 @@ import type { Request, Response, NextFunction } from "express";
 
 const ADMIN_EMAILS = ["admin@vespera.com"];
 
+interface VesperaPublicMetadata {
+  role?: string;
+}
+
 export const requireAdmin = async (req: Request, res: Response, next: NextFunction) => {
   const auth = getAuth(req);
   const userId = auth?.userId;
@@ -12,12 +16,11 @@ export const requireAdmin = async (req: Request, res: Response, next: NextFuncti
   }
 
   try {
-    const client = clerkClient();
-    const user = await client.users.getUser(userId);
-    const metaRole = (user.publicMetadata as any)?.role;
+    const user = await clerkClient.users.getUser(userId);
+    const meta = user.publicMetadata as VesperaPublicMetadata;
     const email = user.emailAddresses?.[0]?.emailAddress || "";
 
-    if (metaRole === "admin" || ADMIN_EMAILS.includes(email)) {
+    if (meta.role === "admin" || ADMIN_EMAILS.includes(email)) {
       next();
       return;
     }

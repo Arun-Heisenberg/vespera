@@ -5,16 +5,20 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useListCollection } from "@workspace/api-client-react";
 import { formatPrice } from "@/components/cart-drawer";
-import { Shield, Package, Users, ShoppingCart, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Shield, Package, ShoppingCart, Clock, CheckCircle, XCircle, ArrowLeft, Eye } from "lucide-react";
 
 const ADMIN_EMAILS = ["admin@vespera.com"];
+
+interface VesperaPublicMetadata {
+  role?: string;
+}
 
 function useIsAdmin() {
   const { user } = useUser();
   if (!user) return false;
   const email = user.primaryEmailAddress?.emailAddress || "";
-  const metaRole = (user.publicMetadata as any)?.role;
-  return metaRole === "admin" || ADMIN_EMAILS.includes(email);
+  const meta = user.publicMetadata as VesperaPublicMetadata;
+  return meta.role === "admin" || ADMIN_EMAILS.includes(email);
 }
 
 interface AdminOrder {
@@ -28,6 +32,42 @@ interface AdminOrder {
   customerEmail: string | null;
 }
 
+interface OrderDetailItem {
+  id: number;
+  title: string;
+  quantity: number;
+  unitPrice: string;
+  totalPrice: string;
+}
+
+interface OrderDetailPayment {
+  id: number;
+  razorpayOrderId: string | null;
+  razorpayPaymentId: string | null;
+  amount: string;
+  currency: string;
+  method: string | null;
+  status: string;
+  paidAt: string | null;
+  createdAt: string;
+}
+
+interface OrderDetail {
+  id: number;
+  orderNumber: string;
+  status: string;
+  paymentStatus: string;
+  totalAmount: string;
+  razorpayOrderId: string | null;
+  razorpayPaymentId: string | null;
+  shippingAddress: Record<string, string> | null;
+  billingAddress: Record<string, string> | null;
+  createdAt: string;
+  updatedAt: string;
+  items: OrderDetailItem[];
+  payment: OrderDetailPayment | null;
+}
+
 function useAdminOrders() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +76,7 @@ function useAdminOrders() {
     fetch(`${import.meta.env.BASE_URL}api/admin/orders`.replace("//api", "/api"), { credentials: "include" })
       .then((r) => r.json())
       .then((data) => {
-        setOrders(data);
+        if (Array.isArray(data)) setOrders(data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -45,13 +85,37 @@ function useAdminOrders() {
   return { orders, loading };
 }
 
-function StatusBadge({ status, type }: { status: string; type: "order" | "payment" }) {
+function useAdminOrderDetail(orderId: number | null) {
+  const [detail, setDetail] = useState<OrderDetail | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!orderId) {
+      setDetail(null);
+      return;
+    }
+    setLoading(true);
+    fetch(`${import.meta.env.BASE_URL}api/admin/orders/${orderId}`.replace("//api", "/api"), { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        setDetail(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [orderId]);
+
+  return { detail, loading };
+}
+
+function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
     pending: { bg: "bg-yellow-500/20", text: "text-yellow-400", icon: <Clock className="w-3 h-3" /> },
     confirmed: { bg: "bg-green-500/20", text: "text-green-400", icon: <CheckCircle className="w-3 h-3" /> },
     paid: { bg: "bg-green-500/20", text: "text-green-400", icon: <CheckCircle className="w-3 h-3" /> },
     unpaid: { bg: "bg-red-500/20", text: "text-red-400", icon: <XCircle className="w-3 h-3" /> },
     failed: { bg: "bg-red-500/20", text: "text-red-400", icon: <XCircle className="w-3 h-3" /> },
+    captured: { bg: "bg-green-500/20", text: "text-green-400", icon: <CheckCircle className="w-3 h-3" /> },
+    created: { bg: "bg-yellow-500/20", text: "text-yellow-400", icon: <Clock className="w-3 h-3" /> },
   };
   const c = config[status] || config.pending;
   return (
@@ -62,10 +126,151 @@ function StatusBadge({ status, type }: { status: string; type: "order" | "paymen
   );
 }
 
+function OrderDetailView({ orderId, onBack }: { orderId: number; onBack: () => void }) {
+  const { detail, loading } = useAdminOrderDetail(orderId);
+
+  if (loading) {
+    return <p className="py-8 text-center text-muted-foreground">Loading order details...</p>;
+  }
+
+  if (!detail) {
+    return (
+      <div className="py-8 text-center">
+        <p className="text-muted-foreground mb-4">Order not found.</p>
+        <Button variant="outline" onClick={onBack}>Back to Orders</Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <button onClick={onBack} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back to Orders
+      </button>
+
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 className="font-serif text-xl">{detail.orderNumber}</h2>
+          <p className="text-xs text-muted-foreground mt-1">
+            {new Date(detail.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <StatusBadge status={detail.status} />
+          <StatusBadge status={detail.paymentStatus} />
+          <span className="font-serif text-lg">{formatPrice(parseFloat(detail.totalAmount))}</span>
+        </div>
+      </div>
+
+      <div className="border border-border/20 bg-secondary/5 p-6">
+        <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">Order Items</h3>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border/20">
+              <th className="text-left py-2 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Product</th>
+              <th className="text-right py-2 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Unit Price</th>
+              <th className="text-right py-2 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Qty</th>
+              <th className="text-right py-2 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {detail.items.map((item) => (
+              <tr key={item.id} className="border-b border-border/10">
+                <td className="py-3 font-serif">{item.title}</td>
+                <td className="py-3 text-right text-muted-foreground">{formatPrice(parseFloat(item.unitPrice))}</td>
+                <td className="py-3 text-right">{item.quantity}</td>
+                <td className="py-3 text-right">{formatPrice(parseFloat(item.totalPrice))}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="border-t border-border/20">
+              <td colSpan={3} className="py-3 text-right font-semibold text-xs uppercase tracking-widest">Total</td>
+              <td className="py-3 text-right font-serif">{formatPrice(parseFloat(detail.totalAmount))}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      {detail.payment && (
+        <div className="border border-border/20 bg-secondary/5 p-6">
+          <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">Payment Details</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between py-1 border-b border-border/10">
+              <span className="text-muted-foreground">Status</span>
+              <StatusBadge status={detail.payment.status} />
+            </div>
+            <div className="flex justify-between py-1 border-b border-border/10">
+              <span className="text-muted-foreground">Amount</span>
+              <span>{formatPrice(parseFloat(detail.payment.amount))} {detail.payment.currency}</span>
+            </div>
+            {detail.payment.method && (
+              <div className="flex justify-between py-1 border-b border-border/10">
+                <span className="text-muted-foreground">Method</span>
+                <span>{detail.payment.method}</span>
+              </div>
+            )}
+            {detail.payment.razorpayOrderId && (
+              <div className="flex justify-between py-1 border-b border-border/10">
+                <span className="text-muted-foreground">Razorpay Order</span>
+                <span className="font-mono text-xs">{detail.payment.razorpayOrderId}</span>
+              </div>
+            )}
+            {detail.payment.razorpayPaymentId && (
+              <div className="flex justify-between py-1 border-b border-border/10">
+                <span className="text-muted-foreground">Razorpay Payment</span>
+                <span className="font-mono text-xs">{detail.payment.razorpayPaymentId}</span>
+              </div>
+            )}
+            {detail.payment.paidAt && (
+              <div className="flex justify-between py-1 border-b border-border/10">
+                <span className="text-muted-foreground">Paid At</span>
+                <span>{new Date(detail.payment.paidAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {detail.shippingAddress && (
+        <div className="border border-border/20 bg-secondary/5 p-6">
+          <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">Shipping Address</h3>
+          <div className="text-sm space-y-1">
+            <p>{detail.shippingAddress.fullName}</p>
+            <p className="text-muted-foreground">{detail.shippingAddress.addressLine1}</p>
+            {detail.shippingAddress.addressLine2 && <p className="text-muted-foreground">{detail.shippingAddress.addressLine2}</p>}
+            <p className="text-muted-foreground">{detail.shippingAddress.city}, {detail.shippingAddress.state} {detail.shippingAddress.pincode}</p>
+            <p className="text-muted-foreground">{detail.shippingAddress.phone}</p>
+          </div>
+        </div>
+      )}
+
+      {detail.razorpayOrderId && (
+        <div className="border border-border/20 bg-secondary/5 p-6">
+          <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">Reference IDs</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between py-1 border-b border-border/10">
+              <span className="text-muted-foreground">Razorpay Order ID</span>
+              <span className="font-mono text-xs">{detail.razorpayOrderId}</span>
+            </div>
+            {detail.razorpayPaymentId && (
+              <div className="flex justify-between py-1 border-b border-border/10">
+                <span className="text-muted-foreground">Razorpay Payment ID</span>
+                <span className="font-mono text-xs">{detail.razorpayPaymentId}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AdminDashboard() {
   const { data: pieces, isLoading: productsLoading } = useListCollection();
   const { orders, loading: ordersLoading } = useAdminOrders();
   const [activeTab, setActiveTab] = useState<"overview" | "products" | "orders">("overview");
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
 
   const totalRevenue = orders
     .filter((o) => o.paymentStatus === "paid")
@@ -88,7 +293,7 @@ function AdminDashboard() {
           {(["overview", "products", "orders"] as const).map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => { setActiveTab(tab); setSelectedOrderId(null); }}
               className={`pb-3 text-sm tracking-widest uppercase transition-colors ${
                 activeTab === tab ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"
               }`}
@@ -170,7 +375,11 @@ function AdminDashboard() {
           </div>
         )}
 
-        {activeTab === "orders" && (
+        {activeTab === "orders" && selectedOrderId && (
+          <OrderDetailView orderId={selectedOrderId} onBack={() => setSelectedOrderId(null)} />
+        )}
+
+        {activeTab === "orders" && !selectedOrderId && (
           <div className="overflow-x-auto">
             {ordersLoading ? (
               <p className="py-8 text-center text-muted-foreground">Loading orders...</p>
@@ -186,6 +395,7 @@ function AdminDashboard() {
                     <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Status</th>
                     <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Payment</th>
                     <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Date</th>
+                    <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -199,10 +409,19 @@ function AdminDashboard() {
                         </div>
                       </td>
                       <td className="py-3 px-4">{formatPrice(parseFloat(order.totalAmount))}</td>
-                      <td className="py-3 px-4"><StatusBadge status={order.status} type="order" /></td>
-                      <td className="py-3 px-4"><StatusBadge status={order.paymentStatus} type="payment" /></td>
+                      <td className="py-3 px-4"><StatusBadge status={order.status} /></td>
+                      <td className="py-3 px-4"><StatusBadge status={order.paymentStatus} /></td>
                       <td className="py-3 px-4 text-muted-foreground text-xs">
                         {new Date(order.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                      </td>
+                      <td className="py-3 px-4">
+                        <button
+                          onClick={() => setSelectedOrderId(order.id)}
+                          className="text-primary hover:text-primary/80 transition-colors"
+                          title="View Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
                       </td>
                     </tr>
                   ))}

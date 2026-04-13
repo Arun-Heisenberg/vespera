@@ -106,6 +106,43 @@ router.get("/orders/:id", async (req, res): Promise<void> => {
   }
 });
 
+router.get("/admin/orders/:id", requireAdmin, async (req, res): Promise<void> => {
+  const orderId = parseInt(req.params.id, 10);
+  if (isNaN(orderId)) {
+    res.status(400).json({ error: "Invalid order ID" });
+    return;
+  }
+
+  try {
+    const [order] = await db
+      .select()
+      .from(ordersTable)
+      .where(eq(ordersTable.id, orderId))
+      .limit(1);
+
+    if (!order) {
+      res.status(404).json({ error: "Order not found" });
+      return;
+    }
+
+    const items = await db
+      .select()
+      .from(orderItemsTable)
+      .where(eq(orderItemsTable.orderId, order.id));
+
+    const [payment] = await db
+      .select()
+      .from(paymentsTable)
+      .where(eq(paymentsTable.orderId, order.id))
+      .limit(1);
+
+    res.json({ ...order, items, payment: payment || null });
+  } catch (err) {
+    req.log.error({ err }, "Admin get order detail error");
+    res.status(500).json({ error: "Failed to retrieve order" });
+  }
+});
+
 router.get("/admin/orders", requireAdmin, async (req, res): Promise<void> => {
   try {
     const orders = await db

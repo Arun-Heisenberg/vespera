@@ -9,7 +9,7 @@ export const customersTable = pgTable("customers", {
   phone: text("phone"),
   fullName: text("full_name").notNull(),
   avatarUrl: text("avatar_url"),
-  defaultAddressId: integer("default_address_id"),
+  defaultAddressId: integer("default_address_id"), // FK to addresses(id) added via raw SQL to avoid circular import
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
