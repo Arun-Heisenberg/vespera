@@ -15,6 +15,7 @@ export const collectionTable = pgTable("collection", {
   dimensions: text("dimensions").notNull().default(""),
   occasionStyling: jsonb("occasion_styling").$type<string[]>().notNull().default([]),
   artisanNotes: text("artisan_notes").notNull().default(""),
+  sortOrder: integer("sort_order").notNull().default(0),
   isFeatured: boolean("is_featured").notNull().default(false),
   slug: text("slug").notNull().unique(),
   sku: text("sku").unique(),

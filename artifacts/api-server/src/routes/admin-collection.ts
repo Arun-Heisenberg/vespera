@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db, collectionTable } from "@workspace/db";
 import { AdminCreateProductBody, AdminUpdateProductBody } from "@workspace/api-zod";
 import { requireAdmin } from "../middlewares/requireAdmin";
@@ -49,6 +49,27 @@ router.post("/admin/collection", requireAdmin, async (req, res): Promise<void> =
   } catch (err) {
     req.log.error({ err }, "Failed to create product");
     res.status(500).json({ error: "Failed to create product" });
+  }
+});
+
+router.put("/admin/collection/reorder", requireAdmin, async (req, res): Promise<void> => {
+  const { orderedIds } = req.body;
+  if (!Array.isArray(orderedIds) || !orderedIds.every((id: unknown) => typeof id === "number")) {
+    res.status(400).json({ error: "Invalid reorder data" });
+    return;
+  }
+
+  try {
+    for (let i = 0; i < orderedIds.length; i++) {
+      await db
+        .update(collectionTable)
+        .set({ sortOrder: i, updatedAt: new Date() })
+        .where(eq(collectionTable.id, orderedIds[i]));
+    }
+    res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Failed to reorder products");
+    res.status(500).json({ error: "Failed to reorder products" });
   }
 });
 

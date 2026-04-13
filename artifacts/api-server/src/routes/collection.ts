@@ -11,7 +11,7 @@ import {
 const router: IRouter = Router();
 
 router.get("/collection", async (req, res): Promise<void> => {
-  const pieces = await db.select().from(collectionTable).orderBy(collectionTable.id);
+  const pieces = await db.select().from(collectionTable).orderBy(collectionTable.sortOrder);
   const mapped = pieces.map((p) => ({
     ...p,
     price: parseFloat(p.price),
@@ -24,7 +24,7 @@ router.get("/collection/featured", async (req, res): Promise<void> => {
     .select()
     .from(collectionTable)
     .where(eq(collectionTable.isFeatured, true))
-    .orderBy(collectionTable.id);
+    .orderBy(collectionTable.sortOrder);
   const mapped = pieces.map((p) => ({
     ...p,
     price: parseFloat(p.price),

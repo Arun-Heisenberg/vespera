@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useListCollection } from "@workspace/api-client-react";
 import { formatPrice } from "@/components/cart-drawer";
-import { Shield, Package, ShoppingCart, Clock, CheckCircle, XCircle, ArrowLeft, Eye, Plus, Pencil, Trash2, Upload, X, ImageIcon } from "lucide-react";
+import { Shield, Package, ShoppingCart, Clock, CheckCircle, XCircle, ArrowLeft, Eye, Plus, Pencil, Trash2, Upload, X, ImageIcon, ChevronUp, ChevronDown } from "lucide-react";
 
 const ADMIN_EMAILS = ["admin@vespera.com", "avkvasp1@gmail.com"];
 
@@ -770,6 +770,29 @@ function AdminDashboard() {
     }
   };
 
+  const handleMoveProduct = async (index: number, direction: "up" | "down") => {
+    if (!pieces) return;
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= pieces.length) return;
+    const reordered = [...pieces];
+    [reordered[index], reordered[newIndex]] = [reordered[newIndex], reordered[index]];
+    const orderedIds = reordered.map((p) => p.id);
+    try {
+      const res = await fetch(
+        `${import.meta.env.BASE_URL}api/admin/collection/reorder`.replace("//api", "/api"),
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ orderedIds }),
+        }
+      );
+      if (res.ok) {
+        refetch();
+      }
+    } catch {}
+  };
+
   return (
     <div className="container mx-auto px-6 md:px-12 py-12">
       <motion.div
@@ -849,6 +872,7 @@ function AdminDashboard() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/20">
+                    <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Order</th>
                     <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Image</th>
                     <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Name</th>
                     <th className="text-left py-3 px-4 text-xs uppercase tracking-widest text-muted-foreground font-semibold">Price</th>
@@ -859,9 +883,30 @@ function AdminDashboard() {
                 </thead>
                 <tbody>
                   {productsLoading ? (
-                    <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">Loading...</td></tr>
-                  ) : pieces?.map((piece) => (
+                    <tr><td colSpan={7} className="py-8 text-center text-muted-foreground">Loading...</td></tr>
+                  ) : pieces?.map((piece, index) => (
                     <tr key={piece.id} className="border-b border-border/10 hover:bg-secondary/5 transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="flex flex-col items-center gap-0.5">
+                          <button
+                            onClick={() => handleMoveProduct(index, "up")}
+                            disabled={index === 0}
+                            className={`p-1 transition-colors ${index === 0 ? "text-muted-foreground/20 cursor-not-allowed" : "text-muted-foreground hover:text-primary"}`}
+                            title="Move up"
+                          >
+                            <ChevronUp className="w-4 h-4" />
+                          </button>
+                          <span className="text-xs text-muted-foreground/50">{index + 1}</span>
+                          <button
+                            onClick={() => handleMoveProduct(index, "down")}
+                            disabled={!pieces || index === pieces.length - 1}
+                            className={`p-1 transition-colors ${!pieces || index === pieces.length - 1 ? "text-muted-foreground/20 cursor-not-allowed" : "text-muted-foreground hover:text-primary"}`}
+                            title="Move down"
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
                       <td className="py-3 px-4">
                         <div className="w-12 h-12 bg-secondary overflow-hidden">
                           {piece.primaryImage ? (
