@@ -72,16 +72,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </div>
 
           <Link href="/" className="absolute left-1/2 -translate-x-1/2">
-            <img 
-              src="/logo.png" 
-              alt="Vespera" 
-              className="h-10 md:h-12 object-contain brightness-125"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-                (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-              }}
-            />
-            <span className="hidden font-serif text-xl md:text-2xl tracking-[0.3em] text-foreground">VESPERA</span>
+            <span className="font-serif text-lg md:text-xl tracking-[0.42em] text-foreground/90 hover:text-primary transition-colors duration-300">
+              VESPERA
+            </span>
           </Link>
 
           <div className="flex items-center gap-4 md:gap-5 flex-1 justify-end">
@@ -269,16 +262,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="relative py-8 md:py-10 luxury-noise">
           <div className="absolute inset-0 bg-gradient-to-b from-card/20 to-background z-0" />
           <div className="w-full px-5 md:px-10 flex flex-col items-center relative z-10">
-            <img 
-              src="/logo.png" 
-              alt="Vespera" 
-              className="h-14 md:h-16 object-contain mb-6 opacity-90 brightness-125"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-                (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-              }}
-            />
-            <span className="hidden font-serif text-2xl tracking-[0.3em] mb-8 text-muted-foreground/40">VESPERA</span>
+            <span className="font-serif text-2xl md:text-3xl tracking-[0.45em] mb-8 text-foreground/80">
+              VESPERA
+            </span>
             
             <div className="flex flex-wrap justify-center gap-8 md:gap-12 mb-5">
               {navLinks.map((link) => (
