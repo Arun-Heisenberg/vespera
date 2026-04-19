@@ -19,7 +19,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-      <section className="relative h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[100svh] overflow-hidden">
         <div className="absolute inset-0 bg-background z-0" />
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
@@ -30,12 +30,12 @@ export default function Home() {
           />
         </div>
 
-        <div className="relative z-10 flex flex-col items-center text-center px-6">
+        <div className="relative z-10 min-h-[100svh] px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-6"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
           >
             <img 
               src="/logo.png" 
@@ -48,29 +48,31 @@ export default function Home() {
             />
             <h1 className="hidden text-4xl md:text-6xl font-serif tracking-[0.3em] shimmer-text">VESPERA</h1>
           </motion.div>
-          
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="text-base md:text-lg font-serif text-foreground/50 max-w-lg mb-8 italic leading-relaxed"
-          >
-            Luxury clutches crafted for unforgettable evenings.
-          </motion.p>
-          
-          <motion.div
+
+          <div className="absolute left-1/2 top-[calc(50%+6.5rem)] md:top-[calc(50%+8.5rem)] -translate-x-1/2 flex w-full max-w-2xl flex-col items-center text-center">
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="text-base md:text-lg font-serif text-foreground/50 max-w-lg mb-8 italic leading-relaxed"
+            >
+              Luxury clutches crafted for unforgettable evenings.
+            </motion.p>
+            
+            <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
-          >
-            <Link 
-              href="/collection" 
-              className="group inline-flex items-center gap-3 px-10 py-4 border border-foreground/20 text-foreground hover:border-primary hover:text-primary transition-all duration-500 tracking-[0.25em] uppercase text-[11px] font-light"
             >
-              Explore Collection
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" strokeWidth={1.5} />
-            </Link>
-          </motion.div>
+              <Link 
+                href="/collection" 
+                className="group inline-flex items-center gap-3 px-10 py-4 border border-foreground/20 text-foreground hover:border-primary hover:text-primary transition-all duration-500 tracking-[0.25em] uppercase text-[11px] font-light"
+              >
+                Explore Collection
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" strokeWidth={1.5} />
+              </Link>
+            </motion.div>
+          </div>
 
           <motion.div
             initial={{ opacity: 0 }}
