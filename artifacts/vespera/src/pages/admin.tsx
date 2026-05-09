@@ -277,7 +277,7 @@ function ImageUploader({
     } finally {
       setUploading(false);
     }
-  }, [getToken, onImageSet]);
+  }, [getToken, onImageSet, onObjectPathSet]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -394,7 +394,10 @@ function ProductFormModal({
         credentials: "include",
         body: JSON.stringify({ imageUrl, priceInr, dimensions }),
       });
-      if (!res.ok) return null;
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error || `Image analysis failed (${res.status})`);
+      }
       const data: { metadata?: GeneratedMetadata } = await res.json();
       return data.metadata ?? null;
     } catch {
@@ -468,12 +471,7 @@ function ProductFormModal({
       if (!isEdit) {
         // Ask the LLM for catalogue copy based purely on the image (+ price/dim hints).
         setEnhanceStatus("Reading the piece and writing the catalogue entry…");
-        const meta = await analyzeImage(
-          token,
-          sourceImagePath || form.primaryImage,
-          parseFloat(form.price) || 0,
-          form.dimensions,
-        );
+        const meta = await analyzeImage(token, sourceImagePath || form.primaryImage, parseFloat(form.price) || 0, form.dimensions);
         if (!meta) {
           setEnhanceStatus("");
           setError(

@@ -84,6 +84,10 @@ function extractObjectPath(rawUrl: string): string | null {
   } catch {
     return null;
   }
+  pathname = pathname.replace(/^\/api\/storage(\/objects\/)/, "/objects/");
+  pathname = pathname.replace(/^\/storage(\/objects\/)/, "/objects/");
+  pathname = pathname.replace(/^\/api\/storage\/objects\//, "/objects/");
+  pathname = pathname.replace(/^\/storage\/objects\//, "/objects/");
   const m = pathname.match(/(?:^|\/)objects\/([A-Za-z0-9._\-/]+)$/);
   if (!m) return null;
   return `/objects/${m[1]}`;
