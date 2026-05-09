@@ -107,16 +107,18 @@ export class ObjectStorageService {
   }
 
   async getObjectEntityUploadURL(): Promise<string> {
-    const privateObjectDir = this.getPrivateObjectDir();
-    if (!privateObjectDir) {
+    const objectId = randomUUID();
+    const privateObjectDir = process.env.PRIVATE_OBJECT_DIR || "";
+    const publicObjectPaths = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
+    const baseDir = privateObjectDir || publicObjectPaths.split(",").map((p) => p.trim()).find(Boolean) || "";
+
+    if (!baseDir) {
       throw new Error(
-        "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
-          "tool and set PRIVATE_OBJECT_DIR env var."
+        "No object storage directory configured. Set PRIVATE_OBJECT_DIR or PUBLIC_OBJECT_SEARCH_PATHS."
       );
     }
 
-    const objectId = randomUUID();
-    const fullPath = `${privateObjectDir}/uploads/${objectId}`;
+    const fullPath = `${baseDir.replace(/\/$/, "")}/uploads/${objectId}`;
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
 
@@ -139,7 +141,10 @@ export class ObjectStorageService {
     }
 
     const entityId = parts.slice(1).join("/");
-    let entityDir = this.getPrivateObjectDir();
+    let entityDir = process.env.PRIVATE_OBJECT_DIR || process.env.PUBLIC_OBJECT_SEARCH_PATHS?.split(",").map((p) => p.trim()).find(Boolean) || "";
+    if (!entityDir) {
+      throw new ObjectNotFoundError();
+    }
     if (!entityDir.endsWith("/")) {
       entityDir = `${entityDir}/`;
     }
@@ -162,7 +167,10 @@ export class ObjectStorageService {
     const url = new URL(rawPath);
     const rawObjectPath = url.pathname;
 
-    let objectEntityDir = this.getPrivateObjectDir();
+    let objectEntityDir = process.env.PRIVATE_OBJECT_DIR || process.env.PUBLIC_OBJECT_SEARCH_PATHS?.split(",").map((p) => p.trim()).find(Boolean) || "";
+    if (!objectEntityDir) {
+      return rawObjectPath;
+    }
     if (!objectEntityDir.endsWith("/")) {
       objectEntityDir = `${objectEntityDir}/`;
     }
@@ -262,6 +270,6 @@ async function signObjectURL({
     );
   }
 
-  const { signed_url: signedURL } = await response.json();
+  const { signed_url: signedURL } = (await response.json()) as { signed_url: string };
   return signedURL;
 }
