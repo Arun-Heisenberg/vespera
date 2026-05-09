@@ -128,7 +128,8 @@ async function uploadGeneratedImage(b64: string, mimeType: string): Promise<stri
     signal: AbortSignal.timeout(60_000),
   });
   if (!put.ok) {
-    throw new Error(`Failed to upload generated image: ${put.status}`);
+    const message = await put.text().catch(() => "");
+    throw new Error(message || `Failed to upload generated image: ${put.status}`);
   }
   return `/api/storage${objectPath}`;
 }

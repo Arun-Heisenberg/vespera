@@ -259,13 +259,16 @@ function ImageUploader({
         body: file,
       });
 
-      if (!uploadRes.ok) throw new Error("Failed to upload file");
+      if (!uploadRes.ok) {
+        const message = await uploadRes.text().catch(() => "");
+        throw new Error(message || `Failed to upload file (${uploadRes.status})`);
+      }
 
       const servingUrl = apiUrl(`/storage${objectPath}`);
       onImageSet(servingUrl);
     } catch (err) {
       console.error("Upload failed:", err);
-      alert("Image upload failed. Please try again.");
+      alert(err instanceof Error ? err.message : "Image upload failed. Please try again.");
     } finally {
       setUploading(false);
     }
