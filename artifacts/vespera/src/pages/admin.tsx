@@ -496,7 +496,7 @@ function ProductFormModal({
                   value={form.description}
                   onChange={(e) => updateField("description", e.target.value)}
                   rows={3}
-                  placeholder="A brief description of the product..."
+                  placeholder="Describe the product, its craftsmanship, materials, occasion, and any special details..."
                   className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40 resize-none"
                 />
               </div>
