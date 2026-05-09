@@ -44,7 +44,11 @@ router.get("/admin/exports/gstr1.csv", requireAdmin, async (req, res): Promise<v
     const cells = [
       r.invoiceNumber || r.orderNumber, date, r.customerName ?? "", buyerState, buyerState,
       String(interState), taxable.toFixed(2), igst.toFixed(2), cgst.toFixed(2), sgst.toFixed(2), total.toFixed(2),
-    ].map((v) => /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
+    ].map((raw) => {
+      let v = String(raw ?? "");
+      if (/^[=+\-@\t\r]/.test(v)) v = `'${v}`;
+      return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+    });
     lines.push(cells.join(","));
   }
 
