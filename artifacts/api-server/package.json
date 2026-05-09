@@ -10,7 +10,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@clerk/express": "^2.1.0",
+    "@clerk/express": "^2.1.15",
     "@google-cloud/storage": "^7.19.0",
     "@google/genai": "^1.44.0",
     "@swc/helpers": "^0.5.21",
