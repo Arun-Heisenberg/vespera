@@ -248,7 +248,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
               <div className="gold-divider w-full" />
 
-              <nav className="flex-1 overflow-y-auto px-6 md:px-8 py-6">
+              <nav className="flex-1 overflow-y-auto px-6 md:px-8 py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
