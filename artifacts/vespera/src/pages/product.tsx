@@ -24,7 +24,7 @@ export default function Product() {
   
   const { data: piece, isLoading: isPieceLoading } = useGetCollectionPiece(
     pieceId as number,
-    { query: { enabled: !!pieceId } }
+    { query: { enabled: !!pieceId } } as any
   );
 
   const isLoading = isListLoading || (!!pieceId && isPieceLoading) || (!piece && !isListLoading);
@@ -93,7 +93,7 @@ export default function Product() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
             
             <div className="flex flex-col-reverse md:flex-row gap-6">
-              <div className="flex md:flex-col gap-3 w-full md:w-24 shrink-0 snap-x">
+              <div className="flex md:flex-col gap-3 w-full md:w-24 shrink-0 snap-x overflow-x-auto md:overflow-x-visible scrollbar-none pb-2 md:pb-0">
                 {allImages.map((img, i) => (
                   <button
                     key={i}

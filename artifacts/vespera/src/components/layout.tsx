@@ -128,15 +128,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [location]);
 
-  useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [isMenuOpen]);
-
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background text-foreground">
       <header 
@@ -222,7 +213,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed top-0 left-0 h-full w-full sm:w-[420px] bg-background z-[70] flex flex-col"
+              className="fixed top-0 left-0 h-full w-full sm:w-[420px] bg-background z-[70] flex flex-col overflow-y-auto scrollbar-none"
             >
               <div className="flex items-center justify-between p-6 md:p-8">
                 <Link href="/" onClick={() => setIsMenuOpen(false)} className="block">

@@ -542,14 +542,14 @@ function ProductFormModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-start justify-center pt-8 md:pt-16 px-4"
+      className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-start justify-center pt-8 md:pt-16 px-4 overflow-y-auto"
       onClick={onClose}
     >
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 20, scale: 0.98 }}
-        className="bg-background border border-border/20 w-full max-w-2xl mb-8 relative"
+        className="bg-background border border-border/20 w-full max-w-2xl mb-8 relative max-h-[calc(100dvh-4rem)] overflow-y-auto scrollbar-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-6 border-b border-border/20">
