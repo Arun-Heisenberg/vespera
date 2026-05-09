@@ -237,13 +237,18 @@ function ImageUploader({
 }) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const { getToken } = useAuth();
 
   const uploadFile = useCallback(async (file: File) => {
     setUploading(true);
     try {
+      const token = await getToken();
       const res = await fetch(`${import.meta.env.BASE_URL}api/storage/uploads/request-url`.replace("//api", "/api"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+        },
         credentials: "include",
         body: JSON.stringify({
           name: file.name,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation } from "wouter";
 import { apiFetch } from "@/lib/api";
-import { Loader2, Package, Truck, CheckCircle, Clock } from "lucide-react";
+import { Loader2, Package, Truck, CheckCircle, Clock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Shipment { awbNumber?: string | null; courier?: string; trackingUrl?: string | null; status?: string; events?: Array<{ at: string; status: string; note?: string }>; }
@@ -46,6 +46,13 @@ export default function Track() {
 
   return (
     <div className="container mx-auto px-6 py-16 max-w-2xl">
+      <button
+        onClick={() => window.history.back()}
+        className="flex items-center gap-1.5 text-xs uppercase tracking-[0.15em] text-muted-foreground/60 hover:text-foreground transition-colors duration-200 mb-8 font-light"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        Back
+      </button>
       <h1 className="text-3xl md:text-4xl font-serif mb-2">Track Your Order</h1>
       <p className="text-sm text-muted-foreground mb-8">Enter your order number and the email address or phone number used at checkout.</p>
 

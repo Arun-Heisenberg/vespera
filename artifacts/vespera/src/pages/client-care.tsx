@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { Mail, Phone, Clock, MapPin, ChevronDown, ArrowRight } from "lucide-react";
+import { Mail, Phone, Clock, MapPin, ChevronDown, ArrowRight, ArrowLeft } from "lucide-react";
 
 const faqs = [
   {
@@ -51,6 +51,15 @@ export default function ClientCare() {
 
   return (
     <div className="flex flex-col">
+      <div className="container mx-auto px-6 pt-6 max-w-5xl">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center gap-1.5 text-xs uppercase tracking-[0.15em] text-muted-foreground/60 hover:text-foreground transition-colors duration-200 font-light"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back
+        </button>
+      </div>
       <section className="relative py-8 md:py-14 overflow-hidden">
         <div className="absolute inset-0 luxury-glow z-0" />
         <div className="relative z-10 text-center px-6 max-w-2xl mx-auto">

@@ -2,35 +2,39 @@ import React from "react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Home, Grid3X3, BookOpen, ShoppingBag, User } from "lucide-react";
-import { Show } from "@clerk/react";
+import { useUser } from "@clerk/react";
 import { useCart } from "./cart-context";
-
-const navItems = [
-  { href: "/", icon: Home, label: "Home" },
-  { href: "/collection", icon: Grid3X3, label: "Shop" },
-  { href: "/our-story", icon: BookOpen, label: "Story" },
-];
 
 export function MobileBottomNav() {
   const [location] = useLocation();
   const { totalItems, setIsCartOpen } = useCart();
+  const { isSignedIn } = useUser();
 
   const isActive = (href: string) => {
     if (href === "/") return location === "/";
     return location.startsWith(href);
   };
 
+  const navItems = [
+    { href: "/", icon: Home, label: "Home" },
+    { href: "/collection", icon: Grid3X3, label: "Shop" },
+    { href: "/our-story", icon: BookOpen, label: "Story" },
+  ];
+
+  const accountHref = isSignedIn ? "/account" : "/sign-in";
+  const accountActive = location === "/account" || location === "/sign-in";
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
       <div className="bg-background/95 backdrop-blur-xl border-t border-border/5 pb-[env(safe-area-inset-bottom)]">
-        <div className="flex items-center justify-around h-14 px-2">
+        <div className="flex items-center h-14 px-2">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className="relative flex flex-col items-center justify-center gap-0.5 w-16 h-full"
+                className="relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full"
               >
                 <item.icon
                   className={`w-[18px] h-[18px] transition-colors duration-300 ${
@@ -58,11 +62,11 @@ export function MobileBottomNav() {
 
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative flex flex-col items-center justify-center gap-0.5 w-16 h-full"
+            className="relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full"
           >
             <div className="relative">
-              <ShoppingBag 
-                className={`w-[18px] h-[18px] transition-colors duration-300 ${totalItems > 0 ? 'text-foreground/50' : 'text-foreground/30'}`}
+              <ShoppingBag
+                className={`w-[18px] h-[18px] transition-colors duration-300 ${totalItems > 0 ? "text-foreground/50" : "text-foreground/30"}`}
                 strokeWidth={1.5}
               />
               {totalItems > 0 && (
@@ -76,45 +80,31 @@ export function MobileBottomNav() {
             </span>
           </button>
 
-          <Show when="signed-in">
-            <Link
-              href="/account"
-              className="relative flex flex-col items-center justify-center gap-0.5 w-16 h-full"
+          <Link
+            href={accountHref}
+            className="relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full"
+          >
+            <User
+              className={`w-[18px] h-[18px] transition-colors duration-300 ${
+                accountActive ? "text-primary" : "text-foreground/30"
+              }`}
+              strokeWidth={accountActive ? 1.8 : 1.5}
+            />
+            <span
+              className={`text-[8px] uppercase tracking-[0.1em] transition-colors duration-300 font-light ${
+                accountActive ? "text-primary" : "text-foreground/25"
+              }`}
             >
-              <User
-                className={`w-[18px] h-[18px] transition-colors duration-300 ${
-                  location === "/account" ? "text-primary" : "text-foreground/30"
-                }`}
-                strokeWidth={location === "/account" ? 1.8 : 1.5}
+              {isSignedIn ? "Account" : "Sign In"}
+            </span>
+            {accountActive && (
+              <motion.div
+                layoutId="mobile-nav-indicator"
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[1.5px] bg-primary"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
               />
-              <span
-                className={`text-[8px] uppercase tracking-[0.1em] transition-colors duration-300 font-light ${
-                  location === "/account" ? "text-primary" : "text-foreground/25"
-                }`}
-              >
-                Account
-              </span>
-              {location === "/account" && (
-                <motion.div
-                  layoutId="mobile-nav-indicator"
-                  className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[1.5px] bg-primary"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-            </Link>
-          </Show>
-
-          <Show when="signed-out">
-            <Link
-              href="/sign-in"
-              className="relative flex flex-col items-center justify-center gap-0.5 w-16 h-full"
-            >
-              <User className="w-[18px] h-[18px] text-foreground/30" strokeWidth={1.5} />
-              <span className="text-[8px] uppercase tracking-[0.1em] text-foreground/25 font-light">
-                Sign In
-              </span>
-            </Link>
-          </Show>
+            )}
+          </Link>
         </div>
       </div>
     </nav>

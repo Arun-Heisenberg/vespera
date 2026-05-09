@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
 
 const sections = [
   {
@@ -117,6 +118,13 @@ export default function Legal() {
   return (
     <div className="flex flex-col">
       <section className="container mx-auto px-4 md:px-8 py-6 md:py-8 max-w-3xl">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center gap-1.5 text-xs uppercase tracking-[0.15em] text-muted-foreground/60 hover:text-foreground transition-colors duration-200 mb-6 font-light"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back
+        </button>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

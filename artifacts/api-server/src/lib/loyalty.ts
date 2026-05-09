@@ -2,7 +2,7 @@ import { db, loyaltyAccountsTable, loyaltyLedgerTable, referralsTable } from "@w
 import { eq, sql } from "drizzle-orm";
 import crypto from "crypto";
 
-export const POINTS_PER_RUPEE_SPENT = 0.01; // 1 point per ₹100
+export const POINTS_PER_RUPEE_SPENT = 0.05; // 5 points per ₹100 = 5% cashback
 export const RUPEE_PER_POINT_REDEEMED = 1;   // 1 point = ₹1
 export const MAX_REDEMPTION_PCT = 0.15;       // up to 15% of subtotal
 

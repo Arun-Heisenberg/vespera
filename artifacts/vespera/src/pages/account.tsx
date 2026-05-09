@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useUser, useClerk, Show } from "@clerk/react";
+import { useUser, useAuth, useClerk, Show } from "@clerk/react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -42,14 +42,17 @@ function useOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const { isSignedIn } = useUser();
+  const { getToken } = useAuth();
 
   useEffect(() => {
     if (!isSignedIn) return;
-    fetch(`${import.meta.env.BASE_URL}api/orders`.replace("//api", "/api"), { credentials: "include" })
-      .then((r) => r.json())
-      .then((data) => { setOrders(data); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, [isSignedIn]);
+    getToken().then((token) =>
+      apiFetch<Order[]>("/orders", { token })
+    ).then((data) => {
+      setOrders(Array.isArray(data) ? data : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, [isSignedIn, getToken]);
 
   return { orders, loading };
 }
@@ -59,12 +62,15 @@ function usePersonalCoupons() {
   const [loading, setLoading] = useState(true);
   const { isSignedIn } = useUser();
 
+  const { getToken } = useAuth();
+
   useEffect(() => {
     if (!isSignedIn) return;
-    apiFetch<PersonalCoupon[]>("/coupons/mine")
-      .then((data) => { setCoupons(data); setLoading(false); })
+    getToken().then((token) =>
+      apiFetch<PersonalCoupon[]>("/coupons/mine", { token })
+    ).then((data) => { setCoupons(data); setLoading(false); })
       .catch(() => setLoading(false));
-  }, [isSignedIn]);
+  }, [isSignedIn, getToken]);
 
   return { coupons, loading };
 }
@@ -261,6 +267,19 @@ function AccountContent() {
 
         {activeTab === "rewards" && (
           <div className="space-y-6">
+            <div className="border border-primary/20 bg-primary/5 p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <ShoppingBag className="w-4 h-4 text-primary" strokeWidth={1.5} />
+                <span className="text-xs uppercase tracking-[0.15em] text-primary font-light">Cashback Programme</span>
+              </div>
+              <p className="text-sm text-foreground/80 font-light leading-relaxed mb-1">
+                Earn <span className="text-primary font-medium">5% cashback</span> on every order as loyalty points.
+              </p>
+              <p className="text-xs text-muted-foreground/60 font-light">
+                1 point = ₹1 · Redeem at checkout · Points are credited once payment is confirmed.
+              </p>
+            </div>
+
             <div className="flex items-center gap-3 mb-2">
               <Gift className="w-4 h-4 text-primary" strokeWidth={1.5} />
               <p className="text-sm text-muted-foreground font-light">
@@ -272,7 +291,7 @@ function AccountContent() {
             ) : coupons.length === 0 ? (
               <div className="py-12 text-center border border-border/10">
                 <Gift className="w-10 h-10 text-muted-foreground/30 mx-auto mb-4" strokeWidth={1} />
-                <p className="text-muted-foreground/60 text-sm font-light mb-2">No rewards yet.</p>
+                <p className="text-muted-foreground/60 text-sm font-light mb-2">No discount codes yet.</p>
                 <p className="text-muted-foreground/40 text-xs font-light">
                   Exclusive codes will appear here when assigned by Vespera.
                 </p>
