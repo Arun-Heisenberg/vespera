@@ -77,7 +77,7 @@ export default function Collection() {
     show: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+      transition: { duration: 0.6 }
     }
   };
 
@@ -174,11 +174,16 @@ export default function Collection() {
                   <motion.img 
                     whileHover={{ scale: 1.05 }}
                     transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                    src={piece.primaryImage}
+                    src={piece.primaryImage || piece.images?.[0] || ""}
                     alt={piece.title}
                     className="w-full h-full object-cover relative z-10"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).style.opacity = '0';
+                      const img = e.target as HTMLImageElement;
+                      if (piece.images && piece.images.length > 0 && img.src !== piece.images[0]) {
+                        img.src = piece.images[0];
+                        return;
+                      }
+                      img.style.opacity = '0';
                     }}
                   />
                   
