@@ -243,12 +243,6 @@ router.post("/admin/storage/enhance-images", requireAdmin, async (req, res): Pro
       },
     });
 
-    if (variants.length === 0) {
-      req.log.error({ errors }, "All image enhancement variants failed");
-      res.status(502).json({ error: "Image enhancement failed", errors });
-      return;
-    }
-
     if (errors.length > 0) {
       req.log.warn({ errors }, "Some image enhancement variants failed");
     }

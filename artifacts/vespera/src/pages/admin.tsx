@@ -432,16 +432,13 @@ function ProductFormModal({
         throw new Error("Image enhancement failed");
       }
       const data: { urls?: string[] } = await res.json();
-      const generated = Array.isArray(data.urls) ? data.urls : [];
-      if (generated.length < 3) {
-        throw new Error("Could not generate 3 image variants");
-      }
+      const generated = Array.isArray(data.urls) ? data.urls.filter((url): url is string => Boolean(url)) : [];
       setEnhanceStatus("");
       return [...baseImages, ...generated];
     } catch (err) {
       console.error("Image enhancement failed:", err);
       setEnhanceStatus("");
-      throw err;
+      return baseImages;
     }
   };
 
@@ -493,6 +490,7 @@ function ProductFormModal({
       }
 
       const finalImages = await enhanceImages(token, sourceImagePath || form.primaryImage, title, material);
+      const images = finalImages.length ? finalImages : [form.primaryImage];
 
       const body = {
         title,
@@ -500,7 +498,7 @@ function ProductFormModal({
         price: parseFloat(form.price),
         stockCount: parseInt(form.stockCount, 10) || 0,
         primaryImage: form.primaryImage,
-        images: finalImages,
+        images,
         material,
         dimensions: form.dimensions,
         occasionStyling,
@@ -531,8 +529,9 @@ function ProductFormModal({
       }
 
       onSaved();
-    } catch {
-      setError("Network error. Please try again.");
+    } catch (err) {
+      console.error("Save product failed:", err);
+      setError("Failed to save product. Please try again.");
       setSaving(false);
     }
   };
