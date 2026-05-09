@@ -473,7 +473,7 @@ function ProductFormModal({
             </div>
           )}
 
-          {isEdit && (
+          {true && (
             <>
               <div>
                 <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
