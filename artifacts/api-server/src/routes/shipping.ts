@@ -108,10 +108,18 @@ router.post("/admin/orders/:id/dispatch", requireAdmin, async (req, res): Promis
       const [{ customersTable }, { eq: eq2 }] = [await import("@workspace/db"), await import("drizzle-orm")];
       const [customer] = await db.select().from(customersTable).where(eq2(customersTable.id, order.customerId)).limit(1);
       if (customer) {
+        const items = await db.select().from(orderItemsTable).where(eq(orderItemsTable.orderId, order.id));
         void notifications.notify("order.shipped", {
           email: customer.email, phone: customer.phone, fullName: customer.fullName,
           notifyViaEmail: customer.notifyViaEmail, notifyViaWhatsapp: customer.notifyViaWhatsapp,
-        }, { orderNumber: order.orderNumber, trackingUrl: trackingUrl || `https://www.thevespera.online/track/${order.orderNumber}` });
+        }, {
+          orderNumber: order.orderNumber,
+          courier: courier || existing?.courier || "manual",
+          awbNumber,
+          estimatedDeliveryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+          trackingUrl: trackingUrl || `https://www.thevespera.online/track/${order.orderNumber}`,
+          items: items.map((item) => ({ title: item.title, quantity: item.quantity })),
+        });
       }
     }
 

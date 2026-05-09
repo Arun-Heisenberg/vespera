@@ -69,11 +69,16 @@ export function render(ctx: NotificationContext): RenderedMessage {
     }
     case "order.shipped": {
       const subject = `Order ${d.orderNumber} dispatched`;
-      const text = `Dear ${name},\n\nOrder ${d.orderNumber} has been dispatched.${d.trackingUrl ? `\nTrack: ${d.trackingUrl}` : ""}${SIGNATURE}`;
+      const items = Array.isArray(d.items) ? d.items as Array<{ title?: string; quantity?: string | number }> : [];
+      const text = `Dear ${name},\n\nYour order ${d.orderNumber} has been dispatched.\n${d.courier ? `Courier Partner: ${d.courier}\n` : ""}${d.awbNumber ? `Tracking Number: ${d.awbNumber}\n` : ""}${d.estimatedDeliveryDate ? `Estimated Delivery Date: ${d.estimatedDeliveryDate}\n` : ""}${d.trackingUrl ? `Track: ${d.trackingUrl}\n` : ""}${items.length ? `\nItem Summary:\n${items.map((item) => `- ${item.title ?? "Item"} x${item.quantity ?? 1}`).join("\n")}\n` : ""}${SIGNATURE}`;
       const html = shell("On Its Way",
         p(`Dear ${name},`) +
-        p(`Order ${d.orderNumber} has been dispatched.`) +
-        (d.trackingUrl ? `<p style="margin:20px 0;"><a href="${escapeHtml(String(d.trackingUrl))}" style="color:#D4AF37;">Track shipment</a></p>` : "")
+        p(`Your order ${d.orderNumber} has been dispatched.`) +
+        (d.courier ? p(`Courier partner: ${String(d.courier)}`) : "") +
+        (d.awbNumber ? p(`Tracking number: ${String(d.awbNumber)}`) : "") +
+        (d.estimatedDeliveryDate ? p(`Estimated delivery date: ${String(d.estimatedDeliveryDate)}`) : "") +
+        (d.trackingUrl ? `<p style="margin:20px 0;"><a href="${escapeHtml(String(d.trackingUrl))}" style="color:#D4AF37;">Track shipment</a></p>` : "") +
+        (items.length ? `<div style="margin-top:18px;padding:16px;border:1px solid rgba(212,175,55,0.15);"><p style="margin:0 0 10px;text-transform:uppercase;letter-spacing:0.18em;font-size:11px;color:#D4AF37;font-family:Inter,Arial,sans-serif;">Item Summary</p>${items.map((item) => `<p style="margin:0 0 6px;">${escapeHtml(`${item.title ?? "Item"} x${item.quantity ?? 1}`)}</p>`).join("")}</div>` : "")
       );
       return { subject, text, html };
     }
