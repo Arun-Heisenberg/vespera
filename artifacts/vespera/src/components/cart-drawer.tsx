@@ -14,6 +14,15 @@ import { CouponInput } from "./coupon-input";
 import { GiftWrapToggle } from "./gift-wrap-toggle";
 import { useCurrency } from "./currency-switcher";
 
+export function formatPrice(price: number) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price);
+}
+
 declare global {
   interface Window {
     Razorpay: new (options: Record<string, unknown>) => { open: () => void; on: (event: string, callback: () => void) => void };
