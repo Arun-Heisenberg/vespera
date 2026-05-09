@@ -335,6 +335,15 @@ function ImageUploader({
   );
 }
 
+interface GeneratedMetadata {
+  title: string;
+  description: string;
+  material: string;
+  slug: string;
+  artisanNotes: string;
+  occasionStyling: string[];
+}
+
 function ProductFormModal({
   product,
   onClose,
@@ -349,25 +358,54 @@ function ProductFormModal({
   const [form, setForm] = useState<ProductFormData>(product ? { ...product } : { ...emptyForm });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [enhanceStatus, setEnhanceStatus] = useState<string>("");
 
   const updateField = <K extends keyof ProductFormData>(key: K, value: ProductFormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
+  // For Edit mode the existing title (which the admin can still rename) keeps
+  // driving the slug, just like before.
   useEffect(() => {
-    if (!isEdit && form.title && !product?.slug) {
+    if (isEdit && form.title && !product?.slug) {
       updateField("slug", generateSlug(form.title));
     }
   }, [form.title, isEdit, product?.slug]);
 
-  const [enhanceStatus, setEnhanceStatus] = useState<string>("");
+  const analyzeImage = async (
+    token: string | null,
+    imageUrl: string,
+    priceInr: number,
+    dimensions: string,
+  ): Promise<GeneratedMetadata | null> => {
+    const url = `${import.meta.env.BASE_URL}api/admin/storage/analyze-image`.replace("//api", "/api");
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers,
+        credentials: "include",
+        body: JSON.stringify({ imageUrl, priceInr, dimensions }),
+      });
+      if (!res.ok) return null;
+      const data: { metadata?: GeneratedMetadata } = await res.json();
+      return data.metadata ?? null;
+    } catch {
+      return null;
+    }
+  };
 
-  const enhanceImages = async (token: string | null): Promise<string[]> => {
+  const enhanceImages = async (
+    token: string | null,
+    sourceImage: string,
+    title: string,
+    material: string,
+  ): Promise<string[]> => {
     // For new products with exactly one image, ask the server to generate
     // 3 professional variants from the uploaded source via Gemini.
     if (isEdit) return form.images;
-    const baseImages = form.images.length > 0 ? form.images : [form.primaryImage];
-    if (baseImages.length !== 1) return baseImages;
+    const baseImages = [sourceImage];
 
     setEnhanceStatus("Generating 3 professional variants from your image…");
     try {
@@ -378,14 +416,9 @@ function ProductFormModal({
         method: "POST",
         headers,
         credentials: "include",
-        body: JSON.stringify({
-          imageUrl: form.primaryImage,
-          productTitle: form.title,
-          material: form.material,
-        }),
+        body: JSON.stringify({ imageUrl: sourceImage, productTitle: title, material }),
       });
       if (!res.ok) {
-        // Don't fail the whole save — just keep the original image.
         setEnhanceStatus("");
         return baseImages;
       }
@@ -400,9 +433,17 @@ function ProductFormModal({
   };
 
   const handleSubmit = async () => {
-    if (!form.title || !form.description || !form.price || !form.primaryImage || !form.slug) {
-      setError("Please fill in all required fields: Title, Description, Price, Image, and Slug");
-      return;
+    if (isEdit) {
+      // Edit mode keeps the full set of fields; require the basics.
+      if (!form.title || !form.description || !form.price || !form.primaryImage || !form.slug) {
+        setError("Please fill in all required fields");
+        return;
+      }
+    } else {
+      if (!form.primaryImage || !form.price) {
+        setError("Please upload a product image and enter a price.");
+        return;
+      }
     }
 
     setSaving(true);
@@ -411,21 +452,53 @@ function ProductFormModal({
     try {
       const token = await getToken();
 
-      const finalImages = await enhanceImages(token);
+      let title = form.title;
+      let description = form.description;
+      let material = form.material;
+      let slug = form.slug;
+      let artisanNotes = form.artisanNotes;
+      let occasionStyling = form.occasionStyling.filter((s) => s.trim());
+
+      if (!isEdit) {
+        // Ask the LLM for catalogue copy based purely on the image (+ price/dim hints).
+        setEnhanceStatus("Reading the piece and writing the catalogue entry…");
+        const meta = await analyzeImage(
+          token,
+          form.primaryImage,
+          parseFloat(form.price) || 0,
+          form.dimensions,
+        );
+        if (!meta) {
+          setEnhanceStatus("");
+          setError(
+            "We couldn't read the image to generate the product details. Please try a different photo or try again.",
+          );
+          setSaving(false);
+          return;
+        }
+        title = meta.title;
+        description = meta.description;
+        material = meta.material;
+        slug = meta.slug;
+        artisanNotes = meta.artisanNotes;
+        occasionStyling = meta.occasionStyling;
+      }
+
+      const finalImages = await enhanceImages(token, form.primaryImage, title, material);
 
       const body = {
-        title: form.title,
-        description: form.description,
+        title,
+        description,
         price: parseFloat(form.price),
         stockCount: parseInt(form.stockCount, 10) || 0,
         primaryImage: form.primaryImage,
         images: finalImages.length > 0 ? finalImages : [form.primaryImage],
-        material: form.material,
+        material,
         dimensions: form.dimensions,
-        occasionStyling: form.occasionStyling.filter((s) => s.trim()),
-        artisanNotes: form.artisanNotes,
+        occasionStyling,
+        artisanNotes,
         isFeatured: form.isFeatured,
-        slug: form.slug,
+        slug,
       };
 
       const url = isEdit
@@ -485,29 +558,55 @@ function ProductFormModal({
             </div>
           )}
 
-          <div>
-            <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
-              Title <span className="text-primary">*</span>
-            </label>
-            <input
-              type="text"
-              value={form.title}
-              onChange={(e) => updateField("title", e.target.value)}
-              placeholder="e.g. Noctuelle"
-              className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40"
-            />
-          </div>
+          {!isEdit && (
+            <div className="bg-primary/5 border border-primary/20 text-primary/90 text-xs px-4 py-3 leading-relaxed">
+              Upload the product photograph and set price &amp; dimensions. Vespera will compose the name,
+              description, material, slug, artisan notes and three professional product photographs for you.
+            </div>
+          )}
+
+          {isEdit && (
+            <>
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
+                  Title <span className="text-primary">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.title}
+                  onChange={(e) => updateField("title", e.target.value)}
+                  placeholder="e.g. Noctuelle"
+                  className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
+                  Description <span className="text-primary">*</span>
+                </label>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => updateField("description", e.target.value)}
+                  rows={3}
+                  placeholder="A brief description of the product..."
+                  className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40 resize-none"
+                />
+              </div>
+            </>
+          )}
 
           <div>
             <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
-              Description <span className="text-primary">*</span>
+              Product Image <span className="text-primary">*</span>
             </label>
-            <textarea
-              value={form.description}
-              onChange={(e) => updateField("description", e.target.value)}
-              rows={3}
-              placeholder="A brief description of the product..."
-              className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40 resize-none"
+            <ImageUploader
+              currentImage={form.primaryImage}
+              onImageSet={(url) => {
+                updateField("primaryImage", url);
+                if (!form.images.length || (form.images.length === 1 && !form.images[0])) {
+                  updateField("images", url ? [url] : []);
+                }
+              }}
             />
           </div>
 
@@ -528,48 +627,6 @@ function ProductFormModal({
             </div>
             <div>
               <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
-                Stock Count
-              </label>
-              <input
-                type="number"
-                value={form.stockCount}
-                onChange={(e) => updateField("stockCount", e.target.value)}
-                min="0"
-                className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
-              Product Image <span className="text-primary">*</span>
-            </label>
-            <ImageUploader
-              currentImage={form.primaryImage}
-              onImageSet={(url) => {
-                updateField("primaryImage", url);
-                if (!form.images.length || (form.images.length === 1 && !form.images[0])) {
-                  updateField("images", url ? [url] : []);
-                }
-              }}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
-                Material
-              </label>
-              <input
-                type="text"
-                value={form.material}
-                onChange={(e) => updateField("material", e.target.value)}
-                placeholder="Hand-burnished leather, gold-plated brass"
-                className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40"
-              />
-            </div>
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
                 Dimensions
               </label>
               <input
@@ -584,29 +641,59 @@ function ProductFormModal({
 
           <div>
             <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
-              Slug <span className="text-primary">*</span>
+              Stock Count
             </label>
             <input
-              type="text"
-              value={form.slug}
-              onChange={(e) => updateField("slug", e.target.value)}
-              placeholder="auto-generated-from-title"
-              className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground font-mono text-xs placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40"
+              type="number"
+              value={form.stockCount}
+              onChange={(e) => updateField("stockCount", e.target.value)}
+              min="0"
+              className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40"
             />
           </div>
 
-          <div>
-            <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
-              Artisan Notes
-            </label>
-            <textarea
-              value={form.artisanNotes}
-              onChange={(e) => updateField("artisanNotes", e.target.value)}
-              rows={2}
-              placeholder="Details about craftsmanship..."
-              className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40 resize-none"
-            />
-          </div>
+          {isEdit && (
+            <>
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
+                  Material
+                </label>
+                <input
+                  type="text"
+                  value={form.material}
+                  onChange={(e) => updateField("material", e.target.value)}
+                  placeholder="Hand-burnished leather, gold-plated brass"
+                  className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
+                  Slug <span className="text-primary">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.slug}
+                  onChange={(e) => updateField("slug", e.target.value)}
+                  placeholder="auto-generated-from-title"
+                  className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground font-mono text-xs placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2">
+                  Artisan Notes
+                </label>
+                <textarea
+                  value={form.artisanNotes}
+                  onChange={(e) => updateField("artisanNotes", e.target.value)}
+                  rows={2}
+                  placeholder="Details about craftsmanship..."
+                  className="w-full bg-secondary/30 border border-border/20 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40 resize-none"
+                />
+              </div>
+            </>
+          )}
 
           <div className="flex items-center gap-3">
             <button

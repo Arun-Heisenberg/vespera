@@ -1,6 +1,11 @@
 import { Router, type IRouter } from "express";
 import { z } from "zod/v4";
-import { generateImageFromImage, isGeminiConfigured } from "@workspace/integrations-gemini-ai/image";
+import {
+  generateImageFromImage,
+  generateProductMetadataFromImage,
+  isGeminiConfigured,
+  type ProductMetadata,
+} from "@workspace/integrations-gemini-ai/image";
 import { ObjectStorageService } from "../lib/objectStorage";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import { recordAudit } from "../lib/audit";
@@ -8,10 +13,16 @@ import { recordAudit } from "../lib/audit";
 const router: IRouter = Router();
 const storage = new ObjectStorageService();
 
-const bodySchema = z.object({
+const enhanceBodySchema = z.object({
   imageUrl: z.string().min(1).max(2000),
   productTitle: z.string().max(200).optional().default(""),
   material: z.string().max(200).optional().default(""),
+});
+
+const analyzeBodySchema = z.object({
+  imageUrl: z.string().min(1).max(2000),
+  priceInr: z.number().nonnegative().optional(),
+  dimensions: z.string().max(200).optional(),
 });
 
 const VARIANT_PROMPTS: Array<{ key: string; prompt: (ctx: { title: string; material: string }) => string }> = [
@@ -60,19 +71,14 @@ class BadSourceImageError extends Error {
  * Resolve the source image strictly from our own object storage. We refuse
  * arbitrary URLs to eliminate SSRF risk — even with admin auth the server
  * should never proxy fetches to attacker-controlled hosts or internal
- * metadata endpoints. Accepted forms (after stripping query/hash):
- *   - "/objects/<id>"
- *   - "/api/storage/objects/<id>"
- *   - any absolute URL whose path matches one of the above
+ * metadata endpoints.
  */
 function extractObjectPath(rawUrl: string): string | null {
   let pathname = rawUrl;
-  // Try to parse as URL to drop scheme/host; for relative paths fall through.
   try {
     if (/^https?:\/\//i.test(rawUrl)) {
       pathname = new URL(rawUrl).pathname;
     } else {
-      // Strip query/hash from a bare path.
       pathname = rawUrl.split("?")[0].split("#")[0];
     }
   } catch {
@@ -98,11 +104,11 @@ async function fetchSourceImage(rawUrl: string): Promise<{ data: string; mimeTyp
   const size = Number(meta.size ?? 0);
   const cap = `max ${Math.round(MAX_SOURCE_BYTES / 1024 / 1024)}MB`;
   if (size > MAX_SOURCE_BYTES) {
-    throw new BadSourceImageError(`Source image too large for enhancement (${cap})`);
+    throw new BadSourceImageError(`Source image too large (${cap})`);
   }
   const [buf] = await file.download();
   if (buf.length > MAX_SOURCE_BYTES) {
-    throw new BadSourceImageError(`Source image too large for enhancement (${cap})`);
+    throw new BadSourceImageError(`Source image too large (${cap})`);
   }
   return {
     data: buf.toString("base64"),
@@ -127,8 +133,61 @@ async function uploadGeneratedImage(b64: string, mimeType: string): Promise<stri
   return `/api/storage${objectPath}`;
 }
 
+router.post("/admin/storage/analyze-image", requireAdmin, async (req, res): Promise<void> => {
+  const parsed = analyzeBodySchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "imageUrl is required" });
+    return;
+  }
+
+  if (!isGeminiConfigured()) {
+    void recordAudit(req, {
+      action: "image.analyze.skipped",
+      entity: "image",
+      metadata: { reason: "gemini_not_configured", imageUrl: parsed.data.imageUrl },
+    });
+    res.status(503).json({ error: "Image analysis is not configured on this server" });
+    return;
+  }
+
+  try {
+    const source = await fetchSourceImage(parsed.data.imageUrl);
+    const metadata: ProductMetadata = await generateProductMetadataFromImage({
+      imageBase64: source.data,
+      imageMimeType: source.mimeType,
+      priceInr: parsed.data.priceInr,
+      dimensions: parsed.data.dimensions,
+    });
+
+    void recordAudit(req, {
+      action: "image.analyze",
+      entity: "image",
+      metadata: {
+        sourceUrl: parsed.data.imageUrl,
+        priceInr: parsed.data.priceInr,
+        dimensions: parsed.data.dimensions,
+        title: metadata.title,
+        slug: metadata.slug,
+      },
+    });
+
+    res.json({ metadata });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Image analysis failed";
+    const status = err instanceof BadSourceImageError ? 400 : 500;
+    if (status === 400) req.log.warn({ err }, "Image analysis rejected: bad source");
+    else req.log.error({ err }, "Image analysis error");
+    void recordAudit(req, {
+      action: "image.analyze.failed",
+      entity: "image",
+      metadata: { sourceUrl: parsed.data.imageUrl, error: message, status },
+    });
+    res.status(status).json({ error: message });
+  }
+});
+
 router.post("/admin/storage/enhance-images", requireAdmin, async (req, res): Promise<void> => {
-  const parsed = bodySchema.safeParse(req.body);
+  const parsed = enhanceBodySchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "imageUrl is required" });
     return;
