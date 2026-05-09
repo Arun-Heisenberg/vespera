@@ -5,7 +5,7 @@ import { Show, useUser } from "@clerk/react";
 import { useCart } from "./cart-context";
 import { CartDrawer } from "./cart-drawer";
 import { MobileBottomNav } from "./mobile-nav";
-import { Menu, X, User, Shield, ShoppingBag } from "lucide-react";
+import { Menu, X, User, Shield, ShoppingBag, ArrowRight, Check } from "lucide-react";
 
 const navLinks = [
   { href: "/collection", label: "Collection" },
@@ -14,12 +14,84 @@ const navLinks = [
   { href: "/legal", label: "Legal" },
 ];
 
+const shopLinks = [
+  { href: "/collection", label: "All Products" },
+  { href: "/collection?cat=clutch", label: "Clutches" },
+  { href: "/collection?cat=tote", label: "Tote Bags" },
+  { href: "/collection?cat=sling", label: "Sling Bags" },
+  { href: "/collection?cat=mini", label: "Mini Bags" },
+  { href: "/collection?sort=new", label: "New Arrivals" },
+];
+
+const helpLinks = [
+  { href: "/account", label: "Track Order" },
+  { href: "/legal#shipping", label: "Shipping Policy" },
+  { href: "/legal#terms", label: "Return Policy" },
+  { href: "/client-care#faq", label: "FAQ" },
+  { href: "/client-care", label: "Contact Us" },
+  { href: "/our-story", label: "About Vespera" },
+];
+
 function useIsAdmin() {
   const { user } = useUser();
   if (!user) return false;
   const email = user.primaryEmailAddress?.emailAddress || "";
   const metaRole = (user.publicMetadata as any)?.role;
   return metaRole === "admin" || email === "admin@vespera.com" || email === "avkvasp1@gmail.com";
+}
+
+function MenuEmailSignup() {
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setError("Please enter a valid email.");
+      return;
+    }
+    try {
+      const existing = JSON.parse(localStorage.getItem("vespera-newsletter") || "[]");
+      if (!existing.includes(trimmed)) existing.push(trimmed);
+      localStorage.setItem("vespera-newsletter", JSON.stringify(existing));
+    } catch {}
+    setError("");
+    setSubmitted(true);
+  };
+
+  if (submitted) {
+    return (
+      <div className="flex items-center gap-2 text-[12px] text-foreground/70 font-light">
+        <Check className="w-4 h-4 text-primary" strokeWidth={1.5} />
+        You're on the list. We'll be in touch.
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex w-full">
+      <input
+        type="email"
+        required
+        value={email}
+        onChange={(e) => { setEmail(e.target.value); if (error) setError(""); }}
+        placeholder="Your email"
+        aria-label="Email for newsletter"
+        className="flex-1 min-w-0 bg-transparent border border-border/20 px-3 py-2.5 text-[12px] text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors"
+      />
+      <button
+        type="submit"
+        className="bg-primary text-primary-foreground px-4 py-2.5 text-[11px] tracking-[0.2em] uppercase font-light hover:bg-primary/90 transition-colors"
+      >
+        Join
+      </button>
+      {error && (
+        <span className="sr-only">{error}</span>
+      )}
+    </form>
+  );
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -39,7 +111,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setIsMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: "instant" });
+    const hash = window.location.hash;
+    if (hash) {
+      const id = hash.slice(1);
+      requestAnimationFrame(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+          window.scrollTo({ top: 0, behavior: "instant" });
+        }
+      });
+    } else {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
   }, [location]);
 
   useEffect(() => {
@@ -161,78 +246,108 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
               <div className="gold-divider w-full" />
 
-              <nav className="flex-1 flex flex-col px-6 md:px-8 py-8 gap-0">
-                {navLinks.map((link, i) => (
-                  <motion.div
-                    key={link.href}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    <Link
-                      href={link.href}
-                      className={`block py-4 text-2xl md:text-3xl font-serif tracking-wide transition-colors duration-300 ${
-                        location === link.href
-                          ? "text-primary"
-                          : "text-foreground/80 hover:text-primary"
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  </motion.div>
-                ))}
+              <nav className="flex-1 overflow-y-auto px-6 md:px-8 py-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.05 }}
+                  className="mb-8"
+                >
+                  <h3 className="text-[10px] tracking-[0.4em] uppercase text-primary/70 font-light mb-3">
+                    Shop
+                  </h3>
+                  <ul className="flex flex-col">
+                    {shopLinks.map((link) => (
+                      <li key={link.label}>
+                        <Link
+                          href={link.href}
+                          className="block py-2.5 text-base font-light text-foreground/85 hover:text-primary transition-colors duration-300"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
 
-                <div className="gold-divider w-full my-6" />
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.12 }}
+                  className="mb-8"
+                >
+                  <h3 className="text-[10px] tracking-[0.4em] uppercase text-primary/70 font-light mb-3">
+                    Help
+                  </h3>
+                  <ul className="flex flex-col">
+                    {helpLinks.map((link) => (
+                      <li key={link.label}>
+                        <Link
+                          href={link.href}
+                          className="block py-2.5 text-base font-light text-foreground/85 hover:text-primary transition-colors duration-300"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
 
-                <Show when="signed-in">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 + navLinks.length * 0.06 }}
-                  >
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.18 }}
+                  className="mb-6"
+                >
+                  <h3 className="text-[10px] tracking-[0.4em] uppercase text-primary/70 font-light mb-3">
+                    Stay Connected
+                  </h3>
+                  <p className="text-[13px] text-foreground/55 font-light leading-relaxed mb-4">
+                    New collections, exclusive previews, and quiet announcements.
+                  </p>
+                  <MenuEmailSignup />
+                </motion.div>
+
+                <div className="gold-divider w-full my-5" />
+
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.22 }}
+                  className="flex flex-col"
+                >
+                  <Show when="signed-in">
                     <Link
                       href="/account"
-                      className={`block py-3 text-sm tracking-[0.2em] uppercase font-light transition-colors duration-300 ${
-                        location === "/account" ? "text-primary" : "text-foreground/50 hover:text-primary"
+                      className={`flex items-center gap-2 py-2.5 text-[12px] tracking-[0.2em] uppercase font-light transition-colors duration-300 ${
+                        location === "/account" ? "text-primary" : "text-foreground/55 hover:text-primary"
                       }`}
                     >
+                      <User className="w-4 h-4" strokeWidth={1.5} />
                       My Account
                     </Link>
-                  </motion.div>
-                </Show>
-
-                <Show when="signed-out">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 + navLinks.length * 0.06 }}
-                  >
+                  </Show>
+                  <Show when="signed-out">
                     <Link
                       href="/sign-in"
-                      className="block py-3 text-sm tracking-[0.2em] uppercase font-light text-foreground/50 hover:text-primary transition-colors duration-300"
+                      className="flex items-center gap-2 py-2.5 text-[12px] tracking-[0.2em] uppercase font-light text-foreground/55 hover:text-primary transition-colors duration-300"
                     >
+                      <User className="w-4 h-4" strokeWidth={1.5} />
                       Sign In
                     </Link>
-                  </motion.div>
-                </Show>
-
-                {isAdmin && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 + (navLinks.length + 1) * 0.06 }}
-                  >
+                  </Show>
+                  {isAdmin && (
                     <Link
                       href="/admin"
-                      className={`flex items-center gap-2 py-3 text-sm tracking-[0.2em] uppercase font-light transition-colors duration-300 ${
-                        location === "/admin" ? "text-primary" : "text-foreground/50 hover:text-primary"
+                      className={`flex items-center gap-2 py-2.5 text-[12px] tracking-[0.2em] uppercase font-light transition-colors duration-300 ${
+                        location === "/admin" ? "text-primary" : "text-foreground/55 hover:text-primary"
                       }`}
                     >
                       <Shield className="w-4 h-4" strokeWidth={1.5} />
                       Admin
                     </Link>
-                  </motion.div>
-                )}
+                  )}
+                </motion.div>
               </nav>
 
               <div className="p-6 md:p-8 border-t border-border/10">

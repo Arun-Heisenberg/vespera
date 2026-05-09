@@ -1,20 +1,59 @@
-import React, { useEffect } from "react";
-import { Link } from "wouter";
+import React, { useEffect, useMemo } from "react";
+import { Link, useSearch } from "wouter";
 import { motion } from "framer-motion";
 import { useListCollection } from "@workspace/api-client-react";
 import { formatPrice } from "@/components/cart-drawer";
 import { Skeleton } from "@/components/ui/skeleton";
 
+const CATEGORY_LABELS: Record<string, string> = {
+  clutch: "Clutches",
+  tote: "Tote Bags",
+  sling: "Sling Bags",
+  mini: "Mini Bags",
+};
+
 export default function Collection() {
+  const search = useSearch();
+  const params = useMemo(() => new URLSearchParams(search), [search]);
+  const cat = params.get("cat") || "";
+  const sort = params.get("sort") || "";
+
+  const headerLabel = cat
+    ? CATEGORY_LABELS[cat] || "Collection"
+    : sort === "new"
+    ? "New Arrivals"
+    : "Evening Minaudières";
+
   useEffect(() => {
-    document.title = "Collection | Vespera";
+    const titleSuffix = cat
+      ? CATEGORY_LABELS[cat] || "Collection"
+      : sort === "new"
+      ? "New Arrivals"
+      : "Collection";
+    document.title = `${titleSuffix} | Vespera`;
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
       metaDesc.setAttribute("content", "Explore the Vespera collection. Sculptural evening minaudières crafted with uncommon materials and singular forms.");
     }
-  }, []);
+  }, [cat, sort]);
 
-  const { data: pieces, isLoading } = useListCollection();
+  const { data: allPieces, isLoading } = useListCollection();
+
+  const pieces = useMemo(() => {
+    if (!allPieces) return allPieces;
+    let result = [...allPieces];
+    if (cat) {
+      const needle = cat.toLowerCase();
+      result = result.filter((p) => {
+        const haystack = `${p.title} ${p.material ?? ""}`.toLowerCase();
+        return haystack.includes(needle);
+      });
+    }
+    if (sort === "new") {
+      result.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
+    }
+    return result;
+  }, [allPieces, cat, sort]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -45,7 +84,7 @@ export default function Collection() {
           >
             <span className="text-[10px] uppercase tracking-[0.4em] text-primary/50 block mb-3 font-light">The Collection</span>
             <h1 className="text-3xl md:text-5xl font-serif mb-4">
-              Evening Minaudières
+              {headerLabel}
             </h1>
             <p className="text-foreground/40 text-sm md:text-base font-light max-w-md mx-auto">
               Wearable sculptures merging architectural forms with artisan techniques.

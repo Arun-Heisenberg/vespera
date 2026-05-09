@@ -99,11 +99,12 @@ export default function ClientCare() {
         </motion.div>
 
         <motion.div
+          id="faq"
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mb-10 md:mb-14"
+          className="mb-10 md:mb-14 scroll-mt-20"
         >
           <div className="text-center mb-8">
             <span className="text-[10px] uppercase tracking-[0.4em] text-primary/50 block mb-3 font-light">Common Questions</span>
