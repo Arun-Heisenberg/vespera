@@ -239,7 +239,7 @@ export function CartDrawer() {
               )}
 
               {showAddress && (
-                <div className="border border-border/20 p-3 space-y-2">
+                <div className="border border-border/20 p-3 space-y-2 max-h-[40vh] overflow-y-auto scrollbar-none">
                   <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">Shipping Address</p>
                   {([
                     ["fullName", "Full name"], ["phone", "Phone"], ["addressLine1", "Address"], ["city", "City"], ["state", "State"], ["pincode", "Pincode (6 digits)"],
