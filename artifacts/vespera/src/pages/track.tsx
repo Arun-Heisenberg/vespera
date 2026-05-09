@@ -18,35 +18,45 @@ export default function Track() {
   const params = useParams<{ orderNumber?: string }>();
   const [, setLocation] = useLocation();
   const [orderNumber, setOrderNumber] = useState(params.orderNumber || "");
+  const [verify, setVerify] = useState("");
   const [data, setData] = useState<TrackResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => { document.title = "Track Order | Vespera"; }, []);
 
-  useEffect(() => {
-    if (!params.orderNumber) return;
-    setLoading(true); setError("");
-    apiFetch<TrackResponse>(`/orders/by-number/${params.orderNumber}/tracking`)
+  const fetchTracking = (num: string, verifyVal: string) => {
+    if (!num || !verifyVal) return;
+    setLoading(true); setError(""); setData(null);
+    apiFetch<TrackResponse>(`/orders/by-number/${num}/tracking`, {
+      method: "POST",
+      body: JSON.stringify({ verify: verifyVal }),
+    })
       .then(setData).catch((e) => setError((e as Error).message)).finally(() => setLoading(false));
-  }, [params.orderNumber]);
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!orderNumber.trim()) return;
-    setLocation(`/track/${orderNumber.trim().toUpperCase()}`);
+    const num = orderNumber.trim().toUpperCase();
+    const verifyVal = verify.trim();
+    if (!num || !verifyVal) return;
+    setLocation(`/track/${num}`);
+    fetchTracking(num, verifyVal);
   };
 
   return (
     <div className="container mx-auto px-6 py-16 max-w-2xl">
       <h1 className="text-3xl md:text-4xl font-serif mb-2">Track Your Order</h1>
-      <p className="text-sm text-muted-foreground mb-8">Enter the order number from your confirmation email.</p>
+      <p className="text-sm text-muted-foreground mb-8">Enter your order number and the email address or phone number used at checkout.</p>
 
-      <form onSubmit={submit} className="flex gap-2 mb-10">
+      <form onSubmit={submit} className="space-y-3 mb-10">
         <input value={orderNumber} onChange={(e) => setOrderNumber(e.target.value.toUpperCase())}
           placeholder="VES-20260101-0001"
-          className="flex-1 bg-secondary/30 border border-border/20 px-4 py-3 text-sm font-mono focus:outline-none focus:border-primary/40" />
-        <Button type="submit" className="bg-primary text-primary-foreground">Track</Button>
+          className="w-full bg-secondary/30 border border-border/20 px-4 py-3 text-sm font-mono focus:outline-none focus:border-primary/40" />
+        <input value={verify} onChange={(e) => setVerify(e.target.value)}
+          placeholder="Email address or phone number"
+          className="w-full bg-secondary/30 border border-border/20 px-4 py-3 text-sm focus:outline-none focus:border-primary/40" />
+        <Button type="submit" className="w-full bg-primary text-primary-foreground">Track Order</Button>
       </form>
 
       {loading && <div className="text-center py-12"><Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" /></div>}

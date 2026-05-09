@@ -5,6 +5,7 @@ import { shipping } from "../lib/shipping";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import { notifications } from "../lib/notifications";
 import { db as _db } from "@workspace/db";
+import rateLimit from "express-rate-limit";
 
 const router: IRouter = Router();
 
@@ -37,10 +38,35 @@ router.get("/shipping/track/:awb", async (req, res): Promise<void> => {
   }
 });
 
-router.get("/orders/by-number/:orderNumber/tracking", async (req, res): Promise<void> => {
+const trackingRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Too many tracking requests. Please try again later." },
+});
+
+router.post("/orders/by-number/:orderNumber/tracking", trackingRateLimit, async (req, res): Promise<void> => {
   try {
+    const verify = String(req.body?.verify || "").trim().toLowerCase();
+    if (!verify) {
+      res.status(400).json({ error: "A verification identifier (email or phone) is required" });
+      return;
+    }
+
     const [order] = await db.select().from(ordersTable).where(eq(ordersTable.orderNumber, req.params.orderNumber)).limit(1);
-    if (!order) { res.status(404).json({ error: "Order not found" }); return; }
+    if (!order || !order.customerId) { res.status(404).json({ error: "Order not found" }); return; }
+
+    const { customersTable: customers } = await import("@workspace/db");
+    const [customer] = await db.select().from(customers).where(eq(customers.id, order.customerId)).limit(1);
+
+    const emailMatch = customer?.email?.toLowerCase() === verify;
+    const phoneMatch = customer?.phone?.replace(/\D/g, "") === verify.replace(/\D/g, "");
+    if (!customer || (!emailMatch && !phoneMatch)) {
+      res.status(404).json({ error: "Order not found" });
+      return;
+    }
+
     const [shipment] = await db.select().from(shipmentsTable).where(eq(shipmentsTable.orderId, order.id)).limit(1);
     res.json({
       orderNumber: order.orderNumber,
