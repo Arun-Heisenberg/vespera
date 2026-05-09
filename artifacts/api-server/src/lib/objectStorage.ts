@@ -108,17 +108,8 @@ export class ObjectStorageService {
 
   async getObjectEntityUploadURL(): Promise<string> {
     const objectId = randomUUID();
-    const privateObjectDir = process.env.PRIVATE_OBJECT_DIR || "";
-    const publicObjectPaths = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
-    const baseDir = privateObjectDir || publicObjectPaths.split(",").map((p) => p.trim()).find(Boolean) || "";
-
-    if (!baseDir) {
-      throw new Error(
-        "No object storage directory configured. Set PRIVATE_OBJECT_DIR or PUBLIC_OBJECT_SEARCH_PATHS."
-      );
-    }
-
-    const fullPath = `${baseDir.replace(/\/$/, "")}/uploads/${objectId}`;
+    const privateObjectDir = this.getPrivateObjectDir();
+    const fullPath = `${privateObjectDir.replace(/\/$/, "")}/uploads/${objectId}`;
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
 
@@ -141,10 +132,7 @@ export class ObjectStorageService {
     }
 
     const entityId = parts.slice(1).join("/");
-    let entityDir = process.env.PRIVATE_OBJECT_DIR || process.env.PUBLIC_OBJECT_SEARCH_PATHS?.split(",").map((p) => p.trim()).find(Boolean) || "";
-    if (!entityDir) {
-      throw new ObjectNotFoundError();
-    }
+    let entityDir = this.getPrivateObjectDir();
     if (!entityDir.endsWith("/")) {
       entityDir = `${entityDir}/`;
     }
@@ -167,10 +155,7 @@ export class ObjectStorageService {
     const url = new URL(rawPath);
     const rawObjectPath = url.pathname;
 
-    let objectEntityDir = process.env.PRIVATE_OBJECT_DIR || process.env.PUBLIC_OBJECT_SEARCH_PATHS?.split(",").map((p) => p.trim()).find(Boolean) || "";
-    if (!objectEntityDir) {
-      return rawObjectPath;
-    }
+    let objectEntityDir = this.getPrivateObjectDir();
     if (!objectEntityDir.endsWith("/")) {
       objectEntityDir = `${objectEntityDir}/`;
     }
