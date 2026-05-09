@@ -185,97 +185,103 @@ export function CartDrawer() {
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex-1 min-h-0 p-6 flex flex-col gap-6 overflow-y-auto scrollbar-none">
-          <AnimatePresence initial={false}>
-            {items.length === 0 ? (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-                className="flex flex-col items-center justify-center h-full text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center">
-                  <ShoppingBag className="w-6 h-6 text-muted-foreground" />
-                </div>
-                <p className="text-muted-foreground font-sans">Your bag is empty.</p>
-                <Button variant="outline" className="mt-4 border-primary/20 text-primary hover:bg-primary/10" onClick={() => { setIsCartOpen(false); setLocation("/collection"); }}>
-                  Continue Shopping
-                </Button>
-              </motion.div>
-            ) : (
-              items.map((item) => (
-                <motion.div key={item.pieceId} layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }}
-                  className="flex gap-4 group">
-                  <div className="relative w-24 h-32 overflow-hidden bg-secondary">
-                    <img src={item.piece.primaryImage} alt={item.piece.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-none">
+          <div className="p-6 space-y-6">
+            <AnimatePresence initial={false}>
+              {items.length === 0 ? (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+                  className="flex flex-col items-center justify-center min-h-[40vh] text-center space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center">
+                    <ShoppingBag className="w-6 h-6 text-muted-foreground" />
                   </div>
-                  <div className="flex-1 flex flex-col justify-between py-1">
-                    <div className="flex justify-between items-start gap-2">
-                      <div>
-                        <h3 className="font-serif text-lg leading-tight">{item.piece.title}</h3>
-                        <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{item.piece.material}</p>
-                      </div>
-                      <button onClick={() => removeItem(item.pieceId)} className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Remove item">
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="flex justify-between items-end">
-                      <div className="flex items-center gap-3 border border-border/40 px-2 py-1">
-                        <button onClick={() => updateQuantity(item.pieceId, item.quantity - 1)} className="text-muted-foreground hover:text-foreground" disabled={item.quantity <= 1}>
-                          <Minus className="w-3 h-3" />
-                        </button>
-                        <span className="text-sm w-4 text-center">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.pieceId, item.quantity + 1)} className="text-muted-foreground hover:text-foreground" disabled={item.quantity >= item.piece.stockCount}>
-                          <Plus className="w-3 h-3" />
-                        </button>
-                      </div>
-                      <p className="font-sans text-sm tracking-wide">{convert(item.piece.price * item.quantity)}</p>
-                    </div>
-                  </div>
+                  <p className="text-muted-foreground font-sans">Your bag is empty.</p>
+                  <Button variant="outline" className="mt-4 border-primary/20 text-primary hover:bg-primary/10" onClick={() => { setIsCartOpen(false); setLocation("/collection"); }}>
+                    Continue Shopping
+                  </Button>
                 </motion.div>
-              ))
-            )}
-          </AnimatePresence>
-
-          {items.length > 0 && (
-            <div className="space-y-3 mt-2">
-              <CouponInput subtotal={subtotal} applied={coupon} onApplied={setCoupon} onCleared={() => setCoupon(null)} />
-              <GiftWrapToggle enabled={giftWrap} onToggle={setGiftWrap} message={giftMessage} onMessageChange={setGiftMessage} />
-
-              {pointsBalance > 0 && maxRedeem > 0 && (
-                <div className="border border-border/20 p-3 space-y-2">
-                  <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">Loyalty — {pointsBalance} pts available</p>
-                  <div className="flex gap-2 items-center">
-                    <input type="number" min={0} max={maxRedeem} value={redeemPoints || ""}
-                      onChange={(e) => setRedeemPoints(Math.max(0, Math.min(maxRedeem, Number(e.target.value) || 0)))}
-                      placeholder={`Redeem up to ${maxRedeem} pts`}
-                      className="flex-1 bg-secondary/30 border border-border/20 px-3 py-2 text-xs focus:outline-none focus:border-primary/40" />
-                    <span className="text-[11px] text-primary">−₹{redeemPoints}</span>
-                  </div>
-                </div>
-              )}
-
-              {showAddress && (
-                <div className="border border-border/20 p-3 space-y-2 max-h-[40vh] overflow-y-auto scrollbar-none">
-                  <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">Shipping Address</p>
-                  {([
-                    ["fullName", "Full name"], ["phone", "Phone"], ["addressLine1", "Address"], ["city", "City"], ["state", "State"], ["pincode", "Pincode (6 digits)"],
-                  ] as const).map(([k, ph]) => (
-                    <input key={k} value={(shippingAddress as Record<string, string>)[k]}
-                      onChange={(e) => setShippingAddress({ ...shippingAddress, [k]: e.target.value })}
-                      placeholder={ph}
-                      className="w-full bg-secondary/30 border border-border/20 px-3 py-2 text-xs focus:outline-none focus:border-primary/40" />
+              ) : (
+                <div className="space-y-4">
+                  {items.map((item) => (
+                    <motion.div key={item.pieceId} layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }}
+                      className="flex gap-4 group">
+                      <div className="relative w-24 h-32 overflow-hidden bg-secondary">
+                        <img src={item.piece.primaryImage} alt={item.piece.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      </div>
+                      <div className="flex-1 flex flex-col justify-between py-1">
+                        <div className="flex justify-between items-start gap-2">
+                          <div>
+                            <h3 className="font-serif text-lg leading-tight">{item.piece.title}</h3>
+                            <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{item.piece.material}</p>
+                          </div>
+                          <button onClick={() => removeItem(item.pieceId)} className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Remove item">
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="flex justify-between items-end">
+                          <div className="flex items-center gap-3 border border-border/40 px-2 py-1">
+                            <button onClick={() => updateQuantity(item.pieceId, item.quantity - 1)} className="text-muted-foreground hover:text-foreground" disabled={item.quantity <= 1}>
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="text-sm w-4 text-center">{item.quantity}</span>
+                            <button onClick={() => updateQuantity(item.pieceId, item.quantity + 1)} className="text-muted-foreground hover:text-foreground" disabled={item.quantity >= item.piece.stockCount}>
+                              <Plus className="w-3 h-3" />
+                            </button>
+                          </div>
+                          <p className="font-sans text-sm tracking-wide">{convert(item.piece.price * item.quantity)}</p>
+                        </div>
+                      </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
+            </AnimatePresence>
 
-              <div className="flex gap-2">
-                <button onClick={() => setPaymentMethod("razorpay")} className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] uppercase tracking-[0.15em] border ${paymentMethod === "razorpay" ? "border-primary text-primary bg-primary/5" : "border-border/30 text-muted-foreground"}`}>
-                  <CreditCard className="w-3.5 h-3.5" /> Online
-                </button>
-                <button onClick={() => setPaymentMethod("cod")} className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] uppercase tracking-[0.15em] border ${paymentMethod === "cod" ? "border-primary text-primary bg-primary/5" : "border-border/30 text-muted-foreground"}`}>
-                  <Banknote className="w-3.5 h-3.5" /> Cash on Delivery
-                </button>
-              </div>
-            </div>
-          )}
+            {items.length > 0 && (
+              <>
+                <div className="space-y-3">
+                  <CouponInput subtotal={subtotal} applied={coupon} onApplied={setCoupon} onCleared={() => setCoupon(null)} />
+                  <GiftWrapToggle enabled={giftWrap} onToggle={setGiftWrap} message={giftMessage} onMessageChange={setGiftMessage} />
+                </div>
+
+                {pointsBalance > 0 && maxRedeem > 0 && (
+                  <div className="border border-border/20 p-3 space-y-2">
+                    <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">Loyalty — {pointsBalance} pts available</p>
+                    <div className="flex gap-2 items-center">
+                      <input type="number" min={0} max={maxRedeem} value={redeemPoints || ""}
+                        onChange={(e) => setRedeemPoints(Math.max(0, Math.min(maxRedeem, Number(e.target.value) || 0)))}
+                        placeholder={`Redeem up to ${maxRedeem} pts`}
+                        className="flex-1 bg-secondary/30 border border-border/20 px-3 py-2 text-xs focus:outline-none focus:border-primary/40" />
+                      <span className="text-[11px] text-primary">−₹{redeemPoints}</span>
+                    </div>
+                  </div>
+                )}
+
+                {showAddress && (
+                  <div className="border border-border/20 p-3 space-y-2">
+                    <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">Shipping Address</p>
+                    {([
+                      ["fullName", "Full name"], ["phone", "Phone"], ["addressLine1", "Address"], ["city", "City"], ["state", "State"], ["pincode", "Pincode (6 digits)"],
+                    ] as const).map(([k, ph]) => (
+                      <input key={k} value={(shippingAddress as Record<string, string>)[k]}
+                        onChange={(e) => setShippingAddress({ ...shippingAddress, [k]: e.target.value })}
+                        placeholder={ph}
+                        className="w-full bg-secondary/30 border border-border/20 px-3 py-2 text-xs focus:outline-none focus:border-primary/40" />
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <button onClick={() => setPaymentMethod("razorpay")} className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] uppercase tracking-[0.15em] border ${paymentMethod === "razorpay" ? "border-primary text-primary bg-primary/5" : "border-border/30 text-muted-foreground"}`}>
+                    <CreditCard className="w-3.5 h-3.5" /> Online
+                  </button>
+                  <button onClick={() => setPaymentMethod("cod")} className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] uppercase tracking-[0.15em] border ${paymentMethod === "cod" ? "border-primary text-primary bg-primary/5" : "border-border/30 text-muted-foreground"}`}>
+                    <Banknote className="w-3.5 h-3.5" /> Cash on Delivery
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {items.length > 0 && (
