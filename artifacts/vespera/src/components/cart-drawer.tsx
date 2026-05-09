@@ -279,36 +279,34 @@ export function CartDrawer() {
                     <Banknote className="w-3.5 h-3.5" /> Cash on Delivery
                   </button>
                 </div>
+
+                <div className="border-t border-border/20 pt-4 mt-1 space-y-2">
+                  <div className="space-y-1 text-xs">
+                    <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>{convert(subtotal)}</span></div>
+                    {discount > 0 && <div className="flex justify-between text-primary"><span>Discount ({coupon?.code})</span><span>−{convert(discount)}</span></div>}
+                    {giftWrapFee > 0 && <div className="flex justify-between text-muted-foreground"><span>Gift wrap</span><span>{convert(giftWrapFee)}</span></div>}
+                    {redeemPoints > 0 && <div className="flex justify-between text-primary"><span>Loyalty redeemed</span><span>−{convert(redeemPoints)}</span></div>}
+                    <p className="text-[10px] text-muted-foreground/70 pt-1">GST 18% inclusive · Final shipping calculated at checkout.</p>
+                  </div>
+                  <div className="flex justify-between font-sans pt-2 border-t border-border/10">
+                    <span className="text-muted-foreground uppercase tracking-widest text-xs font-semibold">Estimated Total</span>
+                    <span className="font-medium tracking-wide">{convert(payableSubtotal)}</span>
+                  </div>
+
+                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 font-serif text-lg tracking-wide rounded-none transition-all"
+                    onClick={handleCheckout} disabled={submitting}>
+                    {submitting ? (
+                      <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Processing…</span>
+                    ) : !isSignedIn ? "Sign In to Checkout"
+                    : !showAddress ? "Continue to Address"
+                    : paymentMethod === "cod" ? "Place COD Order"
+                    : "Pay Now"}
+                  </Button>
+                </div>
               </>
             )}
           </div>
         </div>
-
-        {items.length > 0 && (
-          <div className="border-t border-border/20 p-5 bg-background space-y-2 sticky bottom-0 z-10">
-            <div className="space-y-1 text-xs">
-              <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>{convert(subtotal)}</span></div>
-              {discount > 0 && <div className="flex justify-between text-primary"><span>Discount ({coupon?.code})</span><span>−{convert(discount)}</span></div>}
-              {giftWrapFee > 0 && <div className="flex justify-between text-muted-foreground"><span>Gift wrap</span><span>{convert(giftWrapFee)}</span></div>}
-              {redeemPoints > 0 && <div className="flex justify-between text-primary"><span>Loyalty redeemed</span><span>−{convert(redeemPoints)}</span></div>}
-              <p className="text-[10px] text-muted-foreground/70 pt-1">GST 18% inclusive · Final shipping calculated at checkout.</p>
-            </div>
-            <div className="flex justify-between font-sans pt-2 border-t border-border/10">
-              <span className="text-muted-foreground uppercase tracking-widest text-xs font-semibold">Estimated Total</span>
-              <span className="font-medium tracking-wide">{convert(payableSubtotal)}</span>
-            </div>
-
-            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 font-serif text-lg tracking-wide rounded-none transition-all"
-              onClick={handleCheckout} disabled={submitting}>
-              {submitting ? (
-                <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Processing…</span>
-              ) : !isSignedIn ? "Sign In to Checkout"
-              : !showAddress ? "Continue to Address"
-              : paymentMethod === "cod" ? "Place COD Order"
-              : "Pay Now"}
-            </Button>
-          </div>
-        )}
       </SheetContent>
     </Sheet>
   );
