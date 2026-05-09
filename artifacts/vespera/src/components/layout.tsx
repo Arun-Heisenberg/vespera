@@ -6,6 +6,7 @@ import { useCart } from "./cart-context";
 import { CartDrawer } from "./cart-drawer";
 import { MobileBottomNav } from "./mobile-nav";
 import { Menu, X, User, Shield, ShoppingBag, ArrowRight, Check } from "lucide-react";
+import { CurrencySwitcher } from "./currency-switcher";
 
 const navLinks = [
   { href: "/collection", label: "Collection" },
@@ -163,6 +164,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </Link>
 
           <div className="flex items-center gap-4 md:gap-5 flex-1 justify-end">
+            <div className="hidden md:block"><CurrencySwitcher /></div>
             <Show when="signed-in">
               <Link
                 href="/account"

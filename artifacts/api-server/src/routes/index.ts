@@ -8,6 +8,18 @@ import wishlistsRouter from "./wishlists";
 import addressesRouter from "./addresses";
 import storageRouter from "./storage";
 import adminCollectionRouter from "./admin-collection";
+import shippingRouter from "./shipping";
+import couponsRouter from "./coupons";
+import reviewsRouter from "./reviews";
+import loyaltyRouter from "./loyalty";
+import referralsRouter from "./referrals";
+import appointmentsRouter from "./appointments";
+import backInStockRouter from "./back-in-stock";
+import newsletterRouter from "./newsletter";
+import returnsRouter from "./returns";
+import invoiceRouter from "./invoice";
+import seoRouter from "./seo";
+import adminExportsRouter from "./admin-exports";
 
 const router: IRouter = Router();
 
@@ -20,5 +32,17 @@ router.use(wishlistsRouter);
 router.use(addressesRouter);
 router.use(storageRouter);
 router.use(adminCollectionRouter);
+router.use(shippingRouter);
+router.use(couponsRouter);
+router.use(reviewsRouter);
+router.use(loyaltyRouter);
+router.use(referralsRouter);
+router.use(appointmentsRouter);
+router.use(backInStockRouter);
+router.use(newsletterRouter);
+router.use(returnsRouter);
+router.use(invoiceRouter);
+router.use(seoRouter);
+router.use(adminExportsRouter);
 
 export default router;

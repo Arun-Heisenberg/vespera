@@ -7,6 +7,11 @@ import { useCart } from "@/components/cart-context";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, ChevronRight, Check } from "lucide-react";
+import { PincodeChecker } from "@/components/pincode-checker";
+import { EmiMessage } from "@/components/emi-message";
+import { NotifyMeButton } from "@/components/notify-me-button";
+import { ReviewsSection } from "@/components/reviews-section";
+import { JsonLd } from "@/components/json-ld";
 
 export default function Product() {
   const { slug } = useParams<{ slug: string }>();
@@ -147,6 +152,9 @@ export default function Product() {
                   </div>
                 </div>
 
+                <EmiMessage price={piece.price} />
+                <div className="my-6"><PincodeChecker /></div>
+
                 {piece.stockCount > 0 ? (
                   <Button 
                     onClick={handleAddToBag}
@@ -163,13 +171,7 @@ export default function Product() {
                     <div className="absolute inset-0 bg-gradient-to-r from-primary via-[hsl(46,65%,58%)] to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   </Button>
                 ) : (
-                  <Button 
-                    disabled
-                    variant="outline"
-                    className="w-full h-16 rounded-none border-border text-muted-foreground text-sm uppercase tracking-[0.2em] transition-all mb-4"
-                  >
-                    Currently Unavailable
-                  </Button>
+                  <NotifyMeButton productId={piece.id} />
                 )}
                 
                 <p className="text-center text-[10px] text-muted-foreground/50 tracking-[0.2em] uppercase mt-4 mb-16">
@@ -220,6 +222,18 @@ export default function Product() {
             </div>
           </div>
         ) : null}
+
+        {piece && (
+          <>
+            <ReviewsSection productId={piece.id} />
+            <JsonLd data={{
+              "@context": "https://schema.org", "@type": "Product",
+              name: piece.title, description: piece.description, image: piece.primaryImage,
+              brand: { "@type": "Brand", name: "Vespera" },
+              offers: { "@type": "Offer", priceCurrency: "INR", price: String(piece.price), availability: piece.stockCount > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock", url: `https://www.thevespera.online/collection/${piece.slug}` },
+            }} />
+          </>
+        )}
       </div>
 
       {piece && piece.stockCount > 0 && (

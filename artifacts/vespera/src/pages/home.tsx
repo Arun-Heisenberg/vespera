@@ -6,6 +6,8 @@ import { formatPrice } from "@/components/cart-drawer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowRight, ArrowDown } from "lucide-react";
 
+import { PressBar } from "@/components/press-bar";
+
 export default function Home() {
   useEffect(() => {
     document.title = "Vespera | Sculptural Evening Minaudières";
@@ -89,6 +91,8 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      <PressBar />
 
       <section className="relative py-10 md:py-16">
         <div className="gold-divider w-full absolute top-0" />

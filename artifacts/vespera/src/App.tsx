@@ -17,6 +17,11 @@ import ClientCare from "@/pages/client-care";
 import Legal from "@/pages/legal";
 import Account from "@/pages/account";
 import Admin from "@/pages/admin";
+import Track from "@/pages/track";
+import Appointments from "@/pages/appointments";
+import { CurrencyProvider } from "@/components/currency-switcher";
+import { WhatsappFloatingButton } from "@/components/whatsapp-floating-button";
+import { JsonLd, ORG_JSONLD } from "@/components/json-ld";
 import { useUserSync } from "@/hooks/use-user-sync";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -100,6 +105,9 @@ function AppRoutes() {
         <Route path="/legal" component={Legal} />
         <Route path="/account" component={Account} />
         <Route path="/admin" component={Admin} />
+        <Route path="/track" component={Track} />
+        <Route path="/track/:orderNumber" component={Track} />
+        <Route path="/appointments" component={Appointments} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
@@ -125,13 +133,17 @@ function ClerkProviderWithRoutes() {
         <ClerkQueryClientCacheInvalidator />
         <UserSyncProvider>
           <TooltipProvider>
-            <CartProvider>
-              <Switch>
-                <Route path="/sign-in/*?" component={SignInPage} />
-                <Route path="/sign-up/*?" component={SignUpPage} />
-                <Route component={AppRoutes} />
-              </Switch>
-            </CartProvider>
+            <CurrencyProvider>
+              <CartProvider>
+                <JsonLd data={ORG_JSONLD} />
+                <Switch>
+                  <Route path="/sign-in/*?" component={SignInPage} />
+                  <Route path="/sign-up/*?" component={SignUpPage} />
+                  <Route component={AppRoutes} />
+                </Switch>
+                <WhatsappFloatingButton />
+              </CartProvider>
+            </CurrencyProvider>
             <Toaster />
           </TooltipProvider>
         </UserSyncProvider>
