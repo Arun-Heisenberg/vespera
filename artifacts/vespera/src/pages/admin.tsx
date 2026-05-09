@@ -340,15 +340,6 @@ function ImageUploader({
   );
 }
 
-interface GeneratedMetadata {
-  title: string;
-  description: string;
-  material: string;
-  slug: string;
-  artisanNotes: string;
-  occasionStyling: string[];
-}
-
 function ProductFormModal({
   product,
   onClose,
@@ -363,8 +354,6 @@ function ProductFormModal({
   const [form, setForm] = useState<ProductFormData>(product ? { ...product } : { ...emptyForm });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [enhanceStatus, setEnhanceStatus] = useState<string>("");
-  const [sourceImagePath, setSourceImagePath] = useState("");
 
   const updateField = <K extends keyof ProductFormData>(key: K, value: ProductFormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -377,70 +366,6 @@ function ProductFormModal({
       updateField("slug", generateSlug(form.title));
     }
   }, [form.title, isEdit, product?.slug]);
-
-  const analyzeImage = async (
-    token: string | null,
-    imageUrl: string,
-    priceInr: number,
-    dimensions: string,
-  ): Promise<GeneratedMetadata | null> => {
-    const url = `${import.meta.env.BASE_URL}api/admin/storage/analyze-image`.replace("//api", "/api");
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    try {
-      const res = await fetch(url, {
-        method: "POST",
-        headers,
-        credentials: "include",
-        body: JSON.stringify({ imageUrl, priceInr, dimensions }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error((data as { error?: string }).error || `Image analysis failed (${res.status})`);
-      }
-      const data: { metadata?: GeneratedMetadata } = await res.json();
-      return data.metadata ?? null;
-    } catch (err) {
-      console.warn("Image analysis skipped:", err);
-      return null;
-    }
-  };
-
-  const enhanceImages = async (
-    token: string | null,
-    sourceImage: string,
-    title: string,
-    material: string,
-  ): Promise<string[]> => {
-    // For new products with exactly one image, ask the server to generate
-    // 3 professional variants from the uploaded source via Gemini.
-    if (isEdit) return form.images;
-    const baseImages = [sourceImage];
-
-    setEnhanceStatus("Generating 3 professional variants from your image…");
-    try {
-      const url = `${import.meta.env.BASE_URL}api/admin/storage/enhance-images`.replace("//api", "/api");
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (token) headers["Authorization"] = `Bearer ${token}`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers,
-        credentials: "include",
-        body: JSON.stringify({ imageUrl: sourceImage, productTitle: title, material }),
-      });
-      if (!res.ok) {
-        throw new Error("Image enhancement failed");
-      }
-      const data: { urls?: string[] } = await res.json();
-      const generated = Array.isArray(data.urls) ? data.urls.filter((url): url is string => Boolean(url)) : [];
-      setEnhanceStatus("");
-      return [...baseImages, ...generated];
-    } catch (err) {
-      console.error("Image enhancement failed:", err);
-      setEnhanceStatus("");
-      return baseImages;
-    }
-  };
 
   const handleSubmit = async () => {
     if (isEdit) {
@@ -461,36 +386,13 @@ function ProductFormModal({
 
     try {
       const token = await getToken();
-
-      let title = form.title;
-      let description = form.description;
-      let material = form.material;
-      let slug = form.slug;
-      let artisanNotes = form.artisanNotes;
-      let occasionStyling = form.occasionStyling.filter((s) => s.trim());
-
-      if (!isEdit) {
-        setEnhanceStatus("Reading the piece and writing the catalogue entry…");
-        const meta = await analyzeImage(token, sourceImagePath || form.primaryImage, parseFloat(form.price) || 0, form.dimensions);
-        if (meta) {
-          title = meta.title;
-          description = meta.description;
-          material = meta.material;
-          slug = meta.slug;
-          artisanNotes = meta.artisanNotes;
-          occasionStyling = meta.occasionStyling;
-        } else {
-          title = title || "Untitled Vespera Piece";
-          description = description || "Luxury evening clutch crafted for refined occasions.";
-          material = material || "premium finish";
-          slug = slug || generateSlug(title);
-          artisanNotes = artisanNotes || "Hand-finished by Vespera artisans.";
-          occasionStyling = occasionStyling.length ? occasionStyling : ["Evening gala", "Cocktail reception", "Wedding guest"];
-        }
-      }
-
-      const finalImages = await enhanceImages(token, sourceImagePath || form.primaryImage, title, material);
-      const images = finalImages.length ? finalImages : [form.primaryImage];
+      const title = form.title || "Untitled Vespera Piece";
+      const description = form.description || "Luxury evening clutch crafted for refined occasions.";
+      const material = form.material || "premium finish";
+      const slug = form.slug || generateSlug(title);
+      const artisanNotes = form.artisanNotes || "Hand-finished by Vespera artisans.";
+      const occasionStyling = form.occasionStyling.filter((s) => s.trim());
+      const images = form.images.length ? form.images : [form.primaryImage].filter(Boolean);
 
       const body = {
         title,
@@ -567,8 +469,7 @@ function ProductFormModal({
 
           {!isEdit && (
             <div className="bg-primary/5 border border-primary/20 text-primary/90 text-xs px-4 py-3 leading-relaxed">
-              Upload the product photograph and set price &amp; dimensions. Vespera will compose the name,
-              description, material, slug, artisan notes and three professional product photographs for you.
+              Upload the product photographs and fill in the product details manually.
             </div>
           )}
 
@@ -614,7 +515,6 @@ function ProductFormModal({
                   updateField("images", url ? [url] : []);
                 }
               }}
-              onObjectPathSet={setSourceImagePath}
             />
           </div>
 
@@ -730,7 +630,7 @@ function ProductFormModal({
             onClick={handleSubmit}
             disabled={saving}
           >
-            {saving ? (enhanceStatus || "Saving...") : isEdit ? "Update Product" : "Add Product"}
+            {saving ? "Saving..." : isEdit ? "Update Product" : "Add Product"}
           </Button>
         </div>
       </motion.div>
