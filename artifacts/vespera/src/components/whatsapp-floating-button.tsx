@@ -1,6 +1,6 @@
 import { MessageCircle } from "lucide-react";
 
-const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || "919999999999";
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || "918073723429";
 
 export function WhatsappFloatingButton() {
   const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello Vespera, I have a question about a piece.")}`;
