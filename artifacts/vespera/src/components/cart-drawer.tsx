@@ -186,7 +186,7 @@ export function CartDrawer() {
         </SheetHeader>
 
         <div className="flex-1 min-h-0 overflow-y-auto scrollbar-none">
-          <div className="p-6 space-y-6">
+          <div className="p-6 space-y-4">
             <AnimatePresence initial={false}>
               {items.length === 0 ? (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
@@ -239,13 +239,13 @@ export function CartDrawer() {
 
             {items.length > 0 && (
               <>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <CouponInput subtotal={subtotal} applied={coupon} onApplied={setCoupon} onCleared={() => setCoupon(null)} />
                   <GiftWrapToggle enabled={giftWrap} onToggle={setGiftWrap} message={giftMessage} onMessageChange={setGiftMessage} />
                 </div>
 
                 {pointsBalance > 0 && maxRedeem > 0 && (
-                  <div className="border border-border/20 p-3 space-y-2">
+                  <div className="border border-border/20 p-2.5 space-y-1.5">
                     <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">Loyalty — {pointsBalance} pts available</p>
                     <div className="flex gap-2 items-center">
                       <input type="number" min={0} max={maxRedeem} value={redeemPoints || ""}
@@ -258,7 +258,7 @@ export function CartDrawer() {
                 )}
 
                 {showAddress && (
-                  <div className="border border-border/20 p-3 space-y-2">
+                  <div className="border border-border/20 p-2.5 space-y-1.5">
                     <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">Shipping Address</p>
                     {([
                       ["fullName", "Full name"], ["phone", "Phone"], ["addressLine1", "Address"], ["city", "City"], ["state", "State"], ["pincode", "Pincode (6 digits)"],
@@ -266,7 +266,7 @@ export function CartDrawer() {
                       <input key={k} value={(shippingAddress as Record<string, string>)[k]}
                         onChange={(e) => setShippingAddress({ ...shippingAddress, [k]: e.target.value })}
                         placeholder={ph}
-                        className="w-full bg-secondary/30 border border-border/20 px-3 py-2 text-xs focus:outline-none focus:border-primary/40" />
+                        className="w-full bg-secondary/30 border border-border/20 px-3 py-1.5 text-xs focus:outline-none focus:border-primary/40" />
                     ))}
                   </div>
                 )}
@@ -285,7 +285,7 @@ export function CartDrawer() {
         </div>
 
         {items.length > 0 && (
-          <div className="border-t border-border/20 p-6 bg-background space-y-3 sticky bottom-0 z-10">
+          <div className="border-t border-border/20 p-5 bg-background space-y-2 sticky bottom-0 z-10">
             <div className="space-y-1 text-xs">
               <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>{convert(subtotal)}</span></div>
               {discount > 0 && <div className="flex justify-between text-primary"><span>Discount ({coupon?.code})</span><span>−{convert(discount)}</span></div>}
