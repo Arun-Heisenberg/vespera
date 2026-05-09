@@ -34,12 +34,22 @@ export async function awardPointsForOrder(customerId: number, orderId: number, p
   if (!account) return 0;
   const points = Math.floor(paidAmount * POINTS_PER_RUPEE_SPENT);
   if (points <= 0) return 0;
-  await db.insert(loyaltyLedgerTable).values({
+
+  // Idempotency: skip if this order has already been rewarded
+  const [existing] = await db.select({ id: loyaltyLedgerTable.id })
+    .from(loyaltyLedgerTable)
+    .where(eq(loyaltyLedgerTable.orderId, orderId))
+    .limit(1);
+  if (existing) return 0;
+
+  const inserted = await db.insert(loyaltyLedgerTable).values({
     customerId,
     delta: points,
     reason: "order.paid",
     orderId,
-  });
+  }).onConflictDoNothing().returning({ id: loyaltyLedgerTable.id });
+  // Race: another concurrent request already inserted the ledger row — bail out
+  if (inserted.length === 0) return 0;
   const newLifetime = account.lifetimePoints + points;
   await db
     .update(loyaltyAccountsTable)

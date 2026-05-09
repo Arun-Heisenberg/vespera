@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, pool, collectionTable, ordersTable, orderItemsTable, paymentsTable, customersTable, couponRedemptionsTable, couponsTable } from "@workspace/db";
-import { inArray, eq } from "drizzle-orm";
+import { inArray, eq, ne, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import Razorpay from "razorpay";
 import crypto from "crypto";
@@ -222,6 +222,21 @@ router.post("/checkout/verify", requireAuth, async (req, res): Promise<void> => 
   if (!keySecret) { res.status(500).json({ error: "Payment gateway not configured" }); return; }
 
   try {
+    // Resolve the authenticated customer before touching any order data
+    const auth = getAuth(req);
+    const clerkUserId = auth?.userId;
+    if (!clerkUserId) { res.status(401).json({ error: "Unauthorized" }); return; }
+    const [authCustomer] = await db.select().from(customersTable).where(eq(customersTable.clerkUserId, clerkUserId)).limit(1);
+    if (!authCustomer) { res.status(403).json({ error: "Customer profile not found" }); return; }
+
+    // Fetch the order and verify ownership before processing
+    const [orderToVerify] = await db.select().from(ordersTable).where(eq(ordersTable.razorpayOrderId, razorpay_order_id)).limit(1);
+    if (!orderToVerify) { res.status(404).json({ error: "Order not found" }); return; }
+    if (orderToVerify.customerId !== authCustomer.id) {
+      req.log.warn({ clerkUserId, orderId: orderToVerify.id }, "Ownership mismatch on checkout/verify");
+      res.status(403).json({ error: "Forbidden" }); return;
+    }
+
     const expectedSignature = crypto.createHmac("sha256", keySecret).update(`${razorpay_order_id}|${razorpay_payment_id}`).digest("hex");
     const verified = expectedSignature === razorpay_signature;
 
@@ -235,15 +250,23 @@ router.post("/checkout/verify", requireAuth, async (req, res): Promise<void> => 
         } catch { req.log.warn({ paymentId: razorpay_payment_id }, "Could not fetch payment method"); }
       }
 
-      await db.update(ordersTable)
+      // Atomic idempotency guard: only update (and run side effects) if the order is still unpaid.
+      // Using a conditional WHERE means concurrent replays cannot both win this update.
+      const updatedOrders = await db.update(ordersTable)
         .set({ paymentStatus: "paid", status: "confirmed", razorpayPaymentId: razorpay_payment_id, updatedAt: new Date() })
-        .where(eq(ordersTable.razorpayOrderId, razorpay_order_id));
+        .where(and(eq(ordersTable.razorpayOrderId, razorpay_order_id), ne(ordersTable.paymentStatus, "paid")))
+        .returning({ id: ordersTable.id });
+      if (updatedOrders.length === 0) {
+        // Order was already finalized by a prior (or concurrent) call — safe to return success
+        res.json({ verified: true }); return;
+      }
+
       await db.update(paymentsTable)
         .set({ razorpayPaymentId: razorpay_payment_id, razorpaySignature: razorpay_signature, status: "captured", method: paymentMethod || null, paidAt: new Date() })
         .where(eq(paymentsTable.razorpayOrderId, razorpay_order_id));
 
-      const [paidOrder] = await db.select().from(ordersTable).where(eq(ordersTable.razorpayOrderId, razorpay_order_id)).limit(1);
-      if (paidOrder?.customerId) {
+      const paidOrder = orderToVerify;
+      if (paidOrder.customerId) {
         const [customer] = await db.select().from(customersTable).where(eq(customersTable.id, paidOrder.customerId)).limit(1);
         if (customer) {
           const payload = { orderNumber: paidOrder.orderNumber, totalAmount: paidOrder.totalAmount };
@@ -261,7 +284,7 @@ router.post("/checkout/verify", requireAuth, async (req, res): Promise<void> => 
               await db.insert(couponRedemptionsTable).values({
                 couponId: c.id, customerId: paidOrder.customerId, orderId: paidOrder.id,
                 discountApplied: paidOrder.discountAmount,
-              });
+              }).onConflictDoNothing();
             }
           } catch (err) { req.log.warn({ err }, "Deferred coupon redemption failed"); }
         }

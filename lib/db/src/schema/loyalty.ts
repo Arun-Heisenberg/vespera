@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, unique } from "drizzle-orm/pg-core";
 import { z } from "zod/v4";
 import { customersTable } from "./customers";
 import { ordersTable } from "./orders";
@@ -22,7 +22,9 @@ export const loyaltyLedgerTable = pgTable("loyalty_ledger", {
   orderId: integer("order_id").references(() => ordersTable.id, { onDelete: "set null" }),
   metadata: text("metadata"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (t) => [
+  unique("loyalty_ledger_order_reason_unique").on(t.orderId, t.reason),
+]);
 
 export const referralsTable = pgTable("referrals", {
   id: serial("id").primaryKey(),

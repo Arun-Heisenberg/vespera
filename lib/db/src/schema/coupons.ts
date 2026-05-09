@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, decimal, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, decimal, boolean, timestamp, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { customersTable } from "./customers";
@@ -29,7 +29,9 @@ export const couponRedemptionsTable = pgTable("coupon_redemptions", {
   orderId: integer("order_id").references(() => ordersTable.id, { onDelete: "set null" }),
   discountApplied: decimal("discount_applied", { precision: 10, scale: 2 }).notNull(),
   redeemedAt: timestamp("redeemed_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (t) => [
+  unique("coupon_redemptions_order_unique").on(t.orderId),
+]);
 
 export const insertCouponSchema = createInsertSchema(couponsTable).omit({ id: true, createdAt: true });
 export type InsertCoupon = z.infer<typeof insertCouponSchema>;
