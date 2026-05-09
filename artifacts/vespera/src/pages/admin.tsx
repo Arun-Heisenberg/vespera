@@ -231,10 +231,12 @@ function generateSlug(title: string): string {
 
 function ImageUploader({ 
   currentImage, 
-  onImageSet 
+  onImageSet,
+  onObjectPathSet,
 }: { 
   currentImage: string; 
   onImageSet: (url: string) => void;
+  onObjectPathSet?: (path: string) => void;
 }) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -265,11 +267,13 @@ function ImageUploader({
         throw new Error(message || `Failed to upload file (${uploadRes.status})`);
       }
 
-      const servingUrl = apiUrl(`/storage${objectPath}`);
-      onImageSet(servingUrl);
+      onImageSet(apiUrl(`/storage${objectPath}`));
+      onObjectPathSet?.(objectPath);
+      return objectPath;
     } catch (err) {
       console.error("Upload failed:", err);
       alert(err instanceof Error ? err.message : "Image upload failed. Please try again.");
+      return "";
     } finally {
       setUploading(false);
     }
@@ -360,6 +364,7 @@ function ProductFormModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [enhanceStatus, setEnhanceStatus] = useState<string>("");
+  const [sourceImagePath, setSourceImagePath] = useState("");
 
   const updateField = <K extends keyof ProductFormData>(key: K, value: ProductFormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -465,7 +470,7 @@ function ProductFormModal({
         setEnhanceStatus("Reading the piece and writing the catalogue entry…");
         const meta = await analyzeImage(
           token,
-          form.primaryImage,
+          sourceImagePath || form.primaryImage,
           parseFloat(form.price) || 0,
           form.dimensions,
         );
@@ -485,7 +490,7 @@ function ProductFormModal({
         occasionStyling = meta.occasionStyling;
       }
 
-      const finalImages = await enhanceImages(token, form.primaryImage, title, material);
+      const finalImages = await enhanceImages(token, sourceImagePath || form.primaryImage, title, material);
 
       const body = {
         title,
@@ -608,6 +613,7 @@ function ProductFormModal({
                   updateField("images", url ? [url] : []);
                 }
               }}
+              onObjectPathSet={setSourceImagePath}
             />
           </div>
 
