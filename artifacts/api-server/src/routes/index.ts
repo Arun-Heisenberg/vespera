@@ -20,6 +20,18 @@ import returnsRouter from "./returns";
 import invoiceRouter from "./invoice";
 import seoRouter from "./seo";
 import adminExportsRouter from "./admin-exports";
+import adminAnalyticsRouter from "./admin-analytics";
+import adminCustomersRouter from "./admin-customers";
+import adminBannersRouter from "./admin-banners";
+import adminCodRouter from "./admin-cod";
+import adminRefundsRouter from "./admin-refunds";
+import adminInventoryRouter from "./admin-inventory";
+import adminAbandonedRouter from "./admin-abandoned";
+import adminNewsletterRouter from "./admin-newsletter";
+import adminPincodesRouter from "./admin-pincodes";
+import adminStaffRouter from "./admin-staff";
+import adminGstr1Router from "./admin-gstr1";
+import adminAuditRouter from "./admin-audit";
 
 const router: IRouter = Router();
 
@@ -44,5 +56,17 @@ router.use(returnsRouter);
 router.use(invoiceRouter);
 router.use(seoRouter);
 router.use(adminExportsRouter);
+router.use(adminAnalyticsRouter);
+router.use(adminCustomersRouter);
+router.use(adminBannersRouter);
+router.use(adminCodRouter);
+router.use(adminRefundsRouter);
+router.use(adminInventoryRouter);
+router.use(adminAbandonedRouter);
+router.use(adminNewsletterRouter);
+router.use(adminPincodesRouter);
+router.use(adminStaffRouter);
+router.use(adminGstr1Router);
+router.use(adminAuditRouter);
 
 export default router;

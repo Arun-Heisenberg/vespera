@@ -5,7 +5,58 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useListCollection } from "@workspace/api-client-react";
 import { formatPrice } from "@/components/cart-drawer";
-import { Shield, Package, ShoppingCart, Clock, CheckCircle, XCircle, ArrowLeft, Eye, Plus, Pencil, Trash2, Upload, X, ImageIcon, GripVertical } from "lucide-react";
+import { Shield, Package, ShoppingCart, Clock, CheckCircle, XCircle, ArrowLeft, Eye, Plus, Pencil, Trash2, Upload, X, ImageIcon, GripVertical, LayoutDashboard, Users, MessageSquare, Calendar, Undo2, Image as ImageLucide, MapPin, Mail, FileText, FileSpreadsheet, ScrollText, UserCog, BadgePercent, Wallet, AlertTriangle, Boxes } from "lucide-react";
+import { DashboardTab } from "@/components/admin/dashboard";
+import { CodQueueTab } from "@/components/admin/cod-queue";
+import { AbandonedTab } from "@/components/admin/abandoned";
+import { InventoryTab } from "@/components/admin/inventory";
+import { CustomersTab } from "@/components/admin/customers";
+import { CouponsTab } from "@/components/admin/coupons";
+import { ReviewsTab } from "@/components/admin/reviews";
+import { AppointmentsTab } from "@/components/admin/appointments";
+import { ReturnsTab } from "@/components/admin/returns";
+import { BannersTab } from "@/components/admin/banners";
+import { PincodesTab } from "@/components/admin/pincodes";
+import { NewsletterTab } from "@/components/admin/newsletter";
+import { AuditTab } from "@/components/admin/audit";
+import { ReportsTab } from "@/components/admin/reports";
+import { StaffTab } from "@/components/admin/staff";
+
+type AdminTab = "dashboard" | "products" | "orders" | "cod" | "abandoned" | "inventory"
+  | "customers" | "reviews" | "appointments" | "returns"
+  | "coupons" | "banners" | "pincodes" | "newsletter"
+  | "reports" | "audit" | "staff";
+
+interface NavGroup { label: string; items: Array<{ id: AdminTab; label: string; icon: React.ReactNode }> }
+const NAV: NavGroup[] = [
+  { label: "Daily ops", items: [
+    { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
+    { id: "orders", label: "Orders", icon: <ShoppingCart className="w-4 h-4" /> },
+    { id: "cod", label: "COD queue", icon: <Wallet className="w-4 h-4" /> },
+    { id: "abandoned", label: "Abandoned carts", icon: <AlertTriangle className="w-4 h-4" /> },
+  ]},
+  { label: "Catalog", items: [
+    { id: "products", label: "Products", icon: <Package className="w-4 h-4" /> },
+    { id: "inventory", label: "Inventory & GST", icon: <Boxes className="w-4 h-4" /> },
+    { id: "banners", label: "Banners", icon: <ImageLucide className="w-4 h-4" /> },
+  ]},
+  { label: "Customers", items: [
+    { id: "customers", label: "Customers", icon: <Users className="w-4 h-4" /> },
+    { id: "reviews", label: "Reviews", icon: <MessageSquare className="w-4 h-4" /> },
+    { id: "appointments", label: "Appointments", icon: <Calendar className="w-4 h-4" /> },
+    { id: "returns", label: "Returns", icon: <Undo2 className="w-4 h-4" /> },
+  ]},
+  { label: "Marketing", items: [
+    { id: "coupons", label: "Coupons", icon: <BadgePercent className="w-4 h-4" /> },
+    { id: "newsletter", label: "Newsletter", icon: <Mail className="w-4 h-4" /> },
+    { id: "pincodes", label: "Pincodes", icon: <MapPin className="w-4 h-4" /> },
+  ]},
+  { label: "Operations", items: [
+    { id: "reports", label: "Reports & GSTR-1", icon: <FileSpreadsheet className="w-4 h-4" /> },
+    { id: "staff", label: "Staff & roles", icon: <UserCog className="w-4 h-4" /> },
+    { id: "audit", label: "Audit log", icon: <ScrollText className="w-4 h-4" /> },
+  ]},
+];
 
 const ADMIN_EMAILS = ["admin@vespera.com", "avkvasp1@gmail.com"];
 
@@ -736,7 +787,7 @@ function AdminDashboard() {
   const { data: pieces, isLoading: productsLoading, refetch } = useListCollection();
   const { orders, loading: ordersLoading } = useAdminOrders();
   const { getToken } = useAuth();
-  const [activeTab, setActiveTab] = useState<"overview" | "products" | "orders">("overview");
+  const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<(ProductFormData & { id: number }) | null>(null);
@@ -842,65 +893,62 @@ function AdminDashboard() {
     } catch {}
   };
 
+  void totalRevenue; // dashboard stats moved to DashboardTab
+
   return (
-    <div className="container mx-auto px-6 md:px-12 py-12">
+    <div className="container mx-auto px-4 md:px-8 py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center gap-3 mb-6">
           <Shield className="w-6 h-6 text-primary" />
-          <h1 className="text-3xl md:text-4xl font-serif">Admin Panel</h1>
-        </div>
-        <p className="text-muted-foreground text-sm mb-8">Manage your Vespera store.</p>
-
-        <div className="flex gap-4 mb-8 border-b border-border/20">
-          {(["overview", "products", "orders"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => { setActiveTab(tab); setSelectedOrderId(null); }}
-              className={`pb-3 text-sm tracking-widest uppercase transition-colors ${
-                activeTab === tab ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
+          <h1 className="text-2xl md:text-3xl font-serif">Admin Panel</h1>
         </div>
 
-        {activeTab === "overview" && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="p-6 border border-border/20 bg-secondary/10">
-              <div className="flex items-center gap-3 mb-4">
-                <Package className="w-5 h-5 text-primary" />
-                <span className="text-xs uppercase tracking-widest text-muted-foreground">Products</span>
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6">
+          <aside className="lg:sticky lg:top-6 lg:self-start space-y-5 pb-6">
+            {NAV.map((group) => (
+              <div key={group.label}>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 mb-2 px-2">{group.label}</p>
+                <ul className="space-y-0.5">
+                  {group.items.map((item) => (
+                    <li key={item.id}>
+                      <button
+                        onClick={() => { setActiveTab(item.id); setSelectedOrderId(null); }}
+                        className={`w-full flex items-center gap-2 text-left text-sm px-2 py-1.5 transition-colors ${
+                          activeTab === item.id
+                            ? "bg-primary/10 text-primary border-l-2 border-primary pl-3"
+                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/10"
+                        }`}
+                      >
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <p className="text-3xl font-serif">{productsLoading ? "\u2014" : pieces?.length || 0}</p>
-            </div>
-            <div className="p-6 border border-border/20 bg-secondary/10">
-              <div className="flex items-center gap-3 mb-4">
-                <Package className="w-5 h-5 text-primary" />
-                <span className="text-xs uppercase tracking-widest text-muted-foreground">Featured</span>
-              </div>
-              <p className="text-3xl font-serif">{productsLoading ? "\u2014" : pieces?.filter((p) => p.isFeatured).length || 0}</p>
-            </div>
-            <div className="p-6 border border-border/20 bg-secondary/10">
-              <div className="flex items-center gap-3 mb-4">
-                <ShoppingCart className="w-5 h-5 text-primary" />
-                <span className="text-xs uppercase tracking-widest text-muted-foreground">Total Orders</span>
-              </div>
-              <p className="text-3xl font-serif">{ordersLoading ? "\u2014" : orders.length}</p>
-            </div>
-            <div className="p-6 border border-border/20 bg-secondary/10">
-              <div className="flex items-center gap-3 mb-4">
-                <ShoppingCart className="w-5 h-5 text-primary" />
-                <span className="text-xs uppercase tracking-widest text-muted-foreground">Revenue</span>
-              </div>
-              <p className="text-3xl font-serif">{ordersLoading ? "\u2014" : formatPrice(totalRevenue)}</p>
-            </div>
-          </div>
-        )}
+            ))}
+          </aside>
+
+          <div className="min-w-0">
+        {activeTab === "dashboard" && <DashboardTab />}
+        {activeTab === "cod" && <CodQueueTab />}
+        {activeTab === "abandoned" && <AbandonedTab />}
+        {activeTab === "inventory" && <InventoryTab />}
+        {activeTab === "customers" && <CustomersTab />}
+        {activeTab === "coupons" && <CouponsTab />}
+        {activeTab === "reviews" && <ReviewsTab />}
+        {activeTab === "appointments" && <AppointmentsTab />}
+        {activeTab === "returns" && <ReturnsTab />}
+        {activeTab === "banners" && <BannersTab />}
+        {activeTab === "pincodes" && <PincodesTab />}
+        {activeTab === "newsletter" && <NewsletterTab />}
+        {activeTab === "reports" && <ReportsTab />}
+        {activeTab === "audit" && <AuditTab />}
+        {activeTab === "staff" && <StaffTab />}
 
         {activeTab === "products" && (
           <div>
@@ -1006,6 +1054,10 @@ function AdminDashboard() {
 
         {activeTab === "orders" && !selectedOrderId && (
           <div className="overflow-x-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-serif">Orders</h2>
+              <p className="text-xs text-muted-foreground">{orders.length} total</p>
+            </div>
             {ordersLoading ? (
               <p className="py-8 text-center text-muted-foreground">Loading orders...</p>
             ) : orders.length === 0 ? (
@@ -1055,6 +1107,8 @@ function AdminDashboard() {
             )}
           </div>
         )}
+          </div>
+        </div>
       </motion.div>
 
       <AnimatePresence>

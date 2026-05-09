@@ -12,3 +12,4 @@ export * from "./loyalty";
 export * from "./engagement";
 export * from "./shipping";
 export * from "./returns";
+export * from "./admin";

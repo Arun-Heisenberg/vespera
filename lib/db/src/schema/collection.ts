@@ -22,6 +22,8 @@ export const collectionTable = pgTable("collection", {
   weightGrams: integer("weight_grams"),
   categoryId: integer("category_id").references(() => categoriesTable.id, { onDelete: "set null" }),
   isActive: boolean("is_active").notNull().default(true),
+  hsnCode: text("hsn_code").notNull().default("4202"),
+  gstRate: decimal("gst_rate", { precision: 5, scale: 2 }).notNull().default("18.00"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

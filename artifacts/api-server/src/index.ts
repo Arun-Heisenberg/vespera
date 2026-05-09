@@ -123,6 +123,62 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS is_gift boolean NOT NULL DEFAULT fal
 CREATE INDEX IF NOT EXISTS idx_orders_payment_status_created ON orders(payment_status, created_at);
 CREATE INDEX IF NOT EXISTS idx_reviews_product_status ON reviews(product_id, status);
 CREATE INDEX IF NOT EXISTS idx_shipments_order ON shipments(order_id);
+
+-- Phase 4: admin capabilities
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS cod_verified boolean NOT NULL DEFAULT false;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS cod_verified_at timestamptz;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS cod_verification_notes text;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS invoice_number text UNIQUE;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS refunded_amount numeric(10,2) NOT NULL DEFAULT 0;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS refunded_at timestamptz;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS refund_reason text;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS eway_bill_number text;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS dispatched_at timestamptz;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS manifested_at timestamptz;
+
+ALTER TABLE collection ADD COLUMN IF NOT EXISTS hsn_code text NOT NULL DEFAULT '4202';
+ALTER TABLE collection ADD COLUMN IF NOT EXISTS gst_rate numeric(5,2) NOT NULL DEFAULT 18.00;
+
+CREATE TABLE IF NOT EXISTS banners (
+  id serial PRIMARY KEY,
+  title text NOT NULL, subtitle text NOT NULL DEFAULT '', image_url text NOT NULL DEFAULT '',
+  cta_label text NOT NULL DEFAULT '', cta_url text NOT NULL DEFAULT '',
+  placement text NOT NULL DEFAULT 'home_hero',
+  starts_at timestamptz, ends_at timestamptz,
+  sort_order integer NOT NULL DEFAULT 0, is_active boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+  id serial PRIMARY KEY,
+  actor_clerk_id text, actor_email text,
+  action text NOT NULL, entity text NOT NULL, entity_id text,
+  metadata jsonb NOT NULL DEFAULT '{}'::jsonb, ip_address text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_audit_action ON audit_logs(action, created_at);
+CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_logs(entity, entity_id);
+
+CREATE TABLE IF NOT EXISTS customer_notes (
+  id serial PRIMARY KEY,
+  customer_id integer NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  author_clerk_id text, author_email text,
+  body text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS refunds (
+  id serial PRIMARY KEY,
+  order_id integer NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  amount numeric(10,2) NOT NULL,
+  reason text NOT NULL DEFAULT '',
+  razorpay_refund_id text,
+  status text NOT NULL DEFAULT 'initiated',
+  initiated_by_clerk_id text, initiated_by_email text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE SEQUENCE IF NOT EXISTS invoice_number_seq START WITH 1 INCREMENT BY 1;
 `;
 
 async function runStartupMigrations() {

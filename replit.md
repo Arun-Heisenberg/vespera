@@ -77,7 +77,26 @@ Luxury e-commerce flagship for curated evening minaudières targeting Indian aud
 
 **User Data Sync:** On sign-in, user data (email, phone, name, avatar) is automatically synced to the `customers` table via `POST /api/users/sync`. The `GET /api/users/me` endpoint returns the current user's data.
 
-**Admin:** Client-side role gating via Clerk `publicMetadata.role === "admin"` or allowed admin emails (`admin@vespera.com`, `avkvasp1@gmail.com`). Admin panel at `/admin` with 3 tabs: Overview, Products (CRUD), Orders.
+**Admin:** Client-side role gating via Clerk `publicMetadata.role === "admin"` or allowed admin emails (`admin@vespera.com`, `avkvasp1@gmail.com`). Admin panel at `/admin` with sidebar nav grouped into Daily ops (Dashboard, Orders, COD queue, Abandoned carts), Catalog (Products, Inventory & GST, Banners), Customers (Customers 360, Reviews, Appointments, Returns), Marketing (Coupons, Newsletter, Pincodes), Operations (Reports & GSTR-1, Staff & roles, Audit log). Each tab is a focused component under `src/components/admin/` sharing helpers from `shared.tsx` (`useAuthFetch`, `formatINR`, `SimpleTable`, `Pill`, `PageHeader`).
+
+**Admin capabilities (Phase 4 — India ops):**
+- **Dashboard** (`GET /admin/analytics?days=N`): revenue, AOV, GST collected, discounts, new customers, low-stock count; daily series; payment-method split; top states; top products.
+- **COD verification** (`GET /admin/cod/queue`, `POST /admin/orders/:id/cod-verify`): verify/reject COD orders with notes before dispatch; shows prior RTO count for risk scoring. New `orders` columns: `cod_verified`, `cod_verified_at`, `cod_verification_notes`.
+- **Abandoned carts** (`GET /admin/abandoned-carts`): pending unpaid orders >30 min old, with per-cart WhatsApp/email recovery link.
+- **Inventory & GST** (`GET /admin/inventory?low=1&threshold=N`, `POST /admin/inventory/bulk-update`, `GET /admin/inventory/back-in-stock`): bulk-edit `stock_count`, `hsn_code`, `gst_rate`. New `collection` columns: `hsn_code` (default `4202`), `gst_rate` (default `18.00`).
+- **Customer 360** (`GET /admin/customers?q=…`, `GET /admin/customers/:id`, `POST /admin/customers/:id/notes`): search, LTV, RTO count, orders, addresses, reviews, loyalty, internal notes (new `customer_notes` table).
+- **Coupon analytics** (`GET /admin/analytics/coupons`): uses, total discount, attributed revenue per coupon (joins `coupon_redemptions`).
+- **Banners** (`GET /banners` public, `GET|POST|PUT|DELETE /admin/banners`): scheduled hero/announcement-bar/secondary banners with start/end windows. New `banners` table.
+- **Pincode manager** (`GET|POST|DELETE /admin/pincodes`): override serviceability, COD availability, and prepaid/COD ETA per 6-digit pincode (writes `pincode_zones`).
+- **Newsletter** (`GET /admin/newsletter/subscribers`, `GET /admin/newsletter/subscribers.csv`): list and export to CSV.
+- **Staff & roles** (`GET /admin/staff`, `POST /admin/staff/role`): grant/revoke `admin|manager|support` via Clerk `publicMetadata.role`.
+- **Refunds** (`GET /admin/refunds`, `POST /admin/orders/:id/refund`, `GET /admin/orders/:id/payments`): issue Razorpay refund (or record manual COD refund), updates `orders.refunded_amount` and `payment_status`. New `refunds` table.
+- **Reports & GSTR-1** (`GET /admin/exports/gstr1.csv?month=YYYY-MM`): invoice-level CSV with IGST/CGST/SGST split based on `GST_ORIGIN_STATE` env (default Maharashtra) vs shipping state. New `orders.invoice_number` (UNIQUE) + `invoice_number_seq` sequence.
+- **Audit log** (`GET /admin/audit-logs?action=&entity=`): every admin write captured by `lib/audit.ts` (`recordAudit`) — actor (Clerk id + email), action, entity, IP, metadata. New `audit_logs` table.
+- **Dispatch fields**: `orders.eway_bill_number`, `dispatched_at`, `manifested_at` (writable by existing dispatch endpoint).
+- **Refund fields**: `orders.refunded_amount`, `refunded_at`, `refund_reason`.
+
+**Env vars (admin):** `GST_ORIGIN_STATE` (default `Maharashtra` — origin state for GST inter/intra-state classification), `LOW_STOCK_THRESHOLD` (default 2).
 
 **Admin Product Management:** Full CRUD for products with image upload support via Object Storage (GCS presigned URLs). Admin can add, edit, and delete products with: title, description, price, stock count, product image (upload or URL), material, dimensions, artisan notes, featured toggle, and slug.
 
