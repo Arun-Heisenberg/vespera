@@ -92,6 +92,8 @@ export function CartDrawer() {
   const giftWrapFee = giftWrap ? 500 : 0;
   const pointsBalance = loyalty?.account?.pointsBalance ?? 0;
   const maxRedeem = Math.min(pointsBalance, Math.floor(subtotal * 0.15));
+  const discountedSubtotal = Math.max(0, subtotal - discount);
+  const payableSubtotal = Math.max(0, discountedSubtotal + giftWrapFee - redeemPoints);
 
   const handleCheckout = async () => {
     if (items.length === 0) return;
@@ -273,7 +275,7 @@ export function CartDrawer() {
             </div>
             <div className="flex justify-between font-sans pt-2 border-t border-border/10">
               <span className="text-muted-foreground uppercase tracking-widest text-xs font-semibold">Estimated Total</span>
-              <span className="font-medium tracking-wide">{convert(Math.max(0, subtotal - discount + giftWrapFee - redeemPoints))}</span>
+              <span className="font-medium tracking-wide">{convert(payableSubtotal)}</span>
             </div>
 
             <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 font-serif text-lg tracking-wide rounded-none transition-all"
