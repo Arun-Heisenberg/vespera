@@ -230,10 +230,16 @@ export default function Home() {
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className="aspect-[4/5] bg-gradient-to-br from-secondary via-card to-secondary relative overflow-hidden"
             >
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-20 h-20 border border-primary/10 rotate-45" />
-              </div>
-              <div className="absolute inset-8 border border-primary/5" />
+              <img
+                src="/images/philosophy-editorial.png"
+                alt="The Object as Event — Vespera Philosophy"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const el = e.target as HTMLImageElement;
+                  el.style.display = 'none';
+                  (el.parentElement as HTMLElement).innerHTML += `<div class="absolute inset-0 flex items-center justify-center"><div class="w-20 h-20 border border-primary/10 rotate-45"></div></div><div class="absolute inset-8 border border-primary/5"></div>`;
+                }}
+              />
             </motion.div>
 
             <motion.div
