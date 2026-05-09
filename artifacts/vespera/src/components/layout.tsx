@@ -263,6 +263,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                       <li key={link.label}>
                         <Link
                           href={link.href}
+                          onClick={() => setIsMenuOpen(false)}
                           className="block py-2.5 text-base font-light text-foreground/85 hover:text-primary transition-colors duration-300"
                         >
                           {link.label}
@@ -286,6 +287,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                       <li key={link.label}>
                         <Link
                           href={link.href}
+                          onClick={() => setIsMenuOpen(false)}
                           className="block py-2.5 text-base font-light text-foreground/85 hover:text-primary transition-colors duration-300"
                         >
                           {link.label}
@@ -321,6 +323,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   <Show when="signed-in">
                     <Link
                       href="/account"
+                      onClick={() => setIsMenuOpen(false)}
                       className={`flex items-center gap-2 py-2.5 text-[12px] tracking-[0.2em] uppercase font-light transition-colors duration-300 ${
                         location === "/account" ? "text-primary" : "text-foreground/55 hover:text-primary"
                       }`}
@@ -332,6 +335,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   <Show when="signed-out">
                     <Link
                       href="/sign-in"
+                      onClick={() => setIsMenuOpen(false)}
                       className="flex items-center gap-2 py-2.5 text-[12px] tracking-[0.2em] uppercase font-light text-foreground/55 hover:text-primary transition-colors duration-300"
                     >
                       <User className="w-4 h-4" strokeWidth={1.5} />
@@ -341,6 +345,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   {isAdmin && (
                     <Link
                       href="/admin"
+                      onClick={() => setIsMenuOpen(false)}
                       className={`flex items-center gap-2 py-2.5 text-[12px] tracking-[0.2em] uppercase font-light transition-colors duration-300 ${
                         location === "/admin" ? "text-primary" : "text-foreground/55 hover:text-primary"
                       }`}
