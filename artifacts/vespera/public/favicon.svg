@@ -1,3 +1,21 @@
-<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="180" height="180" rx="36" fill="#FF3C00"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="96" fill="#0A0A0A"/>
+  <!-- Gold V shape -->
+  <g transform="translate(256,256)">
+    <!-- Left arm of V -->
+    <path d="M -110 -130 L -18 130 L 0 80 L -68 -130 Z" fill="#C9A84C"/>
+    <!-- Right arm of V -->
+    <path d="M 110 -130 L 18 130 L 0 80 L 68 -130 Z" fill="#C9A84C"/>
+    <!-- Inner connector bottom -->
+    <path d="M -18 130 L 0 160 L 18 130 L 0 80 Z" fill="#B8922A"/>
+    <!-- Diamond crown above V -->
+    <g transform="translate(0, -148)">
+      <!-- Outer diamond -->
+      <polygon points="0,-28 20,0 0,24 -20,0" fill="#C9A84C" opacity="0.9"/>
+      <!-- Inner diamond highlight -->
+      <polygon points="0,-16 10,0 0,14 -10,0" fill="#E8C96A" opacity="0.7"/>
+      <!-- Top stem -->
+      <rect x="-2" y="-38" width="4" height="12" fill="#C9A84C"/>
+    </g>
+  </g>
 </svg>
