@@ -229,7 +229,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   <img 
                     src="/logo.png" 
                     alt="Vespera" 
-                    className="h-7 md:h-9 object-contain brightness-125"
+                    className="h-12 md:h-14 object-contain brightness-125"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                       (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
