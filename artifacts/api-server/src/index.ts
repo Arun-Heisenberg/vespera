@@ -179,6 +179,9 @@ CREATE TABLE IF NOT EXISTS refunds (
 );
 
 CREATE SEQUENCE IF NOT EXISTS invoice_number_seq START WITH 1 INCREMENT BY 1;
+
+-- Personal coupon assignment
+ALTER TABLE coupons ADD COLUMN IF NOT EXISTS target_customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL;
 `;
 
 async function runStartupMigrations() {

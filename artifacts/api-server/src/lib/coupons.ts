@@ -27,6 +27,12 @@ export async function evaluateCoupon(input: CouponEvalInput): Promise<CouponEval
   if (coupon.validFrom && coupon.validFrom > now) return { ok: false, error: "Coupon not yet active" };
   if (coupon.validUntil && coupon.validUntil < now) return { ok: false, error: "Coupon has expired" };
 
+  if (coupon.targetCustomerId !== null && coupon.targetCustomerId !== undefined) {
+    if (input.customerId !== coupon.targetCustomerId) {
+      return { ok: false, error: "This coupon is not valid for your account" };
+    }
+  }
+
   if (input.subtotal < parseFloat(coupon.minOrderAmount)) {
     return { ok: false, error: `Minimum order ₹${coupon.minOrderAmount} required` };
   }

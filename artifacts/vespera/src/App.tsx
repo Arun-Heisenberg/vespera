@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
-import { CartProvider } from "@/components/cart-context";
+import { CartProvider, useCart } from "@/components/cart-context";
 import { Layout } from "@/components/layout";
 
 import Home from "@/pages/home";
@@ -119,6 +119,21 @@ function UserSyncProvider({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function CouponUrlReader() {
+  const { setPendingCoupon } = useCart();
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("coupon");
+    if (code) {
+      setPendingCoupon(code.toUpperCase());
+      const url = new URL(window.location.href);
+      url.searchParams.delete("coupon");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [setPendingCoupon]);
+  return null;
+}
+
 function ClerkProviderWithRoutes() {
   const [, setLocation] = useLocation();
 
@@ -135,6 +150,7 @@ function ClerkProviderWithRoutes() {
           <TooltipProvider>
             <CurrencyProvider>
               <CartProvider>
+                <CouponUrlReader />
                 <JsonLd data={ORG_JSONLD} />
                 <Switch>
                   <Route path="/sign-in/*?" component={SignInPage} />

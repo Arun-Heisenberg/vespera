@@ -18,6 +18,7 @@ export const couponsTable = pgTable("coupons", {
   validFrom: timestamp("valid_from", { withTimezone: true }),
   validUntil: timestamp("valid_until", { withTimezone: true }),
   isActive: boolean("is_active").notNull().default(true),
+  targetCustomerId: integer("target_customer_id").references(() => customersTable.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

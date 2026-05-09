@@ -46,7 +46,7 @@ interface CheckoutResponse {
 interface VerifyResponse { verified: boolean; orderNumber?: string; }
 
 export function CartDrawer() {
-  const { items, isCartOpen, setIsCartOpen, removeItem, updateQuantity, totalPrice, clearCart } = useCart();
+  const { items, isCartOpen, setIsCartOpen, removeItem, updateQuantity, totalPrice, clearCart, pendingCoupon, setPendingCoupon } = useCart();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { isSignedIn } = useUser();
@@ -55,6 +55,19 @@ export function CartDrawer() {
 
   const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
   const [giftWrap, setGiftWrap] = useState(false);
+
+  useEffect(() => {
+    if (!isCartOpen || !pendingCoupon || coupon) return;
+    apiFetch<AppliedCoupon>("/coupons/validate", {
+      method: "POST",
+      body: JSON.stringify({ code: pendingCoupon, subtotal: totalPrice }),
+    }).then((res) => {
+      setCoupon(res);
+      toast({ title: `Coupon ${res.code} applied!`, description: res.description || undefined });
+    }).catch((e) => {
+      toast({ title: "Coupon could not be applied", description: (e as Error).message, variant: "destructive" });
+    }).finally(() => setPendingCoupon(null));
+  }, [isCartOpen, pendingCoupon]);
   const [giftMessage, setGiftMessage] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "cod">("razorpay");
   const [loyalty, setLoyalty] = useState<LoyaltyMe | null>(null);

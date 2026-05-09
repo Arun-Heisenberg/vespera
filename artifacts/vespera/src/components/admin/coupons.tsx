@@ -4,17 +4,23 @@ import { useAuthFetch, useFetchedList, formatINR, formatDate, PageHeader, Loadin
 interface Coupon {
   id: number; code: string; description: string; discountType: string; discountValue: string;
   minOrderAmount: string; maxDiscountAmount: string | null; usageLimit: number | null;
-  perCustomerLimit: number; firstOrderOnly: boolean; validFrom: string | null; validUntil: string | null; isActive: boolean;
+  perCustomerLimit: number; firstOrderOnly: boolean; validFrom: string | null; validUntil: string | null;
+  isActive: boolean; targetCustomerId: number | null;
 }
 interface Stat { id: number; code: string; uses: number; total_discount: string; attributed_revenue: string; is_active: boolean; }
+
+const DEFAULT_FORM = {
+  code: "", description: "", discountType: "percent", discountValue: "10",
+  minOrderAmount: "0", maxDiscountAmount: "", usageLimit: "", perCustomerLimit: "1",
+  firstOrderOnly: false, targetCustomerEmail: "",
+};
 
 export function CouponsTab() {
   const auth = useAuthFetch();
   const { data: coupons, loading, reload } = useFetchedList<Coupon>("/admin/coupons");
   const [stats, setStats] = useState<Stat[]>([]);
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({ code: "", description: "", discountType: "percent", discountValue: "10",
-    minOrderAmount: "0", maxDiscountAmount: "", usageLimit: "", perCustomerLimit: "1", firstOrderOnly: false });
+  const [form, setForm] = useState(DEFAULT_FORM);
 
   useEffect(() => {
     auth<Stat[]>("/admin/analytics/coupons").then(setStats).catch(() => setStats([]));
@@ -35,9 +41,10 @@ export function CouponsTab() {
         usageLimit: form.usageLimit ? parseInt(form.usageLimit, 10) : undefined,
         perCustomerLimit: parseInt(form.perCustomerLimit, 10) || 1,
         firstOrderOnly: form.firstOrderOnly,
+        targetCustomerEmail: form.targetCustomerEmail.trim() || undefined,
       }) });
       setCreating(false);
-      setForm({ code: "", description: "", discountType: "percent", discountValue: "10", minOrderAmount: "0", maxDiscountAmount: "", usageLimit: "", perCustomerLimit: "1", firstOrderOnly: false });
+      setForm(DEFAULT_FORM);
       reload();
     } catch (e) { alert((e as Error).message); }
   };
@@ -58,25 +65,38 @@ export function CouponsTab() {
         </button>
       } />
       {creating && (
-        <div className="border border-border/20 p-4 mb-6 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-          <input placeholder="CODE" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} className="bg-secondary/30 border border-border/20 px-3 py-2 col-span-2" />
-          <input placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2 col-span-2" />
-          <select value={form.discountType} onChange={(e) => setForm({ ...form, discountType: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2">
-            <option value="percent">% off</option><option value="flat">₹ off</option>
-          </select>
-          <input placeholder="Value" value={form.discountValue} onChange={(e) => setForm({ ...form, discountValue: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2" />
-          <input placeholder="Min order ₹" value={form.minOrderAmount} onChange={(e) => setForm({ ...form, minOrderAmount: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2" />
-          <input placeholder="Max discount ₹ (optional)" value={form.maxDiscountAmount} onChange={(e) => setForm({ ...form, maxDiscountAmount: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2" />
-          <input placeholder="Total uses (optional)" value={form.usageLimit} onChange={(e) => setForm({ ...form, usageLimit: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2" />
-          <input placeholder="Per customer" value={form.perCustomerLimit} onChange={(e) => setForm({ ...form, perCustomerLimit: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2" />
-          <label className="flex items-center gap-2"><input type="checkbox" checked={form.firstOrderOnly} onChange={(e) => setForm({ ...form, firstOrderOnly: e.target.checked })} /> First order only</label>
-          <button onClick={create} className="bg-primary text-primary-foreground px-4 py-2 col-span-full">Save coupon</button>
+        <div className="border border-border/20 p-4 mb-6 space-y-3 text-xs">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <input placeholder="CODE" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} className="bg-secondary/30 border border-border/20 px-3 py-2 col-span-2" />
+            <input placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2 col-span-2" />
+            <select value={form.discountType} onChange={(e) => setForm({ ...form, discountType: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2">
+              <option value="percent">% off</option><option value="flat">₹ off</option>
+            </select>
+            <input placeholder="Value" value={form.discountValue} onChange={(e) => setForm({ ...form, discountValue: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2" />
+            <input placeholder="Min order ₹" value={form.minOrderAmount} onChange={(e) => setForm({ ...form, minOrderAmount: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2" />
+            <input placeholder="Max discount ₹ (optional)" value={form.maxDiscountAmount} onChange={(e) => setForm({ ...form, maxDiscountAmount: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2" />
+            <input placeholder="Total uses (optional)" value={form.usageLimit} onChange={(e) => setForm({ ...form, usageLimit: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2" />
+            <input placeholder="Per customer" value={form.perCustomerLimit} onChange={(e) => setForm({ ...form, perCustomerLimit: e.target.value })} className="bg-secondary/30 border border-border/20 px-3 py-2" />
+            <label className="flex items-center gap-2 col-span-2"><input type="checkbox" checked={form.firstOrderOnly} onChange={(e) => setForm({ ...form, firstOrderOnly: e.target.checked })} /> First order only</label>
+          </div>
+          <div className="border-t border-border/20 pt-3">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary/60 mb-2">Private Assignment (optional)</p>
+            <input
+              placeholder="Assign to customer email — leaves blank for public coupon"
+              value={form.targetCustomerEmail}
+              onChange={(e) => setForm({ ...form, targetCustomerEmail: e.target.value })}
+              className="bg-secondary/30 border border-border/20 px-3 py-2 w-full text-xs"
+            />
+            <p className="text-[10px] text-muted-foreground/50 mt-1">If set, only this customer can redeem the code. It will appear privately in their Account → Rewards tab.</p>
+          </div>
+          <button onClick={create} className="bg-primary text-primary-foreground px-4 py-2 w-full">Save coupon</button>
         </div>
       )}
       <SimpleTable rows={coupons} empty="No coupons yet." columns={[
         { key: "c", header: "Code", render: (c) => <span className="font-mono text-primary">{c.code}</span> },
         { key: "d", header: "Discount", render: (c) => c.discountType === "percent" ? `${c.discountValue}%` : formatINR(c.discountValue) },
         { key: "m", header: "Min order", render: (c) => formatINR(c.minOrderAmount) },
+        { key: "t", header: "Audience", render: (c) => c.targetCustomerId ? <Pill tone="warn">Private</Pill> : <Pill tone="muted">Public</Pill> },
         { key: "u", header: "Uses", render: (c) => {
           const s = statFor(c.id);
           return s ? `${s.uses}${c.usageLimit ? `/${c.usageLimit}` : ""}` : "0";

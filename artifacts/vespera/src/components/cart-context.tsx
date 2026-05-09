@@ -18,6 +18,8 @@ interface CartContextType {
   setIsCartOpen: (isOpen: boolean) => void;
   totalItems: number;
   totalPrice: number;
+  pendingCoupon: string | null;
+  setPendingCoupon: (code: string | null) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -33,6 +35,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   });
   
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [pendingCoupon, setPendingCoupon] = useState<string | null>(null);
   const { isSignedIn } = useUser();
   const prevSignedIn = useRef(isSignedIn);
 
@@ -99,6 +102,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setIsCartOpen,
         totalItems,
         totalPrice,
+        pendingCoupon,
+        setPendingCoupon,
       }}
     >
       {children}
