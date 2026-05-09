@@ -246,6 +246,7 @@ function ImageUploader({
       const token = await getToken();
       const { uploadURL, objectPath } = await apiFetch<{ uploadURL: string; objectPath: string }>("/storage/uploads/request-url", {
         token,
+        method: "POST",
         body: JSON.stringify({
           name: file.name,
           size: file.size,
