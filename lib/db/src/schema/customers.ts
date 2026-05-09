@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -10,6 +10,8 @@ export const customersTable = pgTable("customers", {
   fullName: text("full_name").notNull(),
   avatarUrl: text("avatar_url"),
   defaultAddressId: integer("default_address_id"), // FK to addresses(id) added via raw SQL to avoid circular import
+  notifyViaEmail: boolean("notify_via_email").notNull().default(true),
+  notifyViaWhatsapp: boolean("notify_via_whatsapp").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

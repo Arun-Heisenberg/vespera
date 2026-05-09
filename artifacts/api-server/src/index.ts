@@ -17,6 +17,12 @@ async function runStartupMigrations() {
         END IF;
       END $$
     `);
+    await client.query(
+      "ALTER TABLE customers ADD COLUMN IF NOT EXISTS notify_via_email boolean NOT NULL DEFAULT true"
+    );
+    await client.query(
+      "ALTER TABLE customers ADD COLUMN IF NOT EXISTS notify_via_whatsapp boolean NOT NULL DEFAULT false"
+    );
   } finally {
     client.release();
   }

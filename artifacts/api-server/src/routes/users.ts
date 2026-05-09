@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { getAuth } from "@clerk/express";
 import { db, customersTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { notifications } from "../lib/notifications";
 
 const router: IRouter = Router();
 
@@ -22,6 +23,13 @@ router.post("/users/sync", async (req, res): Promise<void> => {
   };
 
   try {
+    const existing = await db
+      .select({ id: customersTable.id })
+      .from(customersTable)
+      .where(eq(customersTable.clerkUserId, clerkUserId))
+      .limit(1);
+    const isNewUser = existing.length === 0;
+
     const [result] = await db
       .insert(customersTable)
       .values({
@@ -42,6 +50,21 @@ router.post("/users/sync", async (req, res): Promise<void> => {
         },
       })
       .returning();
+
+    if (isNewUser) {
+      void notifications.notify(
+        "user.welcome",
+        {
+          email: result.email,
+          phone: result.phone,
+          fullName: result.fullName,
+          notifyViaEmail: result.notifyViaEmail,
+          notifyViaWhatsapp: result.notifyViaWhatsapp,
+        },
+        { accountUrl: "https://www.thevespera.online/account" },
+        { logger: req.log }
+      );
+    }
 
     res.json({ status: "synced", customerId: result.id });
   } catch (err) {

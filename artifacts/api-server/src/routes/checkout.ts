@@ -6,6 +6,7 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import { getAuth } from "@clerk/express";
 import { requireAuth } from "../middlewares/requireAuth";
+import { notifications } from "../lib/notifications";
 
 const router: IRouter = Router();
 
@@ -154,6 +155,27 @@ router.post("/checkout", requireAuth, async (req, res): Promise<void> => {
 
       await client.query("COMMIT");
 
+      const [customer] = await db
+        .select()
+        .from(customersTable)
+        .where(eq(customersTable.id, customerId))
+        .limit(1);
+
+      if (customer) {
+        void notifications.notify(
+          "order.placed",
+          {
+            email: customer.email,
+            phone: customer.phone,
+            fullName: customer.fullName,
+            notifyViaEmail: customer.notifyViaEmail,
+            notifyViaWhatsapp: customer.notifyViaWhatsapp,
+          },
+          { orderNumber, totalAmount: totalAmountRupees },
+          { logger: req.log }
+        );
+      }
+
       res.json({
         orderId: razorpayOrder.id,
         keyId: process.env.RAZORPAY_KEY_ID!,
@@ -230,6 +252,48 @@ router.post("/checkout/verify", requireAuth, async (req, res): Promise<void> => 
         .where(eq(paymentsTable.razorpayOrderId, razorpay_order_id));
 
       req.log.info({ orderId: razorpay_order_id, paymentId: razorpay_payment_id, method: paymentMethod }, "Payment verified");
+
+      const [paidOrder] = await db
+        .select()
+        .from(ordersTable)
+        .where(eq(ordersTable.razorpayOrderId, razorpay_order_id))
+        .limit(1);
+
+      if (paidOrder?.customerId) {
+        const [customer] = await db
+          .select()
+          .from(customersTable)
+          .where(eq(customersTable.id, paidOrder.customerId))
+          .limit(1);
+
+        if (customer) {
+          const payload = {
+            orderNumber: paidOrder.orderNumber,
+            totalAmount: paidOrder.totalAmount,
+          };
+          void notifications.notify(
+            "order.paid",
+            {
+              email: customer.email,
+              phone: customer.phone,
+              fullName: customer.fullName,
+              notifyViaEmail: customer.notifyViaEmail,
+              notifyViaWhatsapp: customer.notifyViaWhatsapp,
+            },
+            payload,
+            { logger: req.log }
+          );
+          void notifications.notifyAdmin(
+            "admin.order_received",
+            {
+              ...payload,
+              customerName: customer.fullName,
+              customerEmail: customer.email,
+            },
+            { logger: req.log }
+          );
+        }
+      }
     } else {
       await db
         .update(paymentsTable)

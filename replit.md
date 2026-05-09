@@ -85,6 +85,8 @@ Luxury e-commerce flagship for curated evening minaudières targeting Indian aud
 
 **Razorpay:** Requires `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` secrets. Prices in INR. Frontend loads Razorpay JS popup for checkout.
 
+**Notifications:** Pluggable channel-based notification service at `artifacts/api-server/src/lib/notifications/`. Events: `user.welcome` (on first sign-in), `order.placed` (after `POST /checkout`), `order.paid` + `admin.order_received` (after `POST /checkout/verify`), `order.shipped` (manual). Branded HTML+text templates (obsidian/champagne). Per-customer opt-in via `customers.notify_via_email` (default true) and `customers.notify_via_whatsapp` (default false). Email channel uses Resend via `fetch` — activates when `RESEND_API_KEY` is set; otherwise dry-runs to logs. WhatsApp channel is a typed stub (`isEnabled = false`) — flip on by wiring a provider in `channels/whatsapp.ts`. Env vars: `RESEND_API_KEY`, `NOTIFICATION_FROM_EMAIL` (default `Vespera <care@vespera.in>`), `ADMIN_NOTIFICATION_EMAIL`, future `WHATSAPP_PROVIDER`. All sends are fire-and-forget — failures are logged and never break the request flow.
+
 **API Routes (admin):**
 - `POST /admin/collection` — create product (admin, Zod-validated)
 - `PUT /admin/collection/:id` — update product (admin, Zod-validated)
