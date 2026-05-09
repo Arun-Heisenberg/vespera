@@ -14,12 +14,6 @@ import { CouponInput } from "./coupon-input";
 import { GiftWrapToggle } from "./gift-wrap-toggle";
 import { useCurrency } from "./currency-switcher";
 
-export function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency", currency: "INR", minimumFractionDigits: 0, maximumFractionDigits: 0,
-  }).format(price);
-}
-
 declare global {
   interface Window {
     Razorpay: new (options: Record<string, unknown>) => { open: () => void; on: (event: string, callback: () => void) => void };
@@ -75,6 +69,17 @@ export function CartDrawer() {
   const [shippingAddress, setShippingAddress] = useState({ fullName: "", phone: "", addressLine1: "", city: "", state: "", pincode: "", country: "India" });
   const [submitting, setSubmitting] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
+
+  useEffect(() => {
+    if (!isCartOpen) {
+      setShowAddress(false);
+      setShippingAddress({ fullName: "", phone: "", addressLine1: "", city: "", state: "", pincode: "", country: "India" });
+      setGiftWrap(false);
+      setGiftMessage("");
+      setRedeemPoints(0);
+      setPaymentMethod("razorpay");
+    }
+  }, [isCartOpen]);
 
   useEffect(() => {
     if (!isSignedIn) { setLoyalty(null); return; }
@@ -180,7 +185,7 @@ export function CartDrawer() {
                   <ShoppingBag className="w-6 h-6 text-muted-foreground" />
                 </div>
                 <p className="text-muted-foreground font-sans">Your bag is empty.</p>
-                <Button variant="outline" className="mt-4 border-primary/20 text-primary hover:bg-primary/10" onClick={() => setIsCartOpen(false)}>
+                <Button variant="outline" className="mt-4 border-primary/20 text-primary hover:bg-primary/10" onClick={() => { setIsCartOpen(false); setLocation("/collection"); }}>
                   Continue Shopping
                 </Button>
               </motion.div>
@@ -267,10 +272,10 @@ export function CartDrawer() {
         {items.length > 0 && (
           <div className="border-t border-border/20 p-6 bg-background space-y-3">
             <div className="space-y-1 text-xs">
-              <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
-              {discount > 0 && <div className="flex justify-between text-primary"><span>Discount ({coupon?.code})</span><span>−{formatPrice(discount)}</span></div>}
-              {giftWrapFee > 0 && <div className="flex justify-between text-muted-foreground"><span>Gift wrap</span><span>{formatPrice(giftWrapFee)}</span></div>}
-              {redeemPoints > 0 && <div className="flex justify-between text-primary"><span>Loyalty redeemed</span><span>−{formatPrice(redeemPoints)}</span></div>}
+              <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>{convert(subtotal)}</span></div>
+              {discount > 0 && <div className="flex justify-between text-primary"><span>Discount ({coupon?.code})</span><span>−{convert(discount)}</span></div>}
+              {giftWrapFee > 0 && <div className="flex justify-between text-muted-foreground"><span>Gift wrap</span><span>{convert(giftWrapFee)}</span></div>}
+              {redeemPoints > 0 && <div className="flex justify-between text-primary"><span>Loyalty redeemed</span><span>−{convert(redeemPoints)}</span></div>}
               <p className="text-[10px] text-muted-foreground/70 pt-1">GST 18% inclusive · Final shipping calculated at checkout.</p>
             </div>
             <div className="flex justify-between font-sans pt-2 border-t border-border/10">
