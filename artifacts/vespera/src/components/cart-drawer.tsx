@@ -163,7 +163,7 @@ export function CartDrawer() {
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
-      <SheetContent className="w-full sm:max-w-lg bg-background border-l-border/50 p-0 flex flex-col">
+      <SheetContent className="w-full sm:max-w-lg bg-background border-l-border/50 p-0 flex flex-col overflow-hidden">
         <SheetHeader className="p-6 border-b border-border/20 text-left">
           <SheetTitle className="font-serif text-2xl font-normal text-foreground">Shopping Bag</SheetTitle>
           <SheetDescription className="text-muted-foreground font-sans text-sm">
@@ -171,7 +171,7 @@ export function CartDrawer() {
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex-1 p-6 flex flex-col gap-6">
+        <div className="flex-1 min-h-0 p-6 flex flex-col gap-6 overflow-y-auto scrollbar-none">
           <AnimatePresence initial={false}>
             {items.length === 0 ? (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
