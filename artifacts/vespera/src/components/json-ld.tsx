@@ -17,6 +17,6 @@ export const ORG_JSONLD = {
   name: "Vespera",
   url: "https://www.thevespera.online",
   logo: "https://www.thevespera.online/logo.png",
-  sameAs: ["https://www.instagram.com/thevespera"],
+  sameAs: ["https://www.instagram.com/classyclutch16?igsh=cGo5OGdxb2FsZWNq", "https://www.facebook.com/share/1DP1GcGz7B/"],
   contactPoint: { "@type": "ContactPoint", contactType: "customer service", email: "care@vespera.in", areaServed: "IN" },
 };
