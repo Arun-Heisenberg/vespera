@@ -360,6 +360,45 @@ function ProductFormModal({
     }
   }, [form.title, isEdit, product?.slug]);
 
+  const [enhanceStatus, setEnhanceStatus] = useState<string>("");
+
+  const enhanceImages = async (token: string | null): Promise<string[]> => {
+    // For new products with exactly one image, ask the server to generate
+    // 3 professional variants from the uploaded source via Gemini.
+    if (isEdit) return form.images;
+    const baseImages = form.images.length > 0 ? form.images : [form.primaryImage];
+    if (baseImages.length !== 1) return baseImages;
+
+    setEnhanceStatus("Generating 3 professional variants from your image…");
+    try {
+      const url = `${import.meta.env.BASE_URL}api/admin/storage/enhance-images`.replace("//api", "/api");
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers,
+        credentials: "include",
+        body: JSON.stringify({
+          imageUrl: form.primaryImage,
+          productTitle: form.title,
+          material: form.material,
+        }),
+      });
+      if (!res.ok) {
+        // Don't fail the whole save — just keep the original image.
+        setEnhanceStatus("");
+        return baseImages;
+      }
+      const data: { urls?: string[] } = await res.json();
+      const generated = Array.isArray(data.urls) ? data.urls : [];
+      setEnhanceStatus("");
+      return [...baseImages, ...generated];
+    } catch {
+      setEnhanceStatus("");
+      return baseImages;
+    }
+  };
+
   const handleSubmit = async () => {
     if (!form.title || !form.description || !form.price || !form.primaryImage || !form.slug) {
       setError("Please fill in all required fields: Title, Description, Price, Image, and Slug");
@@ -369,23 +408,26 @@ function ProductFormModal({
     setSaving(true);
     setError("");
 
-    const body = {
-      title: form.title,
-      description: form.description,
-      price: parseFloat(form.price),
-      stockCount: parseInt(form.stockCount, 10) || 0,
-      primaryImage: form.primaryImage,
-      images: form.images.length > 0 ? form.images : [form.primaryImage],
-      material: form.material,
-      dimensions: form.dimensions,
-      occasionStyling: form.occasionStyling.filter((s) => s.trim()),
-      artisanNotes: form.artisanNotes,
-      isFeatured: form.isFeatured,
-      slug: form.slug,
-    };
-
     try {
       const token = await getToken();
+
+      const finalImages = await enhanceImages(token);
+
+      const body = {
+        title: form.title,
+        description: form.description,
+        price: parseFloat(form.price),
+        stockCount: parseInt(form.stockCount, 10) || 0,
+        primaryImage: form.primaryImage,
+        images: finalImages.length > 0 ? finalImages : [form.primaryImage],
+        material: form.material,
+        dimensions: form.dimensions,
+        occasionStyling: form.occasionStyling.filter((s) => s.trim()),
+        artisanNotes: form.artisanNotes,
+        isFeatured: form.isFeatured,
+        slug: form.slug,
+      };
+
       const url = isEdit
         ? `${import.meta.env.BASE_URL}api/admin/collection/${product!.id}`.replace("//api", "/api")
         : `${import.meta.env.BASE_URL}api/admin/collection`.replace("//api", "/api");
@@ -593,7 +635,7 @@ function ProductFormModal({
             onClick={handleSubmit}
             disabled={saving}
           >
-            {saving ? "Saving..." : isEdit ? "Update Product" : "Add Product"}
+            {saving ? (enhanceStatus || "Saving...") : isEdit ? "Update Product" : "Add Product"}
           </Button>
         </div>
       </motion.div>

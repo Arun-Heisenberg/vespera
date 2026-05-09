@@ -32,6 +32,7 @@ import adminPincodesRouter from "./admin-pincodes";
 import adminStaffRouter from "./admin-staff";
 import adminGstr1Router from "./admin-gstr1";
 import adminAuditRouter from "./admin-audit";
+import adminImageEnhanceRouter from "./admin-image-enhance";
 
 const router: IRouter = Router();
 
@@ -68,5 +69,6 @@ router.use(adminPincodesRouter);
 router.use(adminStaffRouter);
 router.use(adminGstr1Router);
 router.use(adminAuditRouter);
+router.use(adminImageEnhanceRouter);
 
 export default router;
