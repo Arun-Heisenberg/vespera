@@ -21,6 +21,7 @@ import { NewsletterTab } from "@/components/admin/newsletter";
 import { AuditTab } from "@/components/admin/audit";
 import { ReportsTab } from "@/components/admin/reports";
 import { StaffTab } from "@/components/admin/staff";
+import { apiFetch, apiUrl } from "@/lib/api";
 
 type AdminTab = "dashboard" | "products" | "orders" | "cod" | "abandoned" | "inventory"
   | "customers" | "reviews" | "appointments" | "returns"
@@ -243,23 +244,14 @@ function ImageUploader({
     setUploading(true);
     try {
       const token = await getToken();
-      const res = await fetch(`${import.meta.env.BASE_URL}api/storage/uploads/request-url`.replace("//api", "/api"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { "Authorization": `Bearer ${token}` } : {}),
-        },
-        credentials: "include",
+      const { uploadURL, objectPath } = await apiFetch<{ uploadURL: string; objectPath: string }>("/storage/uploads/request-url", {
+        token,
         body: JSON.stringify({
           name: file.name,
           size: file.size,
           contentType: file.type,
         }),
       });
-
-      if (!res.ok) throw new Error("Failed to get upload URL");
-
-      const { uploadURL, objectPath } = await res.json();
 
       const uploadRes = await fetch(uploadURL, {
         method: "PUT",
@@ -269,7 +261,7 @@ function ImageUploader({
 
       if (!uploadRes.ok) throw new Error("Failed to upload file");
 
-      const servingUrl = `${import.meta.env.BASE_URL}api/storage${objectPath}`.replace("//api", "/api");
+      const servingUrl = apiUrl(`/storage${objectPath}`);
       onImageSet(servingUrl);
     } catch (err) {
       console.error("Upload failed:", err);
@@ -277,7 +269,7 @@ function ImageUploader({
     } finally {
       setUploading(false);
     }
-  }, [onImageSet]);
+  }, [getToken, onImageSet]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
