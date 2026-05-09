@@ -285,7 +285,7 @@ export function CartDrawer() {
         </div>
 
         {items.length > 0 && (
-          <div className="border-t border-border/20 p-6 bg-background space-y-3">
+          <div className="border-t border-border/20 p-6 bg-background space-y-3 sticky bottom-0 z-10">
             <div className="space-y-1 text-xs">
               <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>{convert(subtotal)}</span></div>
               {discount > 0 && <div className="flex justify-between text-primary"><span>Discount ({coupon?.code})</span><span>−{convert(discount)}</span></div>}
