@@ -93,7 +93,7 @@ export default function Product() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
             
             <div className="flex flex-col-reverse md:flex-row gap-6">
-              <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto scrollbar-none w-full md:w-24 shrink-0 snap-x">
+              <div className="flex md:flex-col gap-3 w-full md:w-24 shrink-0 snap-x">
                 {allImages.map((img, i) => (
                   <button
                     key={i}

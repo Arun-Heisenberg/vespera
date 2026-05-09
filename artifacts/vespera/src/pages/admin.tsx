@@ -429,16 +429,19 @@ function ProductFormModal({
         body: JSON.stringify({ imageUrl: sourceImage, productTitle: title, material }),
       });
       if (!res.ok) {
-        setEnhanceStatus("");
-        return baseImages;
+        throw new Error("Image enhancement failed");
       }
       const data: { urls?: string[] } = await res.json();
       const generated = Array.isArray(data.urls) ? data.urls : [];
+      if (generated.length < 3) {
+        throw new Error("Could not generate 3 image variants");
+      }
       setEnhanceStatus("");
       return [...baseImages, ...generated];
-    } catch {
+    } catch (err) {
+      console.error("Image enhancement failed:", err);
       setEnhanceStatus("");
-      return baseImages;
+      throw err;
     }
   };
 
@@ -497,7 +500,7 @@ function ProductFormModal({
         price: parseFloat(form.price),
         stockCount: parseInt(form.stockCount, 10) || 0,
         primaryImage: form.primaryImage,
-        images: finalImages.length > 0 ? finalImages : [form.primaryImage],
+        images: finalImages,
         material,
         dimensions: form.dimensions,
         occasionStyling,
@@ -539,7 +542,7 @@ function ProductFormModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-start justify-center pt-8 md:pt-16 px-4 overflow-y-auto"
+      className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-start justify-center pt-8 md:pt-16 px-4"
       onClick={onClose}
     >
       <motion.div
@@ -556,7 +559,7 @@ function ProductFormModal({
           </button>
         </div>
 
-        <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+        <div className="p-6 space-y-5">
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3">
               {error}
