@@ -400,7 +400,8 @@ function ProductFormModal({
       }
       const data: { metadata?: GeneratedMetadata } = await res.json();
       return data.metadata ?? null;
-    } catch {
+    } catch (err) {
+      console.warn("Image analysis skipped:", err);
       return null;
     }
   };
@@ -469,23 +470,23 @@ function ProductFormModal({
       let occasionStyling = form.occasionStyling.filter((s) => s.trim());
 
       if (!isEdit) {
-        // Ask the LLM for catalogue copy based purely on the image (+ price/dim hints).
         setEnhanceStatus("Reading the piece and writing the catalogue entry…");
         const meta = await analyzeImage(token, sourceImagePath || form.primaryImage, parseFloat(form.price) || 0, form.dimensions);
-        if (!meta) {
-          setEnhanceStatus("");
-          setError(
-            "We couldn't read the image to generate the product details. Please try a different photo or try again.",
-          );
-          setSaving(false);
-          return;
+        if (meta) {
+          title = meta.title;
+          description = meta.description;
+          material = meta.material;
+          slug = meta.slug;
+          artisanNotes = meta.artisanNotes;
+          occasionStyling = meta.occasionStyling;
+        } else {
+          title = title || "Untitled Vespera Piece";
+          description = description || "Luxury evening clutch crafted for refined occasions.";
+          material = material || "premium finish";
+          slug = slug || generateSlug(title);
+          artisanNotes = artisanNotes || "Hand-finished by Vespera artisans.";
+          occasionStyling = occasionStyling.length ? occasionStyling : ["Evening gala", "Cocktail reception", "Wedding guest"];
         }
-        title = meta.title;
-        description = meta.description;
-        material = meta.material;
-        slug = meta.slug;
-        artisanNotes = meta.artisanNotes;
-        occasionStyling = meta.occasionStyling;
       }
 
       const finalImages = await enhanceImages(token, sourceImagePath || form.primaryImage, title, material);
