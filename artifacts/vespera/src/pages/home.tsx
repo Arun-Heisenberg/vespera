@@ -35,12 +35,12 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute left-1/2 top-[42%] md:top-[43%] -translate-x-1/2 -translate-y-1/2"
+            className="absolute left-1/2 top-[38%] md:top-[42%] -translate-x-1/2 -translate-y-1/2"
           >
             <img 
               src="/logo.png" 
               alt="Vespera" 
-              className="h-24 md:h-36 object-contain brightness-125 drop-shadow-[0_0_40px_rgba(180,150,50,0.12)]"
+              className="h-22 md:h-36 object-contain brightness-125 drop-shadow-[0_0_40px_rgba(180,150,50,0.12)]"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
                 (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
@@ -49,12 +49,12 @@ export default function Home() {
             <h1 className="hidden text-4xl md:text-6xl font-serif tracking-[0.3em] shimmer-text">VESPERA</h1>
           </motion.div>
 
-          <div className="absolute left-1/2 top-[calc(42%+5.5rem)] md:top-[calc(43%+7.5rem)] -translate-x-1/2 flex w-full max-w-2xl flex-col items-center text-center">
+          <div className="absolute left-1/2 top-[calc(38%+4.5rem)] md:top-[calc(42%+7rem)] -translate-x-1/2 flex w-full max-w-2xl flex-col items-center text-center">
             <motion.p 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-base md:text-lg font-serif text-foreground/50 max-w-lg mb-5 md:mb-6 italic leading-relaxed"
+              className="text-base md:text-lg font-serif text-foreground/50 max-w-lg mb-4 md:mb-6 italic leading-relaxed"
             >
               Luxury clutches crafted for unforgettable evenings.
             </motion.p>
@@ -66,7 +66,7 @@ export default function Home() {
             >
               <Link 
                 href="/collection" 
-                className="group inline-flex items-center gap-3 px-8 md:px-10 py-3.5 border border-foreground/20 text-foreground hover:border-primary hover:text-primary transition-all duration-500 tracking-[0.25em] uppercase text-[11px] font-light"
+                className="group inline-flex items-center gap-3 px-8 md:px-10 py-3 border border-foreground/20 text-foreground hover:border-primary hover:text-primary transition-all duration-500 tracking-[0.25em] uppercase text-[11px] font-light"
               >
                 Explore Collection
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" strokeWidth={1.5} />
